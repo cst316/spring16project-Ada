@@ -133,7 +133,7 @@ public class TaskImpl implements Task, Comparable {
     public String getType() {
     	Element thisElement = _element.getFirstChildElement("type");
     	if (thisElement == null) {
-    		return null;
+    		return "";
     	}
     	else {
     		return thisElement.getValue();

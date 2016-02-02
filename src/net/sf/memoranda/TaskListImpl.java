@@ -121,7 +121,7 @@ public class TaskListImpl implements TaskList {
     		Task task = new TaskImpl(current, this);
     		String type = task.getType();
     		
-    		if (type != null) {
+    		if (!type.equals("")) {
     			taskTypes.add(type);
     		}
     		
