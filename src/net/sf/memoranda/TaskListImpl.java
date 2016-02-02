@@ -8,9 +8,12 @@
  */
 package net.sf.memoranda;
 
+import java.util.ArrayDeque;
 import java.util.Collection;
+import java.util.Deque;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.TreeSet;
 import java.util.Vector;
 
 import net.sf.memoranda.date.CalendarDate;
@@ -101,6 +104,33 @@ public class TaskListImpl implements TaskList {
     public Collection getActiveSubTasks(String taskId,CalendarDate date) {
         Collection allTasks = getAllSubTasks(taskId);        
         return filterActiveTasks(allTasks,date);
+    }
+    
+    /**
+     * A TreeSet is used for the Collection of Task Types to ensure the
+     * Collection has unique values and that they are in order.
+     */
+    public Collection getTaskTypes() {
+    	Collection<String> taskTypes = new TreeSet<String>();
+    	Deque<Element> taskStack = new ArrayDeque<Element>();
+    	taskStack.push(_root);
+    	
+    	while (taskStack.peek() != null) {
+    		Element current = taskStack.pop();
+    		Elements children = current.getChildElements("task");
+    		Task task = new TaskImpl(current, this);
+    		String type = task.getType();
+    		
+    		if (type != null) {
+    			taskTypes.add(type);
+    		}
+    		
+    		for (int i=0; i<children.size(); i++) {
+    			taskStack.push(children.get(i));
+    		}
+    	}
+    	
+    	return taskTypes;
     }
 
     public Task createTask(CalendarDate startDate, CalendarDate endDate, String text, int priority, long effort, String description, String parentTaskId) {

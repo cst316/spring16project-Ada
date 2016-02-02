@@ -32,6 +32,8 @@ public interface TaskList {
     public Collection getAllSubTasks(String taskId);
     public Collection getActiveSubTasks(String taskId,CalendarDate date);
     
+    public Collection getTaskTypes();
+    
 //    public void adjustParentTasks(Task t);
     
     public long calculateTotalEffortFromSubTasks(Task t);
