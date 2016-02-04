@@ -233,18 +233,11 @@ public class TaskDialog extends JDialog {
                         
                         String currentText = "";
                         
-                        if (k.getKeyChar() == KeyEvent.VK_DOWN) {
-                        	System.out.println("[DEBUG] Down arrow pressed in jTextFieldType");
-                        	jListTypeSuggestion.requestFocus();
-                        }
-                        
                         if (k.getKeyChar() != KeyEvent.VK_BACK_SPACE) { // exempts backspace
                     		currentText = jTextFieldType.getText() + k.getKeyChar();
                         } else {
                         	currentText = jTextFieldType.getText();
                         }
-                        
-                		System.out.println("[DEBUG] You typed: " + currentText);
                 		
                 		int count = 0;
                 		
@@ -259,6 +252,10 @@ public class TaskDialog extends JDialog {
                         			}
                 				}
                 			}
+                		}
+                		
+                		if (count == 0) {
+                			jListTypeSuggestion.setVisible(false);
                 		}
                 		
             			jListTypeSuggestion.setListData(suggestions);
