@@ -9,6 +9,7 @@
 package net.sf.memoranda;
 
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Deque;
 import java.util.Hashtable;
@@ -107,6 +108,36 @@ public class TaskListImpl implements TaskList {
     }
     
     /**
+     * Gets all IDs associated with Tasks
+     * @return collection of all Task IDs
+     */
+    public Collection<String> getIds() {
+    	Collection<String> ids = new ArrayList<String>();
+    	Deque<Element> taskStack = new ArrayDeque<Element>();
+    	taskStack.push(_root);
+    	
+    	while (taskStack.peek() != null) {
+    		Element current = taskStack.pop();
+    		Elements children = current.getChildElements("task");
+    		
+    		Task task = new TaskImpl(current, this);
+    		
+    		try {
+        		String id = task.getID();
+        		ids.add(id);
+    		} catch (Exception e) {
+    			Util.debug("Error: " + e.getMessage());
+    		}
+    		
+    		for (int i = 0; i < children.size(); i++) {
+    			taskStack.push(children.get(i));
+    		}
+    	}
+    	
+    	return ids;
+    }
+    
+    /**
      * A TreeSet is used for the Collection of Task Types to ensure the
      * Collection has unique values and that they are in order.
      */
@@ -165,7 +196,7 @@ public class TaskListImpl implements TaskList {
         
 		elements.put(id, el);
 		
-        Util.debug("Created task with parent " + parentTaskId);
+        Util.debug("Created task with ID: " + id);
         
         return new TaskImpl(el, this);
     }

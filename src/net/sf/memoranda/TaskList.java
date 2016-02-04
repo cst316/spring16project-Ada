@@ -32,6 +32,7 @@ public interface TaskList {
     public Collection getAllSubTasks(String taskId);
     public Collection getActiveSubTasks(String taskId,CalendarDate date);
     
+    public Collection<String> getIds();
     public Collection getTaskTypes();
     
 //    public void adjustParentTasks(Task t);
