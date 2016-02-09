@@ -138,6 +138,14 @@ public class AppFrame extends JFrame {
                 }
         };
     
+		// report action abstract added
+        public Action ReportAction =
+        		new AbstractAction(Local.getString("Open Report Menu")) {
+        		public void actionPreformed(ActionEvent e){
+        			pReport_actionPerformed(e);
+        		}
+        	};	
+	
     JMenuItem jMenuFileNewPrj = new JMenuItem();
         JMenuItem jMenuFileNewNote = new JMenuItem(workPanel.dailyItemsPanel.editorPanel.newAction);
     JMenuItem jMenuFilePackPrj = new JMenuItem(prjPackAction);
@@ -147,6 +155,8 @@ public class AppFrame extends JFrame {
     JMenuItem jMenuFileImportNote = new JMenuItem(importOneNoteAction);
     JMenuItem jMenuFileExportNote = new JMenuItem(
             workPanel.dailyItemsPanel.editorPanel.exportAction);
+    // new option for Report
+    JMenuItem jMenuFileReport = new JMenuItem(ReportAction);
     JMenuItem jMenuFileMin = new JMenuItem(minimizeAction);
 
     JMenuItem jMenuItem1 = new JMenuItem();
@@ -1103,5 +1113,10 @@ public class AppFrame extends JFrame {
                     exc.printStackTrace();
             }
         }
-
+           // Report menu action event
+            protected void pReport_actionPerformed(ActionEvent e) {
+			
+			// To do how to handle report menu
+		   
+        }
 }
