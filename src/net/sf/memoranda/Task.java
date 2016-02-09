@@ -77,6 +77,9 @@ public interface Task {
     
     void setDescription(String description);
     String getDescription();
+    
+    void setType(String type);
+    String getType();
 
     Task getParentTask();
     String getParentId();

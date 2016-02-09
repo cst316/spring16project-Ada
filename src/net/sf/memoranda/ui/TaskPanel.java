@@ -450,35 +450,37 @@ public class TaskPanel extends JPanel {
         Dimension frmSize = App.getFrame().getSize();
         Point loc = App.getFrame().getLocation();
         dlg.setLocation((frmSize.width - dlg.getSize().width) / 2 + loc.x, (frmSize.height - dlg.getSize().height) / 2 + loc.y);
-        dlg.todoField.setText(t.getText());
+        dlg.jTextFieldName.setText(t.getText());
+        dlg.jTextFieldType.setText(t.getType());
         dlg.descriptionField.setText(t.getDescription());
-        dlg.startDate.getModel().setValue(t.getStartDate().getDate());
-        dlg.endDate.getModel().setValue(t.getEndDate().getDate());
-        dlg.priorityCB.setSelectedIndex(t.getPriority());                
+        dlg.jSpinnerStartDate.getModel().setValue(t.getStartDate().getDate());
+        dlg.jSpinnerEndDate.getModel().setValue(t.getEndDate().getDate());
+        dlg.jComboBoxPriority.setSelectedIndex(t.getPriority());                
         dlg.effortField.setText(Util.getHoursFromMillis(t.getEffort()));
 	if((t.getStartDate().getDate()).after(t.getEndDate().getDate()))
-		dlg.chkEndDate.setSelected(false);
+		dlg.jCheckBoxEndDate.setSelected(false);
 	else
-		dlg.chkEndDate.setSelected(true);
-		dlg.progress.setValue(new Integer(t.getProgress()));
+		dlg.jCheckBoxEndDate.setSelected(true);
+		dlg.jSpinnerProgress.setValue(new Integer(t.getProgress()));
  	dlg.chkEndDate_actionPerformed(null);	
         dlg.setVisible(true);
         if (dlg.CANCELLED)
             return;
-        CalendarDate sd = new CalendarDate((Date) dlg.startDate.getModel().getValue());
+        CalendarDate sd = new CalendarDate((Date) dlg.jSpinnerStartDate.getModel().getValue());
 //        CalendarDate ed = new CalendarDate((Date) dlg.endDate.getModel().getValue());
          CalendarDate ed;
- 		if(dlg.chkEndDate.isSelected())
- 			ed = new CalendarDate((Date) dlg.endDate.getModel().getValue());
+ 		if(dlg.jCheckBoxEndDate.isSelected())
+ 			ed = new CalendarDate((Date) dlg.jSpinnerEndDate.getModel().getValue());
  		else
  			ed = null;
         t.setStartDate(sd);
         t.setEndDate(ed);
-        t.setText(dlg.todoField.getText());
+        t.setText(dlg.jTextFieldName.getText());
+        t.setType(dlg.jTextFieldType.getText());
         t.setDescription(dlg.descriptionField.getText());
-        t.setPriority(dlg.priorityCB.getSelectedIndex());
+        t.setPriority(dlg.jComboBoxPriority.getSelectedIndex());
         t.setEffort(Util.getMillisFromHours(dlg.effortField.getText()));
-        t.setProgress(((Integer)dlg.progress.getValue()).intValue());
+        t.setProgress(((Integer)dlg.jSpinnerProgress.getValue()).intValue());
         
 //		CurrentProject.getTaskList().adjustParentTasks(t);
 
@@ -495,24 +497,24 @@ public class TaskPanel extends JPanel {
         
         Dimension frmSize = App.getFrame().getSize();
         Point loc = App.getFrame().getLocation();
-        dlg.startDate.getModel().setValue(CurrentDate.get().getDate());
-        dlg.endDate.getModel().setValue(CurrentDate.get().getDate());
+        dlg.jSpinnerStartDate.getModel().setValue(CurrentDate.get().getDate());
+        dlg.jSpinnerEndDate.getModel().setValue(CurrentDate.get().getDate());
         dlg.setLocation((frmSize.width - dlg.getSize().width) / 2 + loc.x, (frmSize.height - dlg.getSize().height) / 2 + loc.y);
         dlg.setVisible(true);
         if (dlg.CANCELLED)
             return;
-        CalendarDate sd = new CalendarDate((Date) dlg.startDate.getModel().getValue());
+        CalendarDate sd = new CalendarDate((Date) dlg.jSpinnerStartDate.getModel().getValue());
 //        CalendarDate ed = new CalendarDate((Date) dlg.endDate.getModel().getValue());
           CalendarDate ed;
- 		if(dlg.chkEndDate.isSelected())
- 			ed = new CalendarDate((Date) dlg.endDate.getModel().getValue());
+ 		if(dlg.jCheckBoxEndDate.isSelected())
+ 			ed = new CalendarDate((Date) dlg.jSpinnerEndDate.getModel().getValue());
  		else
  			ed = null;
         long effort = Util.getMillisFromHours(dlg.effortField.getText());
 		//XXX Task newTask = CurrentProject.getTaskList().createTask(sd, ed, dlg.todoField.getText(), dlg.priorityCB.getSelectedIndex(),effort, dlg.descriptionField.getText(),parentTaskId);
-		Task newTask = CurrentProject.getTaskList().createTask(sd, ed, dlg.todoField.getText(), dlg.priorityCB.getSelectedIndex(),effort, dlg.descriptionField.getText(),null);
+		Task newTask = CurrentProject.getTaskList().createTask(sd, ed, dlg.jTextFieldName.getText(), dlg.jTextFieldType.getText(), dlg.jComboBoxPriority.getSelectedIndex(),effort, dlg.descriptionField.getText(),null);
 //		CurrentProject.getTaskList().adjustParentTasks(newTask);
-		newTask.setProgress(((Integer)dlg.progress.getValue()).intValue());
+		newTask.setProgress(((Integer)dlg.jSpinnerProgress.getValue()).intValue());
         CurrentStorage.get().storeTaskList(CurrentProject.getTaskList(), CurrentProject.get());
         taskTable.tableChanged();
         parentPanel.updateIndicators();
@@ -543,16 +545,16 @@ public class TaskPanel extends JPanel {
         dlg.setVisible(true);
         if (dlg.CANCELLED)
             return;
-        CalendarDate sd = new CalendarDate((Date) dlg.startDate.getModel().getValue());
+        CalendarDate sd = new CalendarDate((Date) dlg.jSpinnerStartDate.getModel().getValue());
 //        CalendarDate ed = new CalendarDate((Date) dlg.endDate.getModel().getValue());
           CalendarDate ed;
- 		if(dlg.chkEndDate.isSelected())
- 			ed = new CalendarDate((Date) dlg.endDate.getModel().getValue());
+ 		if(dlg.jCheckBoxEndDate.isSelected())
+ 			ed = new CalendarDate((Date) dlg.jSpinnerEndDate.getModel().getValue());
  		else
  			ed = null;
         long effort = Util.getMillisFromHours(dlg.effortField.getText());
-		Task newTask = CurrentProject.getTaskList().createTask(sd, ed, dlg.todoField.getText(), dlg.priorityCB.getSelectedIndex(),effort, dlg.descriptionField.getText(),parentTaskId);
-        newTask.setProgress(((Integer)dlg.progress.getValue()).intValue());
+		Task newTask = CurrentProject.getTaskList().createTask(sd, ed, dlg.jTextFieldName.getText(), dlg.jTextFieldType.getText(), dlg.jComboBoxPriority.getSelectedIndex(),effort, dlg.descriptionField.getText(),parentTaskId);
+        newTask.setProgress(((Integer)dlg.jSpinnerProgress.getValue()).intValue());
 //		CurrentProject.getTaskList().adjustParentTasks(newTask);
 
 		CurrentStorage.get().storeTaskList(CurrentProject.getTaskList(), CurrentProject.get());

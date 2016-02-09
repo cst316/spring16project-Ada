@@ -8,9 +8,13 @@
  */
 package net.sf.memoranda;
 
+import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Deque;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.TreeSet;
 import java.util.Vector;
 
 import net.sf.memoranda.date.CalendarDate;
@@ -102,8 +106,65 @@ public class TaskListImpl implements TaskList {
         Collection allTasks = getAllSubTasks(taskId);        
         return filterActiveTasks(allTasks,date);
     }
+    
+    /**
+     * Gets all IDs associated with Tasks
+     * @return collection of all Task IDs
+     */
+    public Collection<String> getIds() {
+    	Collection<String> ids = new ArrayList<String>();
+    	Deque<Element> taskStack = new ArrayDeque<Element>();
+    	taskStack.push(_root);
+    	
+    	while (taskStack.peek() != null) {
+    		Element current = taskStack.pop();
+    		Elements children = current.getChildElements("task");
+    		
+    		Task task = new TaskImpl(current, this);
+    		
+    		try {
+        		String id = task.getID();
+        		ids.add(id);
+    		} catch (Exception e) {
+    			Util.debug("Error: " + e.getMessage());
+    		}
+    		
+    		for (int i = 0; i < children.size(); i++) {
+    			taskStack.push(children.get(i));
+    		}
+    	}
+    	
+    	return ids;
+    }
+    
+    /**
+     * A TreeSet is used for the Collection of Task Types to ensure the
+     * Collection has unique values and that they are in order.
+     */
+    public Collection getTaskTypes() {
+    	Collection<String> taskTypes = new TreeSet<String>();
+    	Deque<Element> taskStack = new ArrayDeque<Element>();
+    	taskStack.push(_root);
+    	
+    	while (taskStack.peek() != null) {
+    		Element current = taskStack.pop();
+    		Elements children = current.getChildElements("task");
+    		Task task = new TaskImpl(current, this);
+    		String type = task.getType();
+    		
+    		if (!type.equals("")) {
+    			taskTypes.add(type);
+    		}
+    		
+    		for (int i=0; i<children.size(); i++) {
+    			taskStack.push(children.get(i));
+    		}
+    	}
+    	
+    	return taskTypes;
+    }
 
-    public Task createTask(CalendarDate startDate, CalendarDate endDate, String text, int priority, long effort, String description, String parentTaskId) {
+    public Task createTask(CalendarDate startDate, CalendarDate endDate, String text, String type, int priority, long effort, String description, String parentTaskId) {
         Element el = new Element("task");
         el.addAttribute(new Attribute("startDate", startDate.toString()));
         el.addAttribute(new Attribute("endDate", endDate != null? endDate.toString():""));
@@ -116,6 +177,10 @@ public class TaskListImpl implements TaskList {
         Element txt = new Element("text");
         txt.appendChild(text);
         el.appendChild(txt);
+        
+        Element typ = new Element("type");
+        typ.appendChild(type);
+        el.appendChild(typ);
 
         Element desc = new Element("description");
         desc.appendChild(description);
@@ -131,7 +196,7 @@ public class TaskListImpl implements TaskList {
         
 		elements.put(id, el);
 		
-        Util.debug("Created task with parent " + parentTaskId);
+        Util.debug("Created task with ID: " + id);
         
         return new TaskImpl(el, this);
     }

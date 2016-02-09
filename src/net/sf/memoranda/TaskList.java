@@ -19,7 +19,7 @@ public interface TaskList {
 	Project getProject();
     Task getTask(String id);
 
-    Task createTask(CalendarDate startDate, CalendarDate endDate, String text, int priority, long effort, String description, String parentTaskId);
+    Task createTask(CalendarDate startDate, CalendarDate endDate, String text, String type, int priority, long effort, String description, String parentTaskId);
 
     void removeTask(Task task);
 
@@ -31,6 +31,9 @@ public interface TaskList {
 	
     public Collection getAllSubTasks(String taskId);
     public Collection getActiveSubTasks(String taskId,CalendarDate date);
+    
+    public Collection<String> getIds();
+    public Collection getTaskTypes();
     
 //    public void adjustParentTasks(Task t);
     
