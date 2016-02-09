@@ -1,41 +1,41 @@
 package net.sf.memoranda;
 
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
-import java.util.Collection;
-
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import net.sf.memoranda.date.CalendarDate;
 
 public class TaskImplTest {
 
-	private static final String TYPE_ONE = "One";
-	private static final String TYPE_TWO = "Two";
+	private static final String TYPE_A = "Type A";
+	private static final String TYPE_B = "Type B";
 	
-	private Task task;
-	private TaskList tl;
+	private static Task task;
+	private static TaskList taskList;
 	
-	@Before
-	public void setUp() throws Exception {
-		tl = CurrentProject.getTaskList();
-		
-		task = tl.createTask(CalendarDate.today(), CalendarDate.today(), "text", TYPE_ONE, 0, 0, "description", null);
+	@BeforeClass
+	public static void setUpBeforeClass() throws Exception {
+		taskList = CurrentProject.getTaskList();
+	}
+	
+	@AfterClass
+	public static void tearDownAfterClass() throws Exception {
+		task = null;
+		taskList = null;
 	}
 
-	@After
-	public void tearDown() throws Exception {
-	}
-
+	/**
+	 * Save new task via constructor and setting type
+	 */
 	@Test
-	public void testGetSetType() {		
-		Assert.assertTrue(task.getType().equals(TYPE_ONE));
+	public void testSaveAndRetrieveType() {
+		task = taskList.createTask(CalendarDate.today(), CalendarDate.today(), "Name", TYPE_A, 0, 0, "Description", null);
+		assertTrue(task.getType().equals(TYPE_A));
 		
-		task.setType(TYPE_TWO);
-		
-		Assert.assertTrue(task.getType().equals(TYPE_TWO));
+		task.setType(TYPE_B);
+		assertTrue(task.getType().equals(TYPE_B));
 	}
 }
