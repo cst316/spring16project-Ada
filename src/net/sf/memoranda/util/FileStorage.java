@@ -469,5 +469,23 @@ public class FileStorage implements Storage {
                 "");
         }
     }
+    
+    public void storeReport(String html) {
+    	
+    	String path = JN_DOCPATH + "report.html";
+    	
+    	try {
+    		Util.debug("Save report: " + path);
+    		
+            OutputStreamWriter fw =
+                    new OutputStreamWriter(new FileOutputStream(path));
+                fw.write(html);
+                fw.flush();
+                fw.close();
+    		
+    	} catch (Exception e) {
+    		Util.debug("Failed to store note to " + path);
+    	}
+    }
 
 }

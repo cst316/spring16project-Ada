@@ -27,13 +27,13 @@ public interface TaskList {
     
 	public boolean hasParentTask(String id);
 
-	public Collection getTopLevelTasks();
+	public Collection<Task> getTopLevelTasks();
 	
-    public Collection getAllSubTasks(String taskId);
-    public Collection getActiveSubTasks(String taskId,CalendarDate date);
+    public Collection<Task> getAllSubTasks(String taskId);
+    public Collection<Task> getActiveSubTasks(String taskId,CalendarDate date);
     
     public Collection<String> getIds();
-    public Collection getTaskTypes();
+    public Collection<String> getTaskTypes();
     
 //    public void adjustParentTasks(Task t);
     

@@ -19,28 +19,22 @@ import net.sf.memoranda.date.CalendarDate;
 public interface Task {
     
     public static final int SCHEDULED = 0;
-
     public static final int ACTIVE = 1;
-
     public static final int COMPLETED = 2;
-
     public static final int FROZEN = 4;
-
     public static final int FAILED = 5;
-    
     public static final int LOCKED = 6;
-    
     public static final int DEADLINE = 7;
     
     public static final int PRIORITY_LOWEST = 0;
-    
     public static final int PRIORITY_LOW = 1;
-    
     public static final int PRIORITY_NORMAL = 2;
-    
     public static final int PRIORITY_HIGH = 3;
-    
     public static final int PRIORITY_HIGHEST = 4;
+    
+    public static final int ANALYSIS_UNDERESTIMATED = 0;
+    public static final int ANALYSIS_ACCURATE = 1;
+    public static final int ANALYSIS_OVERESTIMATED = 2;
     
     CalendarDate getStartDate();
     void setStartDate(CalendarDate date);
@@ -67,7 +61,7 @@ public interface Task {
     
     void removeDependsFrom(Task task);*/
             
-    Collection getSubTasks();    
+    Collection<Task> getSubTasks();    
     Task getSubTask(String id);
     
     boolean hasSubTasks(String id);
@@ -80,6 +74,8 @@ public interface Task {
     
     void setType(String type);
     String getType();
+    
+    int getAnalysis();
 
     Task getParentTask();
     String getParentId();

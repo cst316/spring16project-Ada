@@ -10,9 +10,7 @@ import java.util.Collection;
 public interface Report {
 	
 	public static final int STYLE_MINIMUM = 0;
-	
 	public static final int STYLE_MEDIUM = 1;
-	
 	public static final int STYLE_MAXIMUM = 2;
 	
 	public int getStyle();
@@ -21,4 +19,8 @@ public interface Report {
 	public Collection<Task> getTasks();
 	public void setTasks(String[] ids);
 	
+	public void exportHtml();
+	public void exportHtmlMin();
+	public void exportHtmlMed();
+	public void exportHtmlMax();
 }

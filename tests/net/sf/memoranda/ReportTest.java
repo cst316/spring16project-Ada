@@ -1,9 +1,10 @@
-package test;
+package net.sf.memoranda;
 
 import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Random;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -14,6 +15,7 @@ import org.junit.Test;
 import net.sf.memoranda.CurrentProject;
 import net.sf.memoranda.ReportImpl;
 import net.sf.memoranda.Task;
+import net.sf.memoranda.TaskList;
 import net.sf.memoranda.date.CalendarDate;
 import net.sf.memoranda.util.FileStorage;
 import net.sf.memoranda.util.Util;
@@ -22,30 +24,45 @@ public class ReportTest {
 
 	private static FileStorage store;
 	private ReportImpl report;
+	private Random rand;
+	private static TaskList taskList = CurrentProject.getTaskList();
+	private static ArrayList<String> allIds;
 	
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
 		store = new FileStorage();
 		
-		CurrentProject.getTaskList().createTask(new CalendarDate(2016, 1, 1), new CalendarDate(2016, 1, 30), "Task A", "Foo", 3, (long)2.5, "blah", null);
-		CurrentProject.getTaskList().createTask(new CalendarDate(2016, 1, 1), new CalendarDate(2016, 1, 30), "Task B", "Bar", 3, (long)2.5, "bloo", null);
-		CurrentProject.getTaskList().createTask(new CalendarDate(2016, 1, 1), new CalendarDate(2016, 1, 30), "Task C", "Type", 3, (long)2.5, "blop", null);
+		for (int i = 0; i < 1000; i++) {
+			taskList.createTask(new CalendarDate(2016, 1, 1), new CalendarDate(2016, 1, 30), String.format("Task %d", i), "Foo", 3, (long)2.5, "blah", null);
+		}
 
-		store.storeTaskList(CurrentProject.getTaskList(), CurrentProject.get());
+		store.storeTaskList(taskList, CurrentProject.get());
+		
+		allIds = (ArrayList<String>)(CurrentProject.getTaskList().getIds());
 	}
 
 	@Before
 	public void setUp() throws Exception {
 		report = new ReportImpl();
+		rand = new Random();
 	}
 
 	@After
 	public void tearDown() throws Exception {
 		report = null;
+		rand = null;
 	}
 	
 	@AfterClass
 	public static void tearDownAfterClass() throws Exception {
+		// Delete tasks
+		for (int i = 0; i < 1000; i++) {
+			taskList.removeTask(taskList.getTask(allIds.get(i)));
+		}
+
+		store.storeTaskList(taskList, CurrentProject.get());
+		
+		taskList = null;
 		store = null;
 	}
 
@@ -66,25 +83,35 @@ public class ReportTest {
 		
 		Collection<String> taskIds = CurrentProject.getTaskList().getIds();
 
-		ArrayList<String> allIds = (ArrayList<String>)(CurrentProject.getTaskList().getIds());
+		int size = rand.nextInt(1000); // get number from 0-999
 		
-		String[] someIds = new String[2];
+		String[] someIds = new String[size];
 		
-		someIds[0] = allIds.get(1);
-		someIds[1] = allIds.get(2);
-		
-		for (int i = 0; i < someIds.length; i++) {
-			System.out.printf("%d: %s\n", i, someIds[i]);
-			Util.debug("Task Name: " + CurrentProject.getTaskList().getTask(someIds[i]).getText());
+		for (int i = 0; i < size; i++) {
+			someIds[i] = allIds.get(i);
 		}
 		
 		report.setTasks(someIds);
 		
 		Collection<Task> tasks = report.getTasks();
-		
-		for (Task task : tasks) {
-			System.out.println("ID: " + task.getID());
-			Util.debug("Name: " + task.getText());
-		}
+	}
+	/*
+	@Test
+	public void testExportHtmlMin() {
+		report.setStyle(0);
+		report.exportHtml();
+	}
+	*/
+	/*
+	@Test
+	public void testExportHtmlMed() {
+		report.setStyle(1);
+		report.exportHtml();
+	}
+	*/
+	@Test
+	public void testExportHtmlMax() {
+		report.setStyle(2);
+		report.exportHtml();
 	}
 }
