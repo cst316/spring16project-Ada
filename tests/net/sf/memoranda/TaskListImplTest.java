@@ -14,47 +14,19 @@ import net.sf.memoranda.date.CalendarDate;
 import net.sf.memoranda.util.Util;
 
 public class TaskListImplTest {
-	
-	private static int TASKS_TO_CREATE = 50;
-	private static int CHILD_TASKS_TO_CREATE = 50;
-
-	private static final String TYPE_ONE = "TestType";
-	private static final String TYPE_TWO = "SecondType";
-
-	private TaskList tl;
-	
-	@Before
-	public void setUp() throws Exception {
-		tl = CurrentProject.getTaskList();
-		
-		for (int i=0; i<TASKS_TO_CREATE; i++) {
-			Task parent = tl.createTask(CalendarDate.today(), CalendarDate.tomorrow(), "text", Util.generateId(), 0, 0, "description", null);
-			
-			for (int j=0; j<CHILD_TASKS_TO_CREATE; j++) {
-				Task child = tl.createTask(CalendarDate.today(), CalendarDate.tomorrow(), "text", Util.generateId(), 0, 0, "description", parent.getID());
-			}
-		}
-	}
-
-	@After
-	public void tearDown() throws Exception {
-
-	}
 
 	@Test
 	public void testGetTaskTypes() {
-		long startTime = System.currentTimeMillis();
-		Collection<String> types = tl.getTaskTypes();
-		long endTime = System.currentTimeMillis();
+		Collection<String> types = CurrentProject.getTaskList().getTaskTypes();
+		String previousType = null;
 		
-		if (types.size() < TASKS_TO_CREATE * CHILD_TASKS_TO_CREATE + TASKS_TO_CREATE) {
-			fail("Not enough Task Types.");
-		}
-		else {
-			for (String s : types) {
-				Util.debug(s);
+		for (String currentType : types) {
+			if (previousType != null) {
+				assertFalse(previousType.equals(currentType));
+				assertTrue(previousType.compareTo(currentType) < 0);
 			}
-			Util.debug("getTaskTypes completed in " + (endTime-startTime) + " ms") ;
+			
+			previousType = currentType;
 		}
 	}
 
