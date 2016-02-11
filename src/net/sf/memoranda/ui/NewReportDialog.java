@@ -8,6 +8,7 @@ import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.text.DateFormat;
@@ -60,6 +61,7 @@ public class NewReportDialog extends JDialog {
     
     // Task Selection
     int numTasksSelected;
+    int numTotalTasks;
     Queue<JCheckBox> taskCheckBoxesQueue;
     Queue<Task> tasksQueue;
     JScrollPane taskScrollPane;
@@ -67,6 +69,7 @@ public class NewReportDialog extends JDialog {
     JPanel taskInnerPanel;
     
     // OK and Cancel Buttons
+    JCheckBox selectAllCheckBox;
 	JButton okButton;
 	JButton cancelButton;
 	JPanel buttonPanel;
@@ -152,6 +155,7 @@ public class NewReportDialog extends JDialog {
 		gc.weightx = 1;
 		gc.weighty = 1;
 		gc.anchor = GridBagConstraints.WEST;
+		numTotalTasks = 0;
 		
 		taskInnerPanel = new JPanel(new GridBagLayout());
 		taskCheckBoxesQueue = new ArrayDeque<JCheckBox>();
@@ -198,6 +202,7 @@ public class NewReportDialog extends JDialog {
 			
 			tasksQueue.add(task);
 			taskCheckBoxesQueue.add(cb);
+			numTotalTasks++;
 		}
 		
 		taskScrollPane = new JScrollPane(taskInnerPanel);
@@ -210,6 +215,15 @@ public class NewReportDialog extends JDialog {
 	}
 	
 	void drawButtonsPanel() {
+		selectAllCheckBox = new JCheckBox("Select all");
+		selectAllCheckBox.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				selectAllCheckBox_actionPerformed(arg0);
+			}
+		});
+		
 		okButton = new JButton();
 		okButton.setMaximumSize(new Dimension(100, 26));
 		okButton.setMinimumSize(new Dimension(100, 26));
@@ -235,6 +249,7 @@ public class NewReportDialog extends JDialog {
         
         buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         buttonPanel.setBorder(defaultBorder);
+        buttonPanel.add(selectAllCheckBox);
         buttonPanel.add(okButton);
         buttonPanel.add(cancelButton);
         this.getContentPane().add(buttonPanel, BorderLayout.SOUTH);
@@ -293,6 +308,26 @@ public class NewReportDialog extends JDialog {
 		else {
 			okButton.setEnabled(true);
 	        this.getRootPane().setDefaultButton(okButton);
+		}
+		
+		if (numTasksSelected == numTotalTasks) {
+			selectAllCheckBox.setSelected(true);
+		}
+		else {
+			selectAllCheckBox.setSelected(false);
+		}
+	}
+	
+	private void selectAllCheckBox_actionPerformed(ActionEvent e) {
+		if (selectAllCheckBox.isSelected()) {
+			for (JCheckBox cb : taskCheckBoxesQueue) {
+				cb.setSelected(true);
+			}
+		}
+		else {
+			for (JCheckBox cb : taskCheckBoxesQueue) {
+				cb.setSelected(false);
+			}
 		}
 	}
 }
