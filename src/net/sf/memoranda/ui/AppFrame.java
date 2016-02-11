@@ -141,7 +141,8 @@ public class AppFrame extends JFrame {
 		// report action abstract added
         public Action ReportAction =
         		new AbstractAction(Local.getString("Open Report Menu")) {
-        		public void actionPreformed(ActionEvent e){
+        	
+        		public void actionPerformed(ActionEvent e){
         			pReport_actionPerformed(e);
         		}
         	};	
@@ -465,6 +466,8 @@ public class AppFrame extends JFrame {
         jMenuFile.add(jMenuFileExportNote);
         jMenuFile.add(jMenuFileImportNote);
         jMenuFile.add(jMenuFileImportPrj);
+        jMenuFile.addSeparator();
+        jMenuFile.add(jMenuFileReport);
         jMenuFile.addSeparator();
         jMenuFile.add(jMenuEditPref);
         jMenuFile.addSeparator();
@@ -1116,7 +1119,8 @@ public class AppFrame extends JFrame {
            // Report menu action event
             protected void pReport_actionPerformed(ActionEvent e) {
 			
-			// To do how to handle report menu
-		   
+            NewReportDialog newReportDialog = new NewReportDialog(this, "New Report");
+            newReportDialog.setLocationRelativeTo(this);
+            newReportDialog.setVisible(true);
         }
 }
