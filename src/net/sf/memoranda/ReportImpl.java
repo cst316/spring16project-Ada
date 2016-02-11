@@ -221,7 +221,7 @@ public class ReportImpl implements Report {
 						htmlBuilder.append(task.getProgress());
 						break;
 					case 7: // Est Effort
-						htmlBuilder.append(task.getEffort());
+						htmlBuilder.append((float)task.getEffort() / 3600000.0f);
 						break;
 					case 8: // Description
 						htmlBuilder.append(task.getDescription());
@@ -280,7 +280,7 @@ public class ReportImpl implements Report {
 						htmlBuilder.append(task.getProgress());
 						break;
 					case 7: // Est Effort
-						htmlBuilder.append(task.getEffort());
+						htmlBuilder.append((float)task.getEffort() / 3600000.0f);
 						break;
 					case 8: // Description
 						htmlBuilder.append(task.getDescription());
