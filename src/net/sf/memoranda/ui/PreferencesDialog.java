@@ -31,15 +31,15 @@ public class PreferencesDialog extends JDialog {
 
 	JRadioButton minHideRB = new JRadioButton();
 
-	ButtonGroup closeGroup = new ButtonGroup();
+/*	ButtonGroup closeGroup = new ButtonGroup();
 
 	JLabel jLabel2 = new JLabel();
 
 	JRadioButton closeExitRB = new JRadioButton();
-
+*/
 	JCheckBox askConfirmChB = new JCheckBox();
 
-	JRadioButton closeHideRB = new JRadioButton();
+//	JRadioButton closeHideRB = new JRadioButton();
 
 	JLabel jLabel3 = new JLabel();
 
@@ -240,7 +240,7 @@ public class PreferencesDialog extends JDialog {
 		gbc.gridy = 1;
 		gbc.insets = new Insets(2, 0, 0, 10);
 		gbc.anchor = GridBagConstraints.WEST;
-		GeneralPanel.add(minHideRB, gbc);
+/*		GeneralPanel.add(minHideRB, gbc);
 		jLabel2.setHorizontalAlignment(SwingConstants.RIGHT);
 		jLabel2.setText(Local.getString("Window close action:"));
 		gbc = new GridBagConstraints();
@@ -271,12 +271,12 @@ public class PreferencesDialog extends JDialog {
 				closeHideRB_actionPerformed(e);
 			}
 		});
-		gbc = new GridBagConstraints();
+*/		gbc = new GridBagConstraints();
 		gbc.gridx = 1;
 		gbc.gridy = 3;
 		gbc.insets = new Insets(2, 0, 0, 10);
 		gbc.anchor = GridBagConstraints.WEST;
-		GeneralPanel.add(closeHideRB, gbc);
+//		GeneralPanel.add(closeHideRB, gbc);
 		jLabel3.setHorizontalAlignment(SwingConstants.RIGHT);
 		jLabel3.setText(Local.getString("Look and feel:"));
 		gbc = new GridBagConstraints();
@@ -549,14 +549,14 @@ public class PreferencesDialog extends JDialog {
 		askConfirmChB.setSelected(!Configuration.get("ASK_ON_EXIT").toString()
 				.equalsIgnoreCase("no"));
 		String onclose = Configuration.get("ON_CLOSE").toString();
-		if (onclose.equals("exit")) {
+/*		if (onclose.equals("exit")) {
 			this.closeExitRB.setSelected(true);
 			// this.askConfirmChB.setEnabled(true);
 		} else {
 			this.closeHideRB.setSelected(true);
 			// this.askConfirmChB.setEnabled(false);
 		}
-
+*/
 		String onmin = Configuration.get("ON_MINIMIZE").toString();
 		this.minTaskbarRB.setSelected(true);
 
@@ -640,11 +640,11 @@ public class PreferencesDialog extends JDialog {
 		else
 			Configuration.put("ASK_ON_EXIT", "no");
 
-		if (this.closeExitRB.isSelected())
+/*		if (this.closeExitRB.isSelected())
 			Configuration.put("ON_CLOSE", "exit");
 		else
 			Configuration.put("ON_CLOSE", "minimize");
-
+*/
 		Configuration.put("ON_MINIMIZE", "normal");
 
 		String lf = Configuration.get("LOOK_AND_FEEL").toString();
