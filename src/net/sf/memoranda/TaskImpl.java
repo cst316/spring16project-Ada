@@ -185,7 +185,7 @@ public class TaskImpl implements Task, Comparable {
     public String getStatusString() {
     	String status = new String();
     	
-    	switch (getStatus(getEndDate())) {
+    	switch (getStatus(new CalendarDate())) {
     		case Task.SCHEDULED:
     			status = "Scheduled";
     			break;
