@@ -2,6 +2,7 @@ package net.sf.memoranda.ui;
 
 import java.awt.AWTEvent;
 import java.awt.BorderLayout;
+import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.Point;
@@ -11,6 +12,9 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowEvent;
 import java.io.File;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -40,6 +44,7 @@ import net.sf.memoranda.Note;
 import net.sf.memoranda.NoteList;
 import net.sf.memoranda.Project;
 import net.sf.memoranda.ProjectListener;
+import net.sf.memoranda.Report;
 import net.sf.memoranda.ResourcesList;
 import net.sf.memoranda.TaskList;
 import net.sf.memoranda.date.CurrentDate;
@@ -47,6 +52,7 @@ import net.sf.memoranda.ui.htmleditor.HTMLEditor;
 import net.sf.memoranda.util.Configuration;
 import net.sf.memoranda.util.Context;
 import net.sf.memoranda.util.CurrentStorage;
+import net.sf.memoranda.util.FileStorage;
 import net.sf.memoranda.util.Local;
 import net.sf.memoranda.util.ProjectExporter;
 import net.sf.memoranda.util.ProjectPackager;
@@ -140,7 +146,7 @@ public class AppFrame extends JFrame {
     
 		// report action abstract added
         public Action ReportAction =
-        		new AbstractAction(Local.getString("Open Report Menu")) {
+        		new AbstractAction(Local.getString("Export Report")) {
         	
         		public void actionPerformed(ActionEvent e){
         			pReport_actionPerformed(e);
@@ -1122,5 +1128,19 @@ public class AppFrame extends JFrame {
             NewReportDialog newReportDialog = new NewReportDialog(this, "New Report");
             newReportDialog.setLocationRelativeTo(this);
             newReportDialog.setVisible(true);
+            
+            if (!newReportDialog.CANCELLED) {
+            	Report report = newReportDialog.getReport();
+            	FileStorage store = new FileStorage();
+            	File file = new File(store.getReportPath());
+            	
+            	report.exportHtml();
+            	
+				try {
+	            	Desktop.getDesktop().open(file);
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+            }
         }
 }

@@ -8,8 +8,12 @@ import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.text.DateFormat;
+import java.util.ArrayDeque;
 import java.util.Collection;
+import java.util.Queue;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -29,7 +33,7 @@ import net.sf.memoranda.Report;
 import net.sf.memoranda.ReportImpl;
 import net.sf.memoranda.Task;
 import net.sf.memoranda.util.Local;
-import sun.misc.Queue;
+import net.sf.memoranda.util.Util;
 
 public class NewReportDialog extends JDialog {	
 	
@@ -37,6 +41,9 @@ public class NewReportDialog extends JDialog {
 	 * 
 	 */
 	private static final long serialVersionUID = 2975505696367632812L;
+	
+	public boolean CANCELLED = true;
+	private Report report;
 
 	Border defaultBorder;
 	
@@ -52,6 +59,7 @@ public class NewReportDialog extends JDialog {
     JPanel stylePanel;
     
     // Task Selection
+    int numTasksSelected;
     Queue<JCheckBox> taskCheckBoxesQueue;
     Queue<Task> tasksQueue;
     JScrollPane taskScrollPane;
@@ -73,6 +81,10 @@ public class NewReportDialog extends JDialog {
             new ExceptionDialog(ex);
             ex.printStackTrace();
         }
+	}
+	
+	public Report getReport() {
+		return this.report;
 	}
 	
 	void jbInit() {
@@ -110,6 +122,7 @@ public class NewReportDialog extends JDialog {
 	    
 	    mediumRadioButton = new JRadioButton();
 	    mediumRadioButton.setText(Local.getString("Standard"));
+	    mediumRadioButton.setSelected(true);
 	    
 	    maximumRadioButton = new JRadioButton();
 	    maximumRadioButton.setText(Local.getString("Detailed"));
@@ -141,8 +154,8 @@ public class NewReportDialog extends JDialog {
 		gc.anchor = GridBagConstraints.WEST;
 		
 		taskInnerPanel = new JPanel(new GridBagLayout());
-		taskCheckBoxesQueue = new Queue<JCheckBox>();
-		tasksQueue = new Queue<Task>();
+		taskCheckBoxesQueue = new ArrayDeque<JCheckBox>();
+		tasksQueue = new ArrayDeque<Task>();
 		
 		{
 			JLabel title = new JLabel(Local.getString("Task"));
@@ -175,8 +188,16 @@ public class NewReportDialog extends JDialog {
 			gc.gridx = 3;
 			taskInnerPanel.add(endDate, gc);
 			
-			tasksQueue.enqueue(task);
-			taskCheckBoxesQueue.enqueue(cb);
+			cb.addItemListener(new ItemListener() {
+
+				@Override
+				public void itemStateChanged(ItemEvent arg0) {
+					taskCheckBox_itemStateChanged(arg0);
+				}
+			});
+			
+			tasksQueue.add(task);
+			taskCheckBoxesQueue.add(cb);
 		}
 		
 		taskScrollPane = new JScrollPane(taskInnerPanel);
@@ -196,10 +217,10 @@ public class NewReportDialog extends JDialog {
 		okButton.setText(Local.getString("Ok"));
 		okButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                // TODO
+                okButton_actionPerformed(e);
             }
         });
-        this.getRootPane().setDefaultButton(okButton);
+		okButton.setEnabled(false);
         
         cancelButton = new JButton();
         cancelButton.setMaximumSize(new Dimension(100, 26));
@@ -224,32 +245,22 @@ public class NewReportDialog extends JDialog {
 		int numTasks = 0;
 		
 		while (!taskCheckBoxesQueue.isEmpty()) {
-			try {
-				Task task = tasksQueue.dequeue();
-				JCheckBox cb = taskCheckBoxesQueue.dequeue();
-				
-				if (cb.isSelected()) {
-					numTasks++;
-					tasksQueue.enqueue(task);
-				}
-			} catch (InterruptedException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
+			Task task = tasksQueue.remove();
+			JCheckBox cb = taskCheckBoxesQueue.remove();
+			
+			if (cb.isSelected()) {
+				numTasks++;
+				tasksQueue.add(task);
 			}
 		}
 		
 		tasksArray = new String[numTasks];
 		
 		for (int i=0; i<numTasks; i++) {
-			try {
-				tasksArray[i] = tasksQueue.dequeue().getID();
-			} catch (InterruptedException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			}
+			tasksArray[i] = tasksQueue.remove().getID();
 		}
 		
-		Report report = new ReportImpl();
+		report = new ReportImpl();
 		if (minimumRadioButton.isSelected()) {
 			report.setStyle(Report.STYLE_MINIMUM);
 		}
@@ -260,5 +271,28 @@ public class NewReportDialog extends JDialog {
 			report.setStyle(Report.STYLE_MAXIMUM);
 		}
 		report.setTasks(tasksArray);
+		
+		CANCELLED = false;
+		this.dispose();
+	}
+	
+	private void taskCheckBox_itemStateChanged(ItemEvent e) {
+		JCheckBox cb = (JCheckBox) e.getSource();
+		
+		if (cb.isSelected()) {
+			numTasksSelected++;
+		}
+		else {
+			numTasksSelected--;
+		}
+		
+		if (numTasksSelected == 0) {
+			this.getRootPane().setDefaultButton(null);
+			okButton.setEnabled(false);
+		}
+		else {
+			okButton.setEnabled(true);
+	        this.getRootPane().setDefaultButton(okButton);
+		}
 	}
 }

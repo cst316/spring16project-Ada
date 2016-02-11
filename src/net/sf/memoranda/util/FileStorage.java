@@ -470,6 +470,11 @@ public class FileStorage implements Storage {
         }
     }
     
+    public String getReportPath() {
+		String filename = JN_DOCPATH + "report.html";
+		return filename;
+   }
+    
     public void storeReport(String html) {
     	
     	String path = JN_DOCPATH + "report.html";

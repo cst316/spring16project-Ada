@@ -5,10 +5,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 
-import org.apache.html.dom.*;
-import org.xml.sax.SAXException;
-
-import net.sf.memoranda.date.CalendarDate;
 import net.sf.memoranda.util.FileStorage;
 import net.sf.memoranda.util.Util;
 
@@ -25,7 +21,7 @@ public class ReportImpl implements Report {
 	
 	private StringBuilder htmlBuilder = new StringBuilder();
 	
-	private Collection<Task> tasks = getTasks();
+	private Collection<Task> tasks = new ArrayList<Task>();
 	
 	
 	/**
@@ -53,7 +49,7 @@ public class ReportImpl implements Report {
 	 * @return Collection of Task elements
 	 */
 	public Collection<Task> getTasks() {
-		return allTasks.getTopLevelTasks();
+		return tasks;
 	}
 
 	/**
@@ -61,6 +57,12 @@ public class ReportImpl implements Report {
 	 */
 	public void setTasks(String[] ids) {
 		_ids = ids;
+		
+		tasks.clear();
+		
+		for (String id : _ids) {
+			tasks.add(allTasks.getTask(id));
+		}
 	}
 	
 	/**
