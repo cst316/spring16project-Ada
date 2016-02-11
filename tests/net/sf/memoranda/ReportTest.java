@@ -56,6 +56,7 @@ public class ReportTest {
 	@AfterClass
 	public static void tearDownAfterClass() throws Exception {
 		// Delete tasks
+
 		for (int i = 0; i < 1000; i++) {
 			taskList.removeTask(taskList.getTask(allIds.get(i)));
 		}
@@ -64,6 +65,7 @@ public class ReportTest {
 		
 		taskList = null;
 		store = null;
+		
 	}
 
 	@Test
@@ -95,20 +97,19 @@ public class ReportTest {
 		
 		Collection<Task> tasks = report.getTasks();
 	}
-	/*
+	
 	@Test
 	public void testExportHtmlMin() {
 		report.setStyle(0);
 		report.exportHtml();
 	}
-	*/
-	/*
+	
 	@Test
 	public void testExportHtmlMed() {
 		report.setStyle(1);
 		report.exportHtml();
 	}
-	*/
+	
 	@Test
 	public void testExportHtmlMax() {
 		report.setStyle(2);

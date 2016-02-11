@@ -1,5 +1,6 @@
 package net.sf.memoranda;
 
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -20,6 +21,7 @@ public class ReportImpl implements Report {
 	private TaskList allTasks = CurrentProject.getTaskList();
 	
 	private StringBuilder htmlBuilder = new StringBuilder();
+	private DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.SHORT);
 	
 	private Collection<Task> tasks = new ArrayList<Task>();
 	
@@ -153,16 +155,16 @@ public class ReportImpl implements Report {
 						htmlBuilder.append(task.getType());
 						break;
 					case 2: // Start Date
-						htmlBuilder.append(task.getStartDate());
+						htmlBuilder.append(dateFormat.format(task.getStartDate().getDate()));
 						break;
 					case 3: // End Date
-						htmlBuilder.append(task.getEndDate());
+						htmlBuilder.append(dateFormat.format(task.getEndDate().getDate()));
 						break;
 					case 4: // Priority
-						htmlBuilder.append(task.getPriority());
+						htmlBuilder.append(task.getPriorityString());
 						break;
 					case 5: // Status
-						htmlBuilder.append(task.getStatus(task.getEndDate()));
+						htmlBuilder.append(task.getStatusString());
 						break;
 					case 6: // % Done
 						htmlBuilder.append(task.getProgress());
@@ -204,16 +206,16 @@ public class ReportImpl implements Report {
 						htmlBuilder.append(task.getType());
 						break;
 					case 2: // Start Date
-						htmlBuilder.append(task.getStartDate());
+						htmlBuilder.append(dateFormat.format(task.getStartDate().getDate()));
 						break;
 					case 3: // End Date
-						htmlBuilder.append(task.getEndDate());
+						htmlBuilder.append(dateFormat.format(task.getEndDate().getDate()));
 						break;
 					case 4: // Priority
-						htmlBuilder.append(task.getPriority());
+						htmlBuilder.append(task.getPriorityString());
 						break;
 					case 5: // Status
-						htmlBuilder.append(task.getStatus(task.getEndDate()));
+						htmlBuilder.append(task.getStatusString());
 						break;
 					case 6: // % Done
 						htmlBuilder.append(task.getProgress());
@@ -263,16 +265,16 @@ public class ReportImpl implements Report {
 						htmlBuilder.append(task.getType());
 						break;
 					case 2: // Start Date
-						htmlBuilder.append(task.getStartDate());
+						htmlBuilder.append(dateFormat.format(task.getStartDate().getDate()));
 						break;
 					case 3: // End Date
-						htmlBuilder.append(task.getEndDate());
+						htmlBuilder.append(dateFormat.format(task.getEndDate().getDate()));
 						break;
 					case 4: // Priority
-						htmlBuilder.append(task.getPriority());
+						htmlBuilder.append(task.getPriorityString());
 						break;
 					case 5: // Status
-						htmlBuilder.append(task.getStatus(task.getEndDate()));
+						htmlBuilder.append(task.getStatusString());
 						break;
 					case 6: // % Done
 						htmlBuilder.append(task.getProgress());

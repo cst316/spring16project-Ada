@@ -43,12 +43,14 @@ public interface Task {
     void setEndDate(CalendarDate date);
     
     int getStatus(CalendarDate date);
+    String getStatusString();
     
     int getProgress();
     void setProgress(int p);
     
     int getPriority();
     void setPriority(int p);
+    String getPriorityString();
     
     String getID();
     

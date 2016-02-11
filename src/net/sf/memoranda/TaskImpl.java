@@ -181,6 +181,39 @@ public class TaskImpl implements Task, Comparable {
 
         return Task.FAILED;
     }
+    
+    public String getStatusString() {
+    	String status = new String();
+    	
+    	switch (getStatus(getEndDate())) {
+    		case Task.SCHEDULED:
+    			status = "Scheduled";
+    			break;
+    		case Task.ACTIVE:
+    			status = "Active";
+    			break;
+    		case Task.COMPLETED:
+    			status = "Completed";
+    			break;
+    		case Task.FROZEN:
+    			status = "Frozen";
+    			break;
+    		case Task.FAILED:
+    			status = "Failed";
+    			break;
+    		case Task.LOCKED:
+    			status = "Locked";
+    			break;
+    		case Task.DEADLINE:
+    			status = "Deadline";
+    			break;
+    		default:
+    			break;
+    	}
+    	
+    	return status;
+    }
+    
     /**
      * Method isDependsCompleted.
      * @return boolean
@@ -303,6 +336,33 @@ public class TaskImpl implements Task, Comparable {
             return Task.PRIORITY_NORMAL;
         return new Integer(pa.getValue()).intValue();
     }
+    
+    public String getPriorityString() {
+    	String priority = new String();
+    	
+    	switch (getPriority()) {
+    		case Task.PRIORITY_LOWEST:
+    			priority = "Lowest";
+    			break;
+    		case Task.PRIORITY_LOW:
+    			priority = "Low";
+    			break;
+    		case Task.PRIORITY_NORMAL:
+    			priority = "Normal";
+    			break;
+    		case Task.PRIORITY_HIGH:
+    			priority = "High";
+    			break;
+    		case Task.PRIORITY_HIGHEST:
+    			priority = "Highest";
+    			break;
+    		default:
+    			break;
+    	}
+    	
+    	return priority;
+    }
+    
     /**
      * @see net.sf.memoranda.Task#setPriority(int)
      */
