@@ -13,6 +13,7 @@ import net.sf.memoranda.NoteList;
 import net.sf.memoranda.Project;
 import net.sf.memoranda.ResourcesList;
 import net.sf.memoranda.TaskList;
+import net.sf.memoranda.TemplateList;
 /**
  * 
  */
@@ -23,6 +24,9 @@ public interface Storage {
             
     TaskList openTaskList(Project prj);    
     void storeTaskList(TaskList tl, Project prj);
+    
+    TemplateList openTemplateList(Project proj);
+    void storeTemplateList(TemplateList tl, Project proj);
     
     NoteList openNoteList(Project prj);
     void storeNoteList(NoteList nl, Project prj);

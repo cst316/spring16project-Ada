@@ -29,6 +29,8 @@ import net.sf.memoranda.ResourcesList;
 import net.sf.memoranda.ResourcesListImpl;
 import net.sf.memoranda.TaskList;
 import net.sf.memoranda.TaskListImpl;
+import net.sf.memoranda.TemplateList;
+import net.sf.memoranda.TemplateListImpl;
 import net.sf.memoranda.date.CalendarDate;
 import net.sf.memoranda.ui.ExceptionDialog;
 import net.sf.memoranda.ui.htmleditor.AltHTMLWriter;
@@ -305,6 +307,31 @@ public class FileStorage implements Storage {
         //tasklistDoc.setDocType(TaskListVersioning.getCurrentDocType());
         saveDocument(tasklistDoc,JN_DOCPATH + prj.getID() + File.separator + ".tasklist");
     }
+    
+    public TemplateList openTemplateList(Project proj) {
+    	String fn = JN_DOCPATH + proj.getID() + File.separator + ".templatelist";
+    	
+    	if (documentExists(fn)) {
+    		Util.debug("Open template list: " + JN_DOCPATH + proj.getID() + File.separator + ".templatelist");
+    		
+    		Document templatelistDoc = openDocument(fn);
+    		
+    		return new TemplateListImpl(templatelistDoc, proj);
+    	} else {
+    		Util.debug("New template list created");
+    		return new TemplateListImpl(proj);
+    	}
+    }
+    
+    public void storeTemplateList(TemplateList templatelist, Project proj) {
+    	String filepath = JN_DOCPATH + proj.getID() + File.separator + ".templatelist";
+    	
+    	Util.debug("Save template list: " + filepath);
+    	Document templatelistDoc = templatelist.getXmlContent();
+    	saveDocument(templatelistDoc, filepath);
+    }
+    
+    
     /**
      * @see net.sf.memoranda.util.Storage#createProjectStorage(net.sf.memoranda.Project)
      */
