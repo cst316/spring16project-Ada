@@ -207,6 +207,10 @@ public class TaskListImpl implements TaskList {
 
     public void removeTask(Task task) {
         String parentTaskId = task.getParentId();
+        Process process = task.getProcess();
+        if (process != null) {
+        	process.removeTask(task.getID());
+        }
         if (parentTaskId == null) {
             _root.removeChild(task.getContent());            
         }

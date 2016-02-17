@@ -52,6 +52,8 @@ public interface Task {
     void setPriority(int p);
     String getPriorityString();
     
+    public Process getProcess();
+    
     String getID();
     
     String getText();

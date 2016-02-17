@@ -10,6 +10,7 @@ package net.sf.memoranda.util;
 
 import net.sf.memoranda.Note;
 import net.sf.memoranda.NoteList;
+import net.sf.memoranda.ProcessList;
 import net.sf.memoranda.Project;
 import net.sf.memoranda.ResourcesList;
 import net.sf.memoranda.TaskList;
@@ -26,6 +27,9 @@ public interface Storage {
     
     NoteList openNoteList(Project prj);
     void storeNoteList(NoteList nl, Project prj);
+    
+    ProcessList openProcessList(Project prj);
+    void storeProcessList(ProcessList pl, Project prj);
     
     void storeNote(Note note, javax.swing.text.Document doc);    
     javax.swing.text.Document openNote(Note note);

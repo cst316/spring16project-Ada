@@ -502,5 +502,13 @@ public class TaskImpl implements Task, Comparable {
 		}
 	}
 
-	
+	public Process getProcess() {
+		Attribute a = _element.getAttribute("process");
+		Process p = null;
+		
+		if (a != null) {
+			p = CurrentProject.getProcessList().getProcess(a.getValue());
+		}
+		return p;
+	}
 }
