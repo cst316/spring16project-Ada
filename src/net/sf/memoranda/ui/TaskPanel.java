@@ -51,6 +51,7 @@ public class TaskPanel extends JPanel {
     JButton editTaskB = new JButton();
     JButton removeTaskB = new JButton();
     JButton completeTaskB = new JButton();
+    JButton newProcessB = new JButton();
     
 	JCheckBoxMenuItem ppShowActiveOnlyChB = new JCheckBoxMenuItem();
 		
@@ -177,6 +178,22 @@ public class TaskPanel extends JPanel {
         completeTaskB.setIcon(
             new ImageIcon(net.sf.memoranda.ui.AppFrame.class.getResource("resources/icons/todo_complete.png")));
 
+        newProcessB.setIcon(
+                new ImageIcon(net.sf.memoranda.ui.AppFrame.class.getResource("resources/icons/process_new.png")));
+        newProcessB.setEnabled(true);
+        newProcessB.setMaximumSize(new Dimension(24, 24));
+        newProcessB.setMinimumSize(new Dimension(24, 24));
+        newProcessB.setToolTipText(Local.getString("Create new process"));
+        newProcessB.setRequestFocusEnabled(false);
+        newProcessB.setPreferredSize(new Dimension(24, 24));
+        newProcessB.setFocusable(false);
+        newProcessB.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+            	newProcessB_actionPerformed(e);
+            }
+        });
+        newProcessB.setBorderPainted(false);
+            
 		// added by rawsushi
 //		showActiveOnly.setBorderPainted(false);
 //		showActiveOnly.setFocusable(false);
@@ -322,6 +339,8 @@ public class TaskPanel extends JPanel {
         tasksToolBar.addSeparator(new Dimension(8, 24));
         tasksToolBar.add(editTaskB, null);
         tasksToolBar.add(completeTaskB, null);
+        tasksToolBar.addSeparator();new Dimension(8, 24);
+        tasksToolBar.add(newProcessB, null);
 
 		//tasksToolBar.add(showActiveOnly, null);
         
@@ -698,6 +717,18 @@ public class TaskPanel extends JPanel {
 		CurrentStorage.get().storeTaskList(CurrentProject.getTaskList(), CurrentProject.get());
 		parentPanel.updateIndicators();
 		//taskTable.updateUI();
+	}
+	  
+	void newProcessB_actionPerformed(ActionEvent e) {
+		  ProcessNameDialog dialog = new ProcessNameDialog(App.getFrame(), "New Process");
+		  dialog.setLocationRelativeTo(this);
+		  dialog.setVisible(true);
+		  
+		  if (!dialog.CANCELLED) {
+			  String name = dialog.getName();
+
+			  CurrentProject.getProcessList().createProcess(name);
+		  }
 	}
 
 	// toggle "show active only"
