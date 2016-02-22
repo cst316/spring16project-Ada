@@ -137,26 +137,30 @@ public class TaskDialog extends JDialog {
 	
     // Buttons
     JButton jButtonCancel = new JButton();
-    JButton jButtonOk = new JButton();
+    JButton jButtonSaveTask = new JButton();
+    JButton jButtonSaveTemplate = new JButton();
+    JButton jButtonOpenTemplate = new JButton();
 	
 	/**
 	 * Draws the UI for the Header
+	 * SS: This seems to be redundant from a UI standpoint so I am taking it out.
 	 */
+    /*
 	private void drawHeader() {
         header.setFont(new java.awt.Font("Dialog", 0, 20));
         header.setForeground(new Color(0, 0, 124));
-        header.setText(Local.getString("To-Do"));
+        header.setText(Local.getString("To-do"));
         header.setIcon(new ImageIcon(net.sf.memoranda.ui.TaskDialog.class.getResource(
             "resources/icons/task48.png")));
 	}
-	
+	*/
 	/**
 	 * Draws the UI for the Cancel button
 	 */
 	private void drawCancel() {
-        jButtonCancel.setMaximumSize(new Dimension(100, 26));
-        jButtonCancel.setMinimumSize(new Dimension(100, 26));
-        jButtonCancel.setPreferredSize(new Dimension(100, 26));
+        jButtonCancel.setMaximumSize(new Dimension(150, 26));
+        jButtonCancel.setMinimumSize(new Dimension(150, 26));
+        jButtonCancel.setPreferredSize(new Dimension(150, 26));
         jButtonCancel.setText(Local.getString("Cancel"));
         jButtonCancel.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -166,16 +170,46 @@ public class TaskDialog extends JDialog {
 	}
 	
 	/**
-	 * Draws the UI for the OK Button
+	 * Draws the UI for the Save Task Button
 	 */
-	private void drawOk() {
-        jButtonOk.setMaximumSize(new Dimension(100, 26));
-        jButtonOk.setMinimumSize(new Dimension(100, 26));
-        jButtonOk.setPreferredSize(new Dimension(100, 26));
-        jButtonOk.setText(Local.getString("Ok"));
-        jButtonOk.addActionListener(new java.awt.event.ActionListener() {
+	private void drawSaveTask() {
+        jButtonSaveTask.setMaximumSize(new Dimension(150, 26));
+        jButtonSaveTask.setMinimumSize(new Dimension(150, 26));
+        jButtonSaveTask.setPreferredSize(new Dimension(150, 26));
+        jButtonSaveTask.setText(Local.getString("Save Task"));
+        jButtonSaveTask.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                okB_actionPerformed(e);
+                saveTask_actionPerformed(e);
+            }
+        });
+	}
+	
+	/**
+	 * Draws the UI for the Save Template Button
+	 */
+	private void drawSaveTemplate() {
+        jButtonSaveTemplate.setMaximumSize(new Dimension(150, 26));
+        jButtonSaveTemplate.setMinimumSize(new Dimension(150, 26));
+        jButtonSaveTemplate.setPreferredSize(new Dimension(150, 26));
+        jButtonSaveTemplate.setText(Local.getString("Save as Template"));
+        jButtonSaveTemplate.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                saveTemplate_actionPerformed(e);
+            }
+        });
+	}
+	
+	/**
+	 * Draws the UI for the Open Template Button
+	 */
+	private void drawOpenTemplate() {
+        jButtonOpenTemplate.setMaximumSize(new Dimension(150, 26));
+        jButtonOpenTemplate.setMinimumSize(new Dimension(150, 26));
+        jButtonOpenTemplate.setPreferredSize(new Dimension(150, 26));
+        jButtonOpenTemplate.setText(Local.getString("Open Template"));
+        jButtonOpenTemplate.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                openTemplate_actionPerformed(e);
             }
         });
 	}
@@ -543,22 +577,24 @@ public class TaskDialog extends JDialog {
 	this.setResizable(false);
 	this.setSize(new Dimension(430,300));
         mBorder = BorderFactory.createEmptyBorder(5, 5, 5, 5);
-        areaBorder = BorderFactory.createEtchedBorder(Color.white, 
-            new Color(142, 142, 142));
-        border4 = BorderFactory.createEmptyBorder(0, 5, 0, 5);
+        //areaBorder = BorderFactory.createEtchedBorder(Color.white, 
+        //    new Color(142, 142, 142));
+        //border4 = BorderFactory.createEmptyBorder(0, 5, 0, 5);
         border8 = BorderFactory.createEtchedBorder(Color.white, 
             new Color(178, 178, 178));
         
         drawCancel();
-		drawOk();
+		drawSaveTask();
+		drawSaveTemplate();
+		drawOpenTemplate();
         
-        this.getRootPane().setDefaultButton(jButtonOk);
+        this.getRootPane().setDefaultButton(jButtonSaveTask);
         mPanel.setBorder(mBorder);
-        areaPanel.setBorder(areaBorder);
-        dialogTitlePanel.setBackground(Color.WHITE);
-        dialogTitlePanel.setBorder(border4);
+        //areaPanel.setBorder(areaBorder);
+        //dialogTitlePanel.setBackground(Color.WHITE);
+        //dialogTitlePanel.setBorder(border4);
         
-        drawHeader();
+        //drawHeader();
         drawName();
         drawType();   
         drawDescription();
@@ -575,7 +611,9 @@ public class TaskDialog extends JDialog {
         getContentPane().add(mPanel);
         mPanel.add(areaPanel, BorderLayout.CENTER);
         mPanel.add(buttonsPanel, BorderLayout.SOUTH);
-        buttonsPanel.add(jButtonOk, null);
+        buttonsPanel.add(jButtonOpenTemplate, null);
+        buttonsPanel.add(jButtonSaveTemplate, null);
+        buttonsPanel.add(jButtonSaveTask, null);
         buttonsPanel.add(jButtonCancel, null);
         this.getContentPane().add(dialogTitlePanel, BorderLayout.NORTH);
         dialogTitlePanel.add(header, null);
@@ -628,8 +666,8 @@ public class TaskDialog extends JDialog {
 		this.endDateMax = max;
 	}
 	
-    void okB_actionPerformed(ActionEvent e) {
-	CANCELLED = false;
+    void saveTask_actionPerformed(ActionEvent e) {
+    	CANCELLED = false;
         this.dispose();
     }
 
@@ -637,6 +675,16 @@ public class TaskDialog extends JDialog {
         this.dispose();
     }
 	
+
+    void saveTemplate_actionPerformed(ActionEvent e) {
+        //TODO: open template title dialog and handle as necessary.
+    }
+    
+
+    void openTemplate_actionPerformed(ActionEvent e) {
+        //TODO: open template list and handle as necessary.
+    }
+    
 	void chkEndDate_actionPerformed(ActionEvent e) {
 		jSpinnerEndDate.setEnabled(jCheckBoxEndDate.isSelected());
 		jButtonEndDate.setEnabled(jCheckBoxEndDate.isSelected());

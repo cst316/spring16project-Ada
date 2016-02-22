@@ -111,12 +111,11 @@ public class TemplateListImpl implements TemplateList {
 	/**
 	 * Removes Template from project and erases it from storage
 	 */
-	/*
 	public void removeTemplate(Template template) {
 		_root.removeChild(template.getContent());
 		elements.remove(template.getId());
 	}
-	*/
+	
 	/**
 	 * Gets all IDs associated with Templates
 	 * 

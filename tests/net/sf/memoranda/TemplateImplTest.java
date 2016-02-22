@@ -75,4 +75,9 @@ public class TemplateImplTest {
 		assertTrue(template.getEffort() == 0);
 		assertTrue(template.getDescription().equals(DESCRIPTION));
 	}
+	
+	@Test
+	public void testRemoveTemplate() {
+		templateList.removeTemplate(template);
+	}
 }

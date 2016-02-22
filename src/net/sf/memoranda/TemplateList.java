@@ -11,7 +11,7 @@ public interface TemplateList {
 	
 	Template createTemplate(CalendarDate startDate, CalendarDate endDate, String title, String type, int priority, long effort, String description);
 	
-	//void removeTemplate(Template template);
+	void removeTemplate(Template template);
 	
 	public Collection<String> getIds();
 	
