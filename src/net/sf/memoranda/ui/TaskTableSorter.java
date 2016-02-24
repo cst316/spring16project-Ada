@@ -11,6 +11,7 @@ import java.awt.event.*;
 import java.util.*;
 
 import net.sf.memoranda.*;
+import net.sf.memoranda.Process;
 import net.sf.memoranda.util.*;
 import net.sf.memoranda.date.*;
 
@@ -24,27 +25,47 @@ public class TaskTableSorter extends TaskTableModel{
 	
 	Comparator comparator = new Comparator(){
 		public int compare(Object o1, Object o2){
-			if(sorting_column == -1) return 0;
-			if( (o1 instanceof Task) == false) return 0;
-			if( (o2 instanceof Task) == false ) return 0;
-			
-			
-			Task task1 = (Task) o1;
-			Task task2 = (Task) o2;
-			
-			// based on TaskTableModel.columnNames
-			switch(sorting_column){
-				case 1: return task1.getText().compareTo(task2.getText());
-				case 2: return task1.getType().compareTo(task2.getType());
-				case 3: return task1.getStartDate().getDate().compareTo(task2.getStartDate().getDate());
-				case 4: return task1.getEndDate().getDate().compareTo(task2.getEndDate().getDate());
-				case 0: // task priority, same as 4
-				case 5: return task1.getPriority() - task2.getPriority();
-				case 6: return task1.getStatus( CurrentDate.get() ) - task2.getStatus( CurrentDate.get() );
-				case 7: return task1.getProgress() - task2.getProgress();
+			int compare = 0;
+			if (sorting_column == -1) {
 			}
-			
-			return 0;
+			else if (o1 instanceof Task && o2 instanceof Task) {
+				Task task1 = (Task) o1;
+				Task task2 = (Task) o2;
+				// based on TaskTableModel.columnNames
+				switch (sorting_column) {
+				case 1:
+					compare = task1.getText().compareTo(task2.getText());
+					break;
+				case 2:
+					compare = task1.getType().compareTo(task2.getType());
+					break;
+				case 3:
+					compare = task1.getStartDate().getDate().compareTo(task2.getStartDate().getDate());
+					break;
+				case 4:
+					compare = task1.getEndDate().getDate().compareTo(task2.getEndDate().getDate());
+					break;
+				case 0: // task priority, same as 4
+				case 5:
+					compare = task1.getPriority() - task2.getPriority();
+					break;
+				case 6:
+					compare = task1.getStatus(CurrentDate.get()) - task2.getStatus(CurrentDate.get());
+					break;
+				case 7:
+					compare = task1.getProgress() - task2.getProgress();
+					break;
+				}
+			}
+			else if (o1 instanceof Process && o2 instanceof Process) {
+				Process p1 = (Process) o1;
+				Process p2 = (Process) o2;
+				compare = p1.getName().compareTo(p2.getName());
+			}
+			else {
+				compare = (o1 instanceof Task ? 1 : -1);
+			}
+			return compare;
 		}
 	};
 	
@@ -58,8 +79,35 @@ public class TaskTableSorter extends TaskTableModel{
 		Collection c = null;
 		
 		if (parent instanceof Project){
-			if( activeOnly() ) c = CurrentProject.getTaskList().getActiveSubTasks(null, CurrentDate.get());
-			else c = CurrentProject.getTaskList().getTopLevelTasks();
+			if( activeOnly() ) {
+				if (opposite) {
+					c = CurrentProject.getProcessList().getActiveProcesses();
+					c.addAll(CurrentProject.getTaskList().getActiveSubTasks(null, CurrentDate.get()));
+				}
+				else {
+					c = CurrentProject.getTaskList().getActiveSubTasks(null, CurrentDate.get());
+					c.addAll(CurrentProject.getProcessList().getActiveProcesses());
+				}
+			}
+			else  {
+				if (opposite) {
+					c = CurrentProject.getProcessList().getActiveProcesses();
+					c.addAll(CurrentProject.getTaskList().getTopLevelTasks());
+				}
+				else {
+					c = CurrentProject.getTaskList().getTopLevelTasks();
+					c.addAll(CurrentProject.getProcessList().getActiveProcesses());
+				}
+			}
+		}
+		else if (parent instanceof Process) {
+			Process p = (Process) parent;
+			if (activeOnly()) {
+				c = p.getActiveTasks(CurrentDate.get());
+			}
+			else {
+				c = p.getTasks();
+			}
 		}
 		else{
 			Task t = (Task) parent;
@@ -68,8 +116,8 @@ public class TaskTableSorter extends TaskTableModel{
 		}
 		
 		Object array[] = c.toArray();
-		Arrays.sort(array, comparator);
 		if(opposite){
+			Arrays.sort(array, comparator);
 			return array[ array.length - index - 1];
 		}
 		return array[index];

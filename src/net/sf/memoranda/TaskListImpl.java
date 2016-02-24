@@ -97,6 +97,23 @@ public class TaskListImpl implements TaskList {
     public Collection<Task> getTopLevelTasks() {
         return getAllRootTasks();
     }
+    
+    public Collection<Task> getTopLevelNoProcessTasks() {
+        Collection<Task> allTasks = getAllRootTasks();
+        Vector<Task> noProcessTasks = new Vector<Task>();
+        
+        for (Task t : allTasks) {
+        	if (t.getProcess() == null) {
+        		noProcessTasks.add(t);
+        	}
+        }
+        
+        return noProcessTasks;
+    }
+    
+    public Collection<Task> getActiveTopLevelNoProcessTasks(CalendarDate date) {
+    	return filterActiveTasks(getTopLevelNoProcessTasks(), date);
+    }
 
     /**
      * All methods to obtain list of tasks are consolidated under getAllSubTasks and getActiveSubTasks.

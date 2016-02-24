@@ -2,6 +2,8 @@ package net.sf.memoranda;
 
 import java.util.Collection;
 
+import net.sf.memoranda.date.CalendarDate;
+
 /**
  * A process is a linear sequence of tasks to be performed.
  */
@@ -15,4 +17,5 @@ public interface Process {
 	public boolean hasTask(String id);
 	public boolean removeTask(String id);
 	public Collection<Task> getTasks();
+	public Collection<Task> getActiveTasks(CalendarDate date);
 }

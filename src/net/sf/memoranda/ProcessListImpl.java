@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Hashtable;
 
+import net.sf.memoranda.date.CalendarDate;
 import net.sf.memoranda.util.Util;
 import nu.xom.Attribute;
 import nu.xom.Document;
@@ -70,6 +71,22 @@ public class ProcessListImpl implements ProcessList {
 		}
 		
 		return removed;
+	}
+
+	@Override
+	public Collection<Process> getActiveProcesses() {
+		ArrayList<Process> processes = new ArrayList<Process>();
+		Elements elements = root.getChildElements("process");
+		
+		for (int i=0; i<elements.size(); i++) {
+			Process p = new ProcessImpl(elements.get(i), this);			
+			
+			if (p.getProgress() < 100) {
+				processes.add(new ProcessImpl(elements.get(i), this));
+			}
+		}
+		
+		return processes;
 	}
 
 	@Override

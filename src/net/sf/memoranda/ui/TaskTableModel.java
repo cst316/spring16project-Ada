@@ -20,17 +20,19 @@
 
 package net.sf.memoranda.ui;
 
-import javax.swing.event.*;
-import javax.swing.tree.TreePath;
+import java.util.Collection;
 
-import net.sf.memoranda.*;
+import javax.swing.event.EventListenerList;
+
+import net.sf.memoranda.CurrentProject;
+import net.sf.memoranda.Process;
+import net.sf.memoranda.Project;
+import net.sf.memoranda.Task;
 import net.sf.memoranda.date.CurrentDate;
 import net.sf.memoranda.ui.treetable.AbstractTreeTableModel;
 import net.sf.memoranda.ui.treetable.TreeTableModel;
-import net.sf.memoranda.util.Local;
 import net.sf.memoranda.util.Context;
-
-import java.util.Hashtable;
+import net.sf.memoranda.util.Local;
 
 /**
  * JAVADOC:
@@ -78,36 +80,78 @@ public class TaskTableModel extends AbstractTreeTableModel implements TreeTableM
      *      int)
      */
     public Object getValueAt(Object node, int column) {
-        if (node instanceof Project)
-            return null;
-        Task t = (Task) node;
-        switch (column) {
-        case 0:
-            return "";
-        case 1:
-            return t;
-        case 2:
-        	return t.getType();
-        case 3:
-            return t.getStartDate().getDate();
-        case 4:
-            if (t.getEndDate() == null)
-                return null;
-            else
-                return t.getEndDate().getDate();        
-        case 5:
-            return getPriorityString(t.getPriority());
-        case 6:
-            return getStatusString(t.getStatus(CurrentDate.get()));
-        case 7:            
-            //return new Integer(t.getProgress());
-			return t;
-        case TaskTable.TASK_ID:
-            return t.getID();
-        case TaskTable.TASK:
-            return t;
-        }
-        return "";
+        Object o = null;
+    	if (node instanceof Project) {
+    		o = null;
+    	}
+    	else if (node instanceof Process) {
+    		Process p = (Process) node;
+    		switch (column) {
+			case 0:
+				o = "";
+				break;
+			case 1:
+				o = p.getName();
+				break;
+			case 3:
+				// TODO
+				o = "start date";
+				break;
+			case 4:
+				// TODO
+				o = "end date";
+				break;
+			case TaskTable.TASK_ID:
+				o = p.getID();
+				break;
+			case TaskTable.TASK:
+				o = p;
+				break;
+			default:
+				o = "";
+				break;
+			}
+    	}
+    	else if (node instanceof Task) {
+			Task t = (Task) node;
+			switch (column) {
+			case 0:
+				o = "";
+				break;
+			case 1:
+				o = t;
+				break;
+			case 2:
+				o = t.getType();
+				break;
+			case 3:
+				o = t.getStartDate().getDate();
+				break;
+			case 4:
+				if (t.getEndDate() == null)
+					o = null;
+				else
+					o = t.getEndDate().getDate();
+				break;
+			case 5:
+				o = getPriorityString(t.getPriority());
+				break;
+			case 6:
+				o = getStatusString(t.getStatus(CurrentDate.get()));
+				break;
+			case 7:
+				//return new Integer(t.getProgress());
+				o = t;
+				break;
+			case TaskTable.TASK_ID:
+				o = t.getID();
+				break;
+			case TaskTable.TASK:
+				o = t;
+				break;
+			}
+		}
+		return o;
     }
 
     String getStatusString(int status) {
@@ -150,27 +194,85 @@ public class TaskTableModel extends AbstractTreeTableModel implements TreeTableM
      * @see javax.swing.tree.TreeModel#getChildCount(java.lang.Object)
      */
     public int getChildCount(Object parent) {
-        if (parent instanceof Project) {
-		if( activeOnly() ){
-			return CurrentProject.getTaskList().getActiveSubTasks(null, CurrentDate.get()).size();
-		}
-		else return CurrentProject.getTaskList().getTopLevelTasks().size();
+        int childCount = 0;
+    	
+    	if (parent instanceof Project) {
+			if( activeOnly() ){
+				childCount = CurrentProject.getTaskList().getActiveTopLevelNoProcessTasks(CurrentDate.get()).size();
+				childCount += CurrentProject.getProcessList().getActiveProcesses().size();
+			}
+			else {
+				childCount = CurrentProject.getTaskList().getTopLevelNoProcessTasks().size();
+				childCount += CurrentProject.getProcessList().getAllProcesses().size();
+			}
         }
-        Task t = (Task) parent;
-        if(activeOnly()) return CurrentProject.getTaskList().getActiveSubTasks(t.getID(), CurrentDate.get()).size();
-	else return t.getSubTasks().size();
+        else if (parent instanceof Process) {
+        	Process p = (Process) parent;
+        	if (activeOnly()) {
+				childCount = p.getActiveTasks(CurrentDate.get()).size();
+			}
+        	else {
+				childCount = p.getTasks().size();
+			} 
+        }
+        else if (parent instanceof Task) {
+			Task t = (Task) parent;
+			if (activeOnly()) {
+				childCount = CurrentProject.getTaskList().getActiveSubTasks(t.getID(), CurrentDate.get()).size();
+			}
+			else {
+				childCount = t.getSubTasks().size();
+			} 
+		}
+    	
+    	return childCount;
     }
 
     /**
      * @see javax.swing.tree.TreeModel#getChild(java.lang.Object, int)
      */
     public Object getChild(Object parent, int index) {
-        if (parent instanceof Project)
-            if( activeOnly() ) return CurrentProject.getTaskList().getActiveSubTasks(null, CurrentDate.get()).toArray()[index];
-	    else return CurrentProject.getTaskList().getTopLevelTasks().toArray()[index];
-        Task t = (Task) parent;
-        if(activeOnly()) return CurrentProject.getTaskList().getActiveSubTasks(t.getID(), CurrentDate.get()).toArray()[index];
-	else return t.getSubTasks().toArray()[index];
+    	Object child = null;
+        if (parent instanceof Project) {
+        	if( activeOnly() ) {
+        		Collection<Task> tasks = CurrentProject.getTaskList().getActiveSubTasks(null, CurrentDate.get());
+        		
+        		if (index < tasks.size()) {
+        			child = tasks.toArray()[index];
+        		}
+        		else {
+        			child = CurrentProject.getProcessList().getActiveProcesses().toArray()[index - tasks.size()];
+        		}
+        	}
+        	else {
+        		Collection<Task> tasks = CurrentProject.getTaskList().getTopLevelNoProcessTasks();
+        		
+        		if (index < tasks.size()) {
+        			child = tasks.toArray()[index];
+        		}
+        		else {
+        			child = CurrentProject.getProcessList().getAllProcesses().toArray()[index - tasks.size()];
+        		}
+        	}
+        }
+        else if (parent instanceof Process) {
+        	Process p = (Process) parent;
+        	if (activeOnly()) {
+        		child = p.getActiveTasks(CurrentDate.get()).toArray()[index];
+        	}
+        	else {
+        		child = p.getTasks().toArray()[index];
+        	}
+        }
+        else if (parent instanceof Task) {
+			Task t = (Task) parent;
+			if (activeOnly()) {
+				child = CurrentProject.getTaskList().getActiveSubTasks(t.getID(), CurrentDate.get()).toArray()[index];
+			} else {
+				child = t.getSubTasks().toArray()[index];
+			} 
+		}
+        return child;
     }
 
     /**

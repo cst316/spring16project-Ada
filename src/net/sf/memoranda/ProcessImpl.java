@@ -2,7 +2,10 @@ package net.sf.memoranda;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
+import java.util.Vector;
 
+import net.sf.memoranda.date.CalendarDate;
 import nu.xom.Attribute;
 import nu.xom.Element;
 import nu.xom.Elements;
@@ -118,7 +121,12 @@ public class ProcessImpl implements Process {
 		return tasks;
 	}
 	
-    private void setAttr(String a, String value) {
+    @Override
+	public Collection<Task> getActiveTasks(CalendarDate date) {
+		return filterActiveTasks(getTasks(), date);
+	}
+
+	private void setAttr(String a, String value) {
         Attribute attr = element.getAttribute(a);
         if (attr == null)
            element.addAttribute(new Attribute(a, value));
@@ -142,6 +150,32 @@ public class ProcessImpl implements Process {
     	
     	if (a != null) {
     		e.removeAttribute(a);
+    	}
+    }
+    
+    /**
+     * Code copied from TaskListImpl.java on 2/19/2016
+     */
+    private Collection<Task> filterActiveTasks(Collection<Task> tasks,CalendarDate date) {
+        Vector<Task> v = new Vector<>();
+        for (Iterator<Task> iter = tasks.iterator(); iter.hasNext();) {
+            Task t = (Task) iter.next();
+            if(isActive(t,date)) {
+                v.add(t);
+            }
+        }
+        return v;
+    }
+
+    /**
+     * Code copied from TaskListImpl.java on 2/19/2016
+     */
+    private boolean isActive(Task t,CalendarDate date) {
+    	if ((t.getStatus(date) == Task.ACTIVE) || (t.getStatus(date) == Task.DEADLINE) || (t.getStatus(date) == Task.FAILED)) {
+    		return true;
+    	}
+    	else {
+    		return false;
     	}
     }
 }
