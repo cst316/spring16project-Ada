@@ -15,10 +15,12 @@ public class TaskImplTest {
 	
 	private static Task task;
 	private static TaskList taskList;
+	private static ProcessList processList;
 	
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
 		taskList = CurrentProject.getTaskList();
+		processList = CurrentProject.getProcessList();
 	}
 	
 	@AfterClass
@@ -37,5 +39,21 @@ public class TaskImplTest {
 		
 		task.setType(TYPE_B);
 		assertTrue(task.getType().equals(TYPE_B));
+	}
+	
+	@Test
+	public void testDatesWithProcess() {
+		CalendarDate yesterday = CalendarDate.yesterday();
+		CalendarDate today = CalendarDate.today();
+		Process p = processList.createProcess("test", yesterday, yesterday);
+		Task t = taskList.createTask(today, today, "text", "type", 0, 0, "description", null);
+		
+		assertTrue(today.equals(t.getStartDate()));
+		assertTrue(today.equals(t.getEndDate()));
+		
+		p.addTask(t.getID());
+		
+		assertTrue(yesterday.equals(t.getStartDate()));
+		assertTrue(yesterday.equals(t.getEndDate()));
 	}
 }

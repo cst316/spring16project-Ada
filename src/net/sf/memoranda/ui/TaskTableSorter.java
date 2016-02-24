@@ -81,22 +81,22 @@ public class TaskTableSorter extends TaskTableModel{
 		if (parent instanceof Project){
 			if( activeOnly() ) {
 				if (opposite) {
-					c = CurrentProject.getProcessList().getActiveProcesses();
+					c = CurrentProject.getProcessList().getActiveProcesses(CurrentDate.get());
 					c.addAll(CurrentProject.getTaskList().getActiveSubTasks(null, CurrentDate.get()));
 				}
 				else {
 					c = CurrentProject.getTaskList().getActiveSubTasks(null, CurrentDate.get());
-					c.addAll(CurrentProject.getProcessList().getActiveProcesses());
+					c.addAll(CurrentProject.getProcessList().getActiveProcesses(CurrentDate.get()));
 				}
 			}
 			else  {
 				if (opposite) {
-					c = CurrentProject.getProcessList().getActiveProcesses();
+					c = CurrentProject.getProcessList().getAllProcesses();
 					c.addAll(CurrentProject.getTaskList().getTopLevelTasks());
 				}
 				else {
 					c = CurrentProject.getTaskList().getTopLevelTasks();
-					c.addAll(CurrentProject.getProcessList().getActiveProcesses());
+					c.addAll(CurrentProject.getProcessList().getAllProcesses());
 				}
 			}
 		}

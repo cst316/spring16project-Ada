@@ -15,11 +15,17 @@ public class ProcessTest {
 	private static final long ONE_HOUR = 1 * 60 * 60 * 1000;
 	ProcessList pl;
 	TaskList tl;
+	CalendarDate yesterday;
+	CalendarDate today;
+	CalendarDate tomorrow;
 	
 	@Before
 	public void setUp() throws Exception {
 		pl = CurrentProject.getProcessList();
 		tl = CurrentProject.getTaskList();
+		yesterday = CalendarDate.yesterday();
+		today = CalendarDate.today();
+		tomorrow = CalendarDate.tomorrow();
 	}
 
 	@After
@@ -28,7 +34,7 @@ public class ProcessTest {
 
 	@Test
 	public void testName() {
-		Process p = pl.createProcess("test");
+		Process p = pl.createProcess("test", today, today);
 		
 		p.setName("name");
 		assertEquals("name", p.getName());
@@ -38,8 +44,7 @@ public class ProcessTest {
 	
 	@Test
 	public void testTasks() {
-		CalendarDate today = new CalendarDate();
-		Process p = pl.createProcess("test");
+		Process p = pl.createProcess("test", today, today);
 		Task t = tl.createTask(today, today, "text", "type", Task.PRIORITY_LOW, 0, "desc", null);
 		
 		assertTrue(p.addTask(t.getID()));
@@ -52,7 +57,7 @@ public class ProcessTest {
 		}
 		
 		// test switching task to a different process
-		Process p2 = pl.createProcess("test2");
+		Process p2 = pl.createProcess("test2", today, today);
 		p2.addTask(t.getID());
 		
 		assertEquals(p2.getID(), t.getProcess().getID());
@@ -72,7 +77,7 @@ public class ProcessTest {
 	@Test
 	public void testProgress() {
 		CalendarDate today = new CalendarDate();
-		Process p = pl.createProcess("test");
+		Process p = pl.createProcess("test", today, today);
 		Task t1 = tl.createTask(today, today, "text", "type", Task.PRIORITY_LOW, ONE_HOUR, "desc", null);
 		Task t2 = tl.createTask(today, today, "text", "type", Task.PRIORITY_LOW, 2 * ONE_HOUR, "desc", null);
 		Task t3 = tl.createTask(today, today, "text", "type", Task.PRIORITY_LOW, 3 * ONE_HOUR, "desc", null);
@@ -86,5 +91,39 @@ public class ProcessTest {
 		p.addTask(t3.getID());
 		
 		assertEquals(16, p.getProgress(), 1);
+	}
+	
+	@Test
+	public void testDates() {
+		Process p = pl.createProcess("test", yesterday, yesterday);
+		assertTrue(yesterday.equals(p.getStartDate()));
+		assertTrue(yesterday.equals(p.getEndDate()));
+		
+		assertFalse(p.setStartDate(today));
+		assertTrue(p.setEndDate(tomorrow));
+		assertTrue(yesterday.equals(p.getStartDate()));
+		assertTrue(tomorrow.equals(p.getEndDate()));
+		
+		assertTrue(p.setStartDate(today));
+		assertFalse(p.setEndDate(yesterday));
+		assertTrue(today.equals(p.getStartDate()));
+		assertTrue(tomorrow.equals(p.getEndDate()));
+	}
+	
+	@Test
+	public void testGetActiveTasks() {
+		Process p = pl.createProcess("test", today, today);
+		Task t1 = tl.createTask(today, today, "text", "type", Task.PRIORITY_LOW, ONE_HOUR, "desc", null);
+		Task t2 = tl.createTask(today, today, "text", "type", Task.PRIORITY_LOW, 2 * ONE_HOUR, "desc", null);
+		Task t3 = tl.createTask(today, today, "text", "type", Task.PRIORITY_LOW, 3 * ONE_HOUR, "desc", null);
+		
+		p.addTask(t1.getID());
+		p.addTask(t2.getID());
+		p.addTask(t3.getID());
+		t1.setProgress(100);
+		
+		assertEquals(3, p.getTasks().size());
+		assertEquals(2, p.getActiveTasks(today).size());
+		assertEquals(0, p.getActiveTasks(yesterday).size());
 	}
 }

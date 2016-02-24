@@ -13,6 +13,10 @@ public interface Process {
 	public String getName();
 	public void setName(String name);
 	public int getProgress();
+	public CalendarDate getStartDate();
+	public boolean setStartDate(CalendarDate date);
+	public CalendarDate getEndDate();
+	public boolean setEndDate(CalendarDate date);
 	public boolean addTask(String id);
 	public boolean hasTask(String id);
 	public boolean removeTask(String id);

@@ -800,7 +800,7 @@ public class TaskPanel extends JPanel {
 		  if (!dialog.CANCELLED) {
 			  String name = dialog.getName();
 
-			  CurrentProject.getProcessList().createProcess(name);
+			  CurrentProject.getProcessList().createProcess(name, new CalendarDate(), new CalendarDate()); // TODO
 			  
 			  taskTable.tableChanged();
 			  CurrentStorage.get().storeProcessList(CurrentProject.getProcessList(), CurrentProject.get());

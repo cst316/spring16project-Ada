@@ -42,7 +42,16 @@ public class TaskImpl implements Task, Comparable {
     }
 
     public CalendarDate getStartDate() {
-        return new CalendarDate(_element.getAttribute("startDate").getValue());
+    	CalendarDate date;
+    	Process p = getProcess();
+    	
+    	if (p == null) {
+    		date = new CalendarDate(_element.getAttribute("startDate").getValue());
+    	}
+    	else {
+    		date = p.getStartDate();
+    	}
+        return date;
     }
 
     public void setStartDate(CalendarDate date) {
@@ -50,6 +59,10 @@ public class TaskImpl implements Task, Comparable {
     }
 
     public CalendarDate getEndDate() {
+    	Process p = getProcess();
+    	if (p != null) {
+    		return p.getEndDate();
+    	}
 		String ed = _element.getAttribute("endDate").getValue();
 		if (ed != "")
 			return new CalendarDate(_element.getAttribute("endDate").getValue());

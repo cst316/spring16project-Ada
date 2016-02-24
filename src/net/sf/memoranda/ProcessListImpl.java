@@ -34,17 +34,20 @@ public class ProcessListImpl implements ProcessList {
 	}
 	
 	@Override
-	public Process createProcess(String name) {
+	public Process createProcess(String name, CalendarDate startDate, CalendarDate endDate) {
 		Element e = new Element("process");
 		String id = Util.generateId();
+		Process p = new ProcessImpl(e, this);
 		
 		e.addAttribute(new Attribute("id", id));
-		e.addAttribute(new Attribute("name", name));
+		p.setName(name);
+		p.setStartDate(startDate);
+		p.setEndDate(endDate);
 		
 		root.appendChild(e);
 		elements.put(id, e);
 		
-		return new ProcessImpl(e, this);
+		return p;
 	}
 
 	@Override
@@ -74,14 +77,14 @@ public class ProcessListImpl implements ProcessList {
 	}
 
 	@Override
-	public Collection<Process> getActiveProcesses() {
+	public Collection<Process> getActiveProcesses(CalendarDate date) {
 		ArrayList<Process> processes = new ArrayList<Process>();
 		Elements elements = root.getChildElements("process");
 		
 		for (int i=0; i<elements.size(); i++) {
-			Process p = new ProcessImpl(elements.get(i), this);			
+			Process p = new ProcessImpl(elements.get(i), this);
 			
-			if (p.getProgress() < 100) {
+			if (p.getProgress() < 100 && !date.before(p.getStartDate())) {
 				processes.add(new ProcessImpl(elements.get(i), this));
 			}
 		}

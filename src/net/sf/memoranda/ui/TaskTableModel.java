@@ -199,7 +199,7 @@ public class TaskTableModel extends AbstractTreeTableModel implements TreeTableM
     	if (parent instanceof Project) {
 			if( activeOnly() ){
 				childCount = CurrentProject.getTaskList().getActiveTopLevelNoProcessTasks(CurrentDate.get()).size();
-				childCount += CurrentProject.getProcessList().getActiveProcesses().size();
+				childCount += CurrentProject.getProcessList().getActiveProcesses(CurrentDate.get()).size();
 			}
 			else {
 				childCount = CurrentProject.getTaskList().getTopLevelNoProcessTasks().size();
@@ -241,7 +241,7 @@ public class TaskTableModel extends AbstractTreeTableModel implements TreeTableM
         			child = tasks.toArray()[index];
         		}
         		else {
-        			child = CurrentProject.getProcessList().getActiveProcesses().toArray()[index - tasks.size()];
+        			child = CurrentProject.getProcessList().getActiveProcesses(CurrentDate.get()).toArray()[index - tasks.size()];
         		}
         	}
         	else {

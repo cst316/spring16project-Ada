@@ -57,6 +57,54 @@ public class ProcessImpl implements Process {
 	}
 
 	@Override
+	public CalendarDate getStartDate() {
+		Attribute attr = element.getAttribute("startdate");
+		CalendarDate date = null;
+		
+		if (attr != null) {
+			date = new CalendarDate(attr.getValue());
+		}
+		return date;
+	}
+
+	@Override
+	public boolean setStartDate(CalendarDate date) {
+		boolean isValid = false;
+		CalendarDate endDate = this.getEndDate();
+		
+		if (date != null && (endDate == null || !date.after(endDate))) {
+			setAttr("startdate", date.toString());
+			isValid = true;
+		}
+		
+		return isValid;
+	}
+
+	@Override
+	public CalendarDate getEndDate() {
+		Attribute attr = element.getAttribute("enddate");
+		CalendarDate date = null;
+		
+		if (attr != null) {
+			date = new CalendarDate(attr.getValue());
+		}
+		return date;
+	}
+
+	@Override
+	public boolean setEndDate(CalendarDate date) {
+		boolean isValid = false;
+		CalendarDate startDate = this.getStartDate();
+		
+		if (date != null && (startDate == null || !date.before(startDate))) {
+			setAttr("enddate", date.toString());
+			isValid = true;
+		}
+		
+		return isValid;
+	}
+
+	@Override
 	public boolean addTask(String id) {
 		boolean isTaskAdded = false;
 		

@@ -8,15 +8,19 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import net.sf.memoranda.date.CalendarDate;
+
 public class ProcessListTest {
 
 	ProcessList pl;
 	TaskList tl;
+	CalendarDate today;
 	
 	@Before
 	public void setUp() throws Exception {
 		pl = CurrentProject.getProcessList();
 		tl = CurrentProject.getTaskList();
+		today = new CalendarDate();
 	}
 
 	@After
@@ -25,7 +29,8 @@ public class ProcessListTest {
 
 	@Test
 	public void test() {
-		Process p1 = pl.createProcess("test");
+		pl.createProcess("process", today, today);
+		Process p1 = pl.createProcess("test", today, today);
 		assertTrue(p1 != null);
 		
 		Process p2 = pl.getProcess(p1.getID());
@@ -42,5 +47,18 @@ public class ProcessListTest {
 		assertEquals(1, sizeOne-sizeTwo, 0);
 		
 		assertTrue(pl.getProcess("badID") == null);
+		
+		Process p3 = pl.createProcess("complete process", today, today);
+		Task t1 = tl.createTask(today, today, "text", "type", 0, 10, "description", null);
+		p3.addTask(t1.getID());
+		t1.setProgress(100);
+		
+		CalendarDate tomorrow = CalendarDate.tomorrow();
+		Process p4 = pl.createProcess("future process", tomorrow, tomorrow);
+		
+		sizeOne = pl.getAllProcesses().size();
+		sizeTwo = pl.getActiveProcesses(today).size();
+		
+		assertTrue((sizeOne - sizeTwo) >= 2);
 	}
 }
