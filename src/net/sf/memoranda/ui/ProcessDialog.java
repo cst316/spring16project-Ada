@@ -6,6 +6,7 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
+import java.util.Date;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -16,6 +17,8 @@ import javax.swing.border.Border;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import net.sf.memoranda.CurrentProject;
+import net.sf.memoranda.date.CalendarDate;
 import net.sf.memoranda.ui.htmleditor.util.Local;
 
 /**
@@ -23,23 +26,30 @@ import net.sf.memoranda.ui.htmleditor.util.Local;
  * @author james
  *
  */
-public class ProcessNameDialog extends JDialog {
+public class ProcessDialog extends JDialog {
 
 	public boolean CANCELLED = true;
+	
+	CalendarDate minDate;
+	CalendarDate maxDate;
+	CalendarDate startDate;
+	CalendarDate endDate;
 	
 	Border defaultBorder;
 	
 	JPanel namePanel;
 	JTextField nameTextField;
 	
+	StartEndDatePanel datesPanel;
+	
 	JPanel buttonPanel;
 	JButton okButton;
 	JButton cancelButton;
 	
-	public ProcessNameDialog(Frame frame, String title) {
+	public ProcessDialog(Frame frame, String title, CalendarDate startDate, CalendarDate endDate) {
 		super(frame, title, true);
 		try {
-			jbInit();
+			jbInit(startDate, endDate);
 			pack();
 		}
         catch (Exception ex) {
@@ -55,11 +65,24 @@ public class ProcessNameDialog extends JDialog {
 		return nameTextField.getText().trim();
 	}
 	
-	private void jbInit() {
+	public Date getStartDate() {
+		return datesPanel.getStartDate();
+	}
+	
+	public Date getEndDate() {
+		return datesPanel.getEndDate();
+	}
+	
+	private void jbInit(CalendarDate startDate, CalendarDate endDate) {
 		this.setResizable(false);
 		defaultBorder = BorderFactory.createEmptyBorder(3, 3, 3, 3);
 		
 		drawNamePanel();
+		
+		datesPanel = new StartEndDatePanel(this);
+		datesPanel.setStartDate(startDate);
+		datesPanel.setEndDate(endDate);
+		this.getContentPane().add(datesPanel, BorderLayout.CENTER);
 		
 		drawButtonPanel();
 	}
@@ -83,7 +106,7 @@ public class ProcessNameDialog extends JDialog {
         cancelButton.setText(Local.getString("Cancel"));
         cancelButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                ProcessNameDialog.this.dispose();
+                ProcessDialog.this.dispose();
             }
         });
         
@@ -103,7 +126,7 @@ public class ProcessNameDialog extends JDialog {
 		namePanel.setBorder(defaultBorder);
 		namePanel.add(nameTextField);
 		
-		this.getContentPane().add(namePanel, BorderLayout.CENTER);
+		this.getContentPane().add(namePanel, BorderLayout.NORTH);
 	}
 	
 	private void okButton_actionPerormed() {

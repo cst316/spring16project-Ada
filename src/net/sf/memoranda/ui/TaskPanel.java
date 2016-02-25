@@ -793,14 +793,16 @@ public class TaskPanel extends JPanel {
 	}
 	  
 	void newProcessB_actionPerformed(ActionEvent e) {
-		  ProcessNameDialog dialog = new ProcessNameDialog(App.getFrame(), "New Process");
+		  ProcessDialog dialog = new ProcessDialog(App.getFrame(), "New Process", CurrentDate.get(), CurrentDate.get());
 		  dialog.setLocationRelativeTo(this);
 		  dialog.setVisible(true);
 		  
 		  if (!dialog.CANCELLED) {
 			  String name = dialog.getName();
-
-			  CurrentProject.getProcessList().createProcess(name, new CalendarDate(), new CalendarDate()); // TODO
+			  Date startDate = dialog.getStartDate();
+			  Date endDate = dialog.getEndDate();
+			  
+			  CurrentProject.getProcessList().createProcess(name, new CalendarDate(startDate), new CalendarDate(endDate));
 			  
 			  taskTable.tableChanged();
 			  CurrentStorage.get().storeProcessList(CurrentProject.getProcessList(), CurrentProject.get());
@@ -809,16 +811,20 @@ public class TaskPanel extends JPanel {
 	}
 	
 	void editProcessB_actionPerformed(ActionEvent e) {
-		ProcessNameDialog dialog = new ProcessNameDialog(App.getFrame(), "Edit Process");
 		Process selectedProcess = (Process) taskTable.getModel().getValueAt(taskTable.getSelectedRow(), TaskTable.TASK);
+		ProcessDialog dialog = new ProcessDialog(App.getFrame(), "Edit Process", selectedProcess.getStartDate(), selectedProcess.getEndDate());
 		dialog.setLocationRelativeTo(this);
 		dialog.nameTextField.setText(selectedProcess.getName());
 		dialog.setVisible(true);
 		
 		if (!dialog.CANCELLED) {
 			String name = dialog.getName();
+			Date startDate = dialog.getStartDate();
+			Date endDate = dialog.getEndDate();
 			
 			selectedProcess.setName(name);
+			selectedProcess.setStartDate(new CalendarDate(startDate));
+			selectedProcess.setEndDate(new CalendarDate(endDate));
 			
 			taskTable.tableChanged();
 			CurrentStorage.get().storeProcessList(CurrentProject.getProcessList(), CurrentProject.get());
