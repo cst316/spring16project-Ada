@@ -198,7 +198,7 @@ public class TaskPanel extends JPanel {
         newProcessB.setBorderPainted(false);
         
         editProcessB.setIcon(
-                new ImageIcon(net.sf.memoranda.ui.AppFrame.class.getResource("resources/icons/process_new.png")));
+                new ImageIcon(net.sf.memoranda.ui.AppFrame.class.getResource("resources/icons/todo_edit.png")));
         editProcessB.setEnabled(false);
         editProcessB.setMaximumSize(new Dimension(24, 24));
         editProcessB.setMinimumSize(new Dimension(24, 24));
@@ -214,7 +214,7 @@ public class TaskPanel extends JPanel {
         editProcessB.setBorderPainted(false);
         
         addProcessTaskB.setIcon(
-                new ImageIcon(net.sf.memoranda.ui.AppFrame.class.getResource("resources/icons/process_new.png")));
+                new ImageIcon(net.sf.memoranda.ui.AppFrame.class.getResource("resources/icons/todo_remove.png")));
         addProcessTaskB.setEnabled(false);
         addProcessTaskB.setMaximumSize(new Dimension(24, 24));
         addProcessTaskB.setMinimumSize(new Dimension(24, 24));

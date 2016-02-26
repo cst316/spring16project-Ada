@@ -94,12 +94,13 @@ public class TaskTableModel extends AbstractTreeTableModel implements TreeTableM
 				o = p.getName();
 				break;
 			case 3:
-				// TODO
-				o = "start date";
+				o = p.getStartDate().getDate();
 				break;
 			case 4:
-				// TODO
-				o = "end date";
+				o = p.getEndDate().getDate();
+				break;
+			case 7:
+				o = p;
 				break;
 			case TaskTable.TASK_ID:
 				o = p.getID();

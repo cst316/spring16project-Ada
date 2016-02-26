@@ -60,10 +60,30 @@ public class TaskTableSorter extends TaskTableModel{
 			else if (o1 instanceof Process && o2 instanceof Process) {
 				Process p1 = (Process) o1;
 				Process p2 = (Process) o2;
-				compare = p1.getName().compareTo(p2.getName());
+				
+				switch (sorting_column) {
+				case 1:
+					compare = p1.getName().compareTo(p2.getName());
+					break;
+				case 3:
+					compare = p1.getStartDate().getDate().compareTo(p2.getStartDate().getDate());
+					break;
+				case 4:
+					compare = p1.getEndDate().getDate().compareTo(p2.getEndDate().getDate());
+					break;
+				case 7:
+					compare = p1.getProgress() - p2.getProgress();
+					break;
+				default:
+					compare = p1.getName().compareTo(p2.getName());
+					break;
+				}
 			}
 			else {
-				compare = (o1 instanceof Task ? 1 : -1);
+				compare = (o1 instanceof Task ? -1 : 1);
+				if (TaskTableSorter.this.opposite) {
+					compare *= -1;
+				}
 			}
 			return compare;
 		}
@@ -80,24 +100,12 @@ public class TaskTableSorter extends TaskTableModel{
 		
 		if (parent instanceof Project){
 			if( activeOnly() ) {
-				if (opposite) {
-					c = CurrentProject.getProcessList().getActiveProcesses(CurrentDate.get());
-					c.addAll(CurrentProject.getTaskList().getActiveSubTasks(null, CurrentDate.get()));
-				}
-				else {
-					c = CurrentProject.getTaskList().getActiveSubTasks(null, CurrentDate.get());
-					c.addAll(CurrentProject.getProcessList().getActiveProcesses(CurrentDate.get()));
-				}
+				c = CurrentProject.getTaskList().getActiveSubTasks(null, CurrentDate.get());
+				c.addAll(CurrentProject.getProcessList().getActiveProcesses(CurrentDate.get()));
 			}
 			else  {
-				if (opposite) {
-					c = CurrentProject.getProcessList().getAllProcesses();
-					c.addAll(CurrentProject.getTaskList().getTopLevelTasks());
-				}
-				else {
-					c = CurrentProject.getTaskList().getTopLevelTasks();
-					c.addAll(CurrentProject.getProcessList().getAllProcesses());
-				}
+				c = CurrentProject.getTaskList().getTopLevelTasks();
+				c.addAll(CurrentProject.getProcessList().getAllProcesses());
 			}
 		}
 		else if (parent instanceof Process) {
@@ -111,15 +119,19 @@ public class TaskTableSorter extends TaskTableModel{
 		}
 		else{
 			Task t = (Task) parent;
-			if(activeOnly()) c = CurrentProject.getTaskList().getActiveSubTasks(t.getID(), CurrentDate.get());
-			else c = t.getSubTasks();
+			if (activeOnly()) {
+				c = CurrentProject.getTaskList().getActiveSubTasks(t.getID(), CurrentDate.get());
+			}
+			else  {
+				c = t.getSubTasks();
+			}
 		}
 		
 		Object array[] = c.toArray();
+		Arrays.sort(array, comparator);
 		if(opposite){
-			Arrays.sort(array, comparator);
 			return array[ array.length - index - 1];
-		}
+		}		
 		return array[index];
 	}
 
