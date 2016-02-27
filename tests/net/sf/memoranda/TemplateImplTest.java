@@ -80,4 +80,16 @@ public class TemplateImplTest {
 	public void testRemoveTemplate() {
 		templateList.removeTemplate(template);
 	}
+	
+	@Test
+	public void testNullValues() {
+		Template t = templateList.createTemplate(null, null, "Empty Template", null, 0, 0, null);
+		int[] diff = t.getDateDifference();
+		
+		assertEquals(-1, diff[0]);
+		assertEquals(-1, diff[1]);
+		assertEquals(-1, diff[2]);
+		assertEquals("", t.getDescription());
+		assertEquals("", t.getType());
+	}
 }
