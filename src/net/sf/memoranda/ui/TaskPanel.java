@@ -530,7 +530,7 @@ public class TaskPanel extends JPanel {
         Task t =
             CurrentProject.getTaskList().getTask(
                 taskTable.getModel().getValueAt(taskTable.getSelectedRow(), TaskTable.TASK_ID).toString());
-        TaskDialog dlg = new TaskDialog(App.getFrame(), Local.getString("Edit task"));
+        TaskDialog dlg = new TaskDialog(App.getFrame(), Local.getString("Edit task"), null);
         Dimension frmSize = App.getFrame().getSize();
         Point loc = App.getFrame().getLocation();
         dlg.setLocation((frmSize.width - dlg.getSize().width) / 2 + loc.x, (frmSize.height - dlg.getSize().height) / 2 + loc.y);
@@ -575,7 +575,7 @@ public class TaskPanel extends JPanel {
     }
 
     void newTaskB_actionPerformed(ActionEvent e) {
-        TaskDialog dlg = new TaskDialog(App.getFrame(), Local.getString("New task"));
+        TaskDialog dlg = new TaskDialog(App.getFrame(), Local.getString("New task"), null);
         
         //XXX String parentTaskId = taskTable.getCurrentRootTask();
         
@@ -606,7 +606,7 @@ public class TaskPanel extends JPanel {
     }
 
     void addSubTask_actionPerformed(ActionEvent e) {
-        TaskDialog dlg = new TaskDialog(App.getFrame(), Local.getString("New Task"));
+        TaskDialog dlg = new TaskDialog(App.getFrame(), Local.getString("New Task"), null);
         String parentTaskId = taskTable.getModel().getValueAt(taskTable.getSelectedRow(), TaskTable.TASK_ID).toString();
         
 //        Util.debug("Adding sub task under " + parentTaskId);
@@ -832,8 +832,65 @@ public class TaskPanel extends JPanel {
 		}
 	}
 	
+	// US-3 Task 49: Create add task wizard
 	void addProcessTaskB_actionPerformed(ActionEvent e) {
-		// TODO
+		// Get process name
+		Process selectedProcess = (Process) taskTable.getModel().getValueAt(taskTable.getSelectedRow(), TaskTable.TASK);
+		String processName = selectedProcess.getName();
+		String processId = selectedProcess.getID();
+		
+		Util.debug("ID: " + processId);
+		
+		// Button text
+		String[] options = new String[2];
+		options[0] = new String(Local.getString("Create New Task"));
+		options[1] = new String(Local.getString("Use Existing Task"));
+		
+		// Display option pane
+		int selection = JOptionPane.showOptionDialog(App.getFrame(), Local.getString("Select how you would like to add your task to \"" + processName + "\":"), Local.getString("Add Process Task"), 0, JOptionPane.INFORMATION_MESSAGE, null, options, null);
+		
+		// Selection handle
+		if (selection == 0) { // Create new task
+			TaskDialog taskDialog = new TaskDialog(App.getFrame(), Local.getString("New Task for \"" + processName + "\""), processId);
+			
+	        Dimension frmSize = App.getFrame().getSize();
+	        Point loc = App.getFrame().getLocation();
+	        taskDialog.jSpinnerStartDate.getModel().setValue(CurrentDate.get().getDate());
+	        taskDialog.jSpinnerEndDate.getModel().setValue(CurrentDate.get().getDate());
+	        taskDialog.setLocation((frmSize.width - taskDialog.getSize().width) / 2 + loc.x, (frmSize.height - taskDialog.getSize().height) / 2 + loc.y);
+	        taskDialog.setVisible(true);
+	        if (taskDialog.CANCELLED)
+	            return;
+	        
+	        CalendarDate sd = new CalendarDate(selectedProcess.getStartDate().getDate());
+	        CalendarDate ed = new CalendarDate(selectedProcess.getEndDate().getDate());
+	        long effort = Util.getMillisFromHours(taskDialog.effortField.getText());
+			Task newTask = CurrentProject.getTaskList().createTask(sd, ed, taskDialog.jTextFieldName.getText(), taskDialog.jTextFieldType.getText(), taskDialog.jComboBoxPriority.getSelectedIndex(),effort, taskDialog.descriptionField.getText(),null);
+			newTask.setProgress(((Integer)taskDialog.jSpinnerProgress.getValue()).intValue());
+			CurrentStorage.get().storeTaskList(CurrentProject.getTaskList(), CurrentProject.get());
+			
+			selectedProcess.addTask(newTask.getID());
+			CurrentStorage.get().storeProcessList(CurrentProject.getProcessList(), CurrentProject.get());
+	        //taskTable.tableChanged();
+	        //parentPanel.updateIndicators();
+	        
+			
+		} else if (selection == 1) {
+			// Use existing
+			
+			TaskSelectionDialog tsd = new TaskSelectionDialog(App.getFrame(), "Tasks");
+			tsd.setLocationRelativeTo(this);
+			tsd.setVisible(true);
+			
+			if (!tsd.CANCELLED) {
+				String[] tasks = tsd.getSelectedTasks();
+				
+				for (int i = 0; i < tasks.length; i++) {
+					selectedProcess.addTask(tasks[i]);
+					CurrentStorage.get().storeProcessList(CurrentProject.getProcessList(), CurrentProject.get());
+				}
+			}
+		}
 	}
 
 	// toggle "show active only"

@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.Vector;
 
 import net.sf.memoranda.date.CalendarDate;
+import net.sf.memoranda.util.Util;
 import nu.xom.Attribute;
 import nu.xom.Element;
 import nu.xom.Elements;
@@ -106,11 +107,15 @@ public class ProcessImpl implements Process {
 
 	@Override
 	public boolean addTask(String id) {
+		Util.debug("Getting Task ID: " + id + "...");
+		
 		boolean isTaskAdded = false;
 		
 		Task task = CurrentProject.getTaskList().getTask(id);
 		
 		if (!hasTask(id) && task != null) {
+			Util.debug("Found Task!");
+			
 			Element child = new Element("task");
 			child.addAttribute(new Attribute("id", id));
 			element.appendChild(child);
@@ -119,6 +124,8 @@ public class ProcessImpl implements Process {
 			
 			isTaskAdded = true;
 		}
+		
+		Util.debug("Added? " + Boolean.toString(isTaskAdded));
 		
 		return isTaskAdded;
 	}
