@@ -854,6 +854,8 @@ public class TaskPanel extends JPanel {
 	
 	void editProcessB_actionPerformed(ActionEvent e) {
 		Process selectedProcess = (Process) taskTable.getModel().getValueAt(taskTable.getSelectedRow(), TaskTable.TASK);
+		String processName = selectedProcess.getName();
+		String processId = selectedProcess.getID();
 		ProcessDialog dialog = new ProcessDialog(App.getFrame(), "Edit Process", selectedProcess.getStartDate(), selectedProcess.getEndDate());
 		dialog.setLocationRelativeTo(this);
 		dialog.nameTextField.setText(selectedProcess.getName());
@@ -871,6 +873,8 @@ public class TaskPanel extends JPanel {
 			taskTable.tableChanged();
 			CurrentStorage.get().storeProcessList(CurrentProject.getProcessList(), CurrentProject.get());
 			parentPanel.updateIndicators();
+	        
+	        sortProcessTasks(processName, processId);
 		}
 	}
 	
