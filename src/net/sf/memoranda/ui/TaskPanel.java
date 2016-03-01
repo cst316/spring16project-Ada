@@ -55,6 +55,7 @@ public class TaskPanel extends JPanel {
     JButton newProcessB = new JButton();
     JButton editProcessB = new JButton();
     JButton addProcessTaskB = new JButton();
+    JButton removeProcessTaskB = new JButton();
     
 	JCheckBoxMenuItem ppShowActiveOnlyChB = new JCheckBoxMenuItem();
 		
@@ -228,6 +229,22 @@ public class TaskPanel extends JPanel {
             }
         });
         addProcessTaskB.setBorderPainted(false);
+        
+        removeProcessTaskB.setIcon(
+                new ImageIcon(net.sf.memoranda.ui.AppFrame.class.getResource("resources/icons/todo_remove.png")));
+        removeProcessTaskB.setEnabled(false);
+        removeProcessTaskB.setMaximumSize(new Dimension(24, 24));
+        removeProcessTaskB.setMinimumSize(new Dimension(24, 24));
+        removeProcessTaskB.setToolTipText(Local.getString("Remove task from process"));
+        removeProcessTaskB.setRequestFocusEnabled(false);
+        removeProcessTaskB.setPreferredSize(new Dimension(24, 24));
+        removeProcessTaskB.setFocusable(false);
+        removeProcessTaskB.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+            	removeProcessTaskB_actionPerformed(e);
+            }
+        });
+        removeProcessTaskB.setBorderPainted(false);
             
 		// added by rawsushi
 //		showActiveOnly.setBorderPainted(false);
@@ -378,6 +395,7 @@ public class TaskPanel extends JPanel {
         tasksToolBar.add(newProcessB, null);
         tasksToolBar.add(editProcessB, null);
         tasksToolBar.add(addProcessTaskB, null);
+        tasksToolBar.add(removeProcessTaskB, null);
 
 		//tasksToolBar.add(showActiveOnly, null);
         
@@ -409,9 +427,10 @@ public class TaskPanel extends JPanel {
                 
             	boolean taskSelected = false;
             	boolean processSelected = false;
+            	Object selectedItem;
             	
             	if (taskTable.getRowCount() > 0 && taskTable.getSelectedRowCount() == 1) {
-            		Object selectedItem = taskTable.getModel().getValueAt(taskTable.getSelectedRow(), TaskTable.TASK);
+            		selectedItem = taskTable.getModel().getValueAt(taskTable.getSelectedRow(), TaskTable.TASK);
                 	taskSelected = (selectedItem instanceof Task);
                 	processSelected = (selectedItem instanceof Process);
             	}
@@ -444,10 +463,19 @@ public class TaskPanel extends JPanel {
     				//ppSubTasks.setEnabled(hasSubTasks);
     				ppCalcTask.setEnabled(hasSubTasks);
     				Task t = CurrentProject.getTaskList().getTask(thisTaskId);
-                    parentPanel.calendar.jnCalendar.renderer.setTask(t);
+                    if (t.getParentId() == null && t.getProcess() != null) {
+                    	removeProcessTaskB.setEnabled(true);
+                    }
+                    else {
+                    	removeProcessTaskB.setEnabled(false);
+                    }
+    				
+    				parentPanel.calendar.jnCalendar.renderer.setTask(t);
                     parentPanel.calendar.jnCalendar.updateUI();
                 }
                 else {
+                	removeProcessTaskB.setEnabled(false);
+                	
                     parentPanel.calendar.jnCalendar.renderer.setTask(null);
                     parentPanel.calendar.jnCalendar.updateUI();
                 }
@@ -909,6 +937,24 @@ public class TaskPanel extends JPanel {
 				CurrentStorage.get().storeTaskList(CurrentProject.getTaskList(), CurrentProject.get());
 				parentPanel.updateIndicators();
 			}
+		}
+	}
+	
+	/**
+	 * Remove task from process.
+	 * @param e	ActionEvent
+	 */
+	void removeProcessTaskB_actionPerformed(ActionEvent e) {
+		Task t = (Task) taskTable.getModel().getValueAt(taskTable.getSelectedRow(), TaskTable.TASK);
+		Process p = t.getProcess();
+		
+		if (p != null) {
+			p.removeTask(t.getID());
+			
+			taskTable.tableChanged();
+			CurrentStorage.get().storeProcessList(CurrentProject.getProcessList(), CurrentProject.get());
+			CurrentStorage.get().storeTaskList(CurrentProject.getTaskList(), CurrentProject.get());
+			parentPanel.updateIndicators();
 		}
 	}
 
