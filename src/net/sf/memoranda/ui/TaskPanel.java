@@ -875,6 +875,23 @@ public class TaskPanel extends JPanel {
 	}
 	
 	// US-3 Task 49: Create add task wizard
+	// Show sorting dialog following task addition to process
+	void sortProcessTasks(String processName, String processId) {
+		ProcessTaskSortDialog ptsd = new ProcessTaskSortDialog(App.getFrame(), Local.getString("Sort Tasks for \"" + processName + "\":"), processId);
+		
+        Dimension frmSize = App.getFrame().getSize();
+        Point loc = App.getFrame().getLocation();
+        ptsd.setLocation((frmSize.width - ptsd.getSize().width) / 2 + loc.x, (frmSize.height - ptsd.getSize().height) / 2 + loc.y);
+        ptsd.setVisible(true);
+        if (ptsd.CANCELLED)
+            return;
+        
+		CurrentStorage.get().storeProcessList(CurrentProject.getProcessList(), CurrentProject.get());
+        taskTable.tableChanged();
+        parentPanel.updateIndicators();
+	}
+	
+	// US-3 Task 49: Create add task wizard
 	void addProcessTaskB_actionPerformed(ActionEvent e) {
 		// Get process name
 		Process selectedProcess = (Process) taskTable.getModel().getValueAt(taskTable.getSelectedRow(), TaskTable.TASK);
@@ -917,6 +934,8 @@ public class TaskPanel extends JPanel {
 	        taskTable.tableChanged();
 	        parentPanel.updateIndicators();
 	        
+	        sortProcessTasks(processName, processId);
+	        
 			
 		} else if (selection == 1) {
 			// Use existing
@@ -936,6 +955,8 @@ public class TaskPanel extends JPanel {
 				CurrentStorage.get().storeProcessList(CurrentProject.getProcessList(), CurrentProject.get());
 				CurrentStorage.get().storeTaskList(CurrentProject.getTaskList(), CurrentProject.get());
 				parentPanel.updateIndicators();
+		        
+		        sortProcessTasks(processName, processId);
 			}
 		}
 	}
