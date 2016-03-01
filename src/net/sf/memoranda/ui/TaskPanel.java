@@ -214,7 +214,7 @@ public class TaskPanel extends JPanel {
         editProcessB.setBorderPainted(false);
         
         addProcessTaskB.setIcon(
-                new ImageIcon(net.sf.memoranda.ui.AppFrame.class.getResource("resources/icons/todo_remove.png")));
+                new ImageIcon(net.sf.memoranda.ui.AppFrame.class.getResource("resources/icons/todo_new.png")));
         addProcessTaskB.setEnabled(false);
         addProcessTaskB.setMaximumSize(new Dimension(24, 24));
         addProcessTaskB.setMinimumSize(new Dimension(24, 24));
@@ -530,7 +530,14 @@ public class TaskPanel extends JPanel {
         Task t =
             CurrentProject.getTaskList().getTask(
                 taskTable.getModel().getValueAt(taskTable.getSelectedRow(), TaskTable.TASK_ID).toString());
-        TaskDialog dlg = new TaskDialog(App.getFrame(), Local.getString("Edit task"), null);
+        Process p = t.getProcess();
+        TaskDialog dlg;
+        if (p == null) {
+        	dlg = new TaskDialog(App.getFrame(), Local.getString("Edit task"), null);
+        }
+        else {
+        	dlg = new TaskDialog(App.getFrame(), Local.getString("Edit task"), p.getID());
+        }
         Dimension frmSize = App.getFrame().getSize();
         Point loc = App.getFrame().getLocation();
         dlg.setLocation((frmSize.width - dlg.getSize().width) / 2 + loc.x, (frmSize.height - dlg.getSize().height) / 2 + loc.y);
@@ -606,7 +613,6 @@ public class TaskPanel extends JPanel {
     }
 
     void addSubTask_actionPerformed(ActionEvent e) {
-        TaskDialog dlg = new TaskDialog(App.getFrame(), Local.getString("New Task"), null);
         String parentTaskId = taskTable.getModel().getValueAt(taskTable.getSelectedRow(), TaskTable.TASK_ID).toString();
         
 //        Util.debug("Adding sub task under " + parentTaskId);
@@ -614,7 +620,15 @@ public class TaskPanel extends JPanel {
         Dimension frmSize = App.getFrame().getSize();
         Point loc = App.getFrame().getLocation();
 		Task parent = CurrentProject.getTaskList().getTask(parentTaskId);
+		Process parentProc = parent.getProcess();
 		CalendarDate todayD = CurrentDate.get();
+        TaskDialog dlg;
+        if (parentProc == null) {
+        	dlg = new TaskDialog(App.getFrame(), Local.getString("New Task"), null);
+        }
+        else {
+        	dlg = new TaskDialog(App.getFrame(), Local.getString("New Task"), parentProc.getID());
+        }
 		if (todayD.after(parent.getStartDate()))
 			dlg.setStartDate(todayD);
 		else
@@ -868,11 +882,12 @@ public class TaskPanel extends JPanel {
 			Task newTask = CurrentProject.getTaskList().createTask(sd, ed, taskDialog.jTextFieldName.getText(), taskDialog.jTextFieldType.getText(), taskDialog.jComboBoxPriority.getSelectedIndex(),effort, taskDialog.descriptionField.getText(),null);
 			newTask.setProgress(((Integer)taskDialog.jSpinnerProgress.getValue()).intValue());
 			CurrentStorage.get().storeTaskList(CurrentProject.getTaskList(), CurrentProject.get());
-			
+
 			selectedProcess.addTask(newTask.getID());
 			CurrentStorage.get().storeProcessList(CurrentProject.getProcessList(), CurrentProject.get());
-	        //taskTable.tableChanged();
-	        //parentPanel.updateIndicators();
+			CurrentStorage.get().storeTaskList(CurrentProject.getTaskList(), CurrentProject.get());
+	        taskTable.tableChanged();
+	        parentPanel.updateIndicators();
 	        
 			
 		} else if (selection == 1) {
@@ -887,8 +902,12 @@ public class TaskPanel extends JPanel {
 				
 				for (int i = 0; i < tasks.length; i++) {
 					selectedProcess.addTask(tasks[i]);
-					CurrentStorage.get().storeProcessList(CurrentProject.getProcessList(), CurrentProject.get());
 				}
+				
+				taskTable.tableChanged();
+				CurrentStorage.get().storeProcessList(CurrentProject.getProcessList(), CurrentProject.get());
+				CurrentStorage.get().storeTaskList(CurrentProject.getTaskList(), CurrentProject.get());
+				parentPanel.updateIndicators();
 			}
 		}
 	}

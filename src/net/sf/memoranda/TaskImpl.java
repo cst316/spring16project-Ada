@@ -522,6 +522,12 @@ public class TaskImpl implements Task, Comparable {
 		if (a != null) {
 			p = CurrentProject.getProcessList().getProcess(a.getValue());
 		}
+		else {
+			Task parent = this.getParentTask();
+			if (parent != null) {
+			p = parent.getProcess();	
+			}
+		}
 		return p;
 	}
 }
