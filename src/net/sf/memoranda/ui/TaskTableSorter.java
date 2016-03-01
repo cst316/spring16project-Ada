@@ -128,9 +128,11 @@ public class TaskTableSorter extends TaskTableModel{
 		}
 		
 		Object array[] = c.toArray();
-		Arrays.sort(array, comparator);
-		if(opposite){
-			return array[ array.length - index - 1];
+		if (!(parent instanceof Process)) {
+			Arrays.sort(array, comparator);
+			if(opposite){
+				return array[ array.length - index - 1];
+			}
 		}		
 		return array[index];
 	}

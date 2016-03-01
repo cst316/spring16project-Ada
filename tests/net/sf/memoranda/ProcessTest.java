@@ -23,9 +23,9 @@ public class ProcessTest {
 	public void setUp() throws Exception {
 		pl = CurrentProject.getProcessList();
 		tl = CurrentProject.getTaskList();
-		yesterday = CalendarDate.yesterday();
-		today = CalendarDate.today();
-		tomorrow = CalendarDate.tomorrow();
+		yesterday = new CalendarDate(29, 2, 2016);
+		today = new CalendarDate(1, 3, 2016);
+		tomorrow = new CalendarDate(2, 3, 2016);
 	}
 
 	@After
@@ -125,5 +125,59 @@ public class ProcessTest {
 		assertEquals(3, p.getTasks().size());
 		assertEquals(2, p.getActiveTasks(today).size());
 		assertEquals(0, p.getActiveTasks(yesterday).size());
+	}
+	
+	@Test
+	public void testTaskOrder() {
+		Process p = pl.createProcess("test", today, today);
+		Task t1 = tl.createTask(today, today, "text", "type", Task.PRIORITY_LOW, ONE_HOUR, "desc", null);
+		Task t2 = tl.createTask(today, today, "text", "type", Task.PRIORITY_LOW, ONE_HOUR, "desc", null);
+		Task t3 = tl.createTask(today, today, "text", "type", Task.PRIORITY_LOW, ONE_HOUR, "desc", null);
+		Task outsideTask = tl.createTask(today, today, "text", "type", Task.PRIORITY_LOW, ONE_HOUR, "desc", null);
+		
+		p.addTask(t1.getID());
+		p.addTask(t2.getID());
+		p.addTask(t3.getID());
+		
+		// testing valid order
+		String[] validOrder = {t1.getID(), t2.getID(), t3.getID()};
+		
+		assertTrue(p.setTaskOrder(validOrder));
+		
+		// testing too few tasks
+		String[] tooFew = {t1.getID(), t2.getID()};
+		
+		assertFalse(p.setTaskOrder(tooFew));
+		
+		// testing with task not in process
+		String[] wrongTask = {t1.getID(), t2.getID(), outsideTask.getID()};
+		
+		assertFalse(p.setTaskOrder(wrongTask));
+		
+		// testing with a duplicate task
+		String[] duplicate = {t3.getID(), t2.getID(), t3.getID(), t1.getID()};
+		
+		assertFalse(p.setTaskOrder(duplicate));
+		
+		// testing with an invalid id
+		String[] invalidId = {t2.getID(), "bad id", t3.getID(), t1.getID()};
+		
+		assertFalse(p.setTaskOrder(invalidId));
+		
+		// testing order of tasks is correct
+		int i = 0;
+		for (Task t : p.getTasks()) {
+			assertEquals(validOrder[i], t.getID());
+			i++;
+		}
+		
+		String[] validOrder2 = {t3.getID(), t2.getID(), t1.getID()};
+		
+		assertTrue(p.setTaskOrder(validOrder2));
+		i = 0;
+		for (Task t : p.getTasks()) {
+			assertEquals(validOrder2[i], t.getID());
+			i++;
+		}
 	}
 }

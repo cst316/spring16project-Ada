@@ -22,4 +22,12 @@ public interface Process {
 	public boolean removeTask(String id);
 	public Collection<Task> getTasks();
 	public Collection<Task> getActiveTasks(CalendarDate date);
+	
+	/**
+	 * Sets the order of the tasks in the process identical to the order of the
+	 * ids in the array provided.
+	 * @param ids	IDs of the tasks
+	 * @return	true if successful
+	 */
+	public boolean setTaskOrder(String[] ids);
 }

@@ -54,6 +54,13 @@ public interface Task {
     
     public Process getProcess();
     
+    /**
+     * Used to determine the order of tasks in a process. Lower weight tasks
+     * are to be done before higher weight tasks.
+     * @return	int
+     */
+    public int getProcessWeight();
+    
     String getID();
     
     String getText();

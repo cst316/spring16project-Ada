@@ -2,7 +2,9 @@ package net.sf.memoranda;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Iterator;
+import java.util.TreeSet;
 import java.util.Vector;
 
 import net.sf.memoranda.date.CalendarDate;
@@ -13,6 +15,24 @@ import nu.xom.Elements;
 
 public class ProcessImpl implements Process {
 
+	public static final Comparator<Task> TASK_COMPARATOR = new Comparator<Task>() {
+
+		@Override
+		public int compare(Task t1, Task t2) {
+			int difference = t1.getProcessWeight() - t2.getProcessWeight();
+			
+			if (difference == 0) {
+				difference = t1.getText().compareTo(t2.getText());
+				
+				if (difference == 0) {
+					difference = t1.getID().compareTo(t2.getID());
+				}
+			}
+			
+			return difference;
+		}
+	};
+	
     private Element element;
     private ProcessList pl;
     
@@ -166,7 +186,7 @@ public class ProcessImpl implements Process {
 	@Override
 	public Collection<Task> getTasks() {
 		Elements elements = element.getChildElements("task");
-		ArrayList<Task> tasks = new ArrayList<Task>();
+		TreeSet<Task> tasks = new TreeSet<Task>(TASK_COMPARATOR);
 		TaskList tl = CurrentProject.getTaskList();
 		
 		for (int i=0; i<elements.size(); i++) {
@@ -179,6 +199,77 @@ public class ProcessImpl implements Process {
     @Override
 	public Collection<Task> getActiveTasks(CalendarDate date) {
 		return filterActiveTasks(getTasks(), date);
+	}
+
+	/* (non-Javadoc)
+	 * @see net.sf.memoranda.Process#setTaskOrder(java.lang.String[])
+	 */
+	@Override
+	public boolean setTaskOrder(String[] ids) {
+		boolean isValid = false;
+		Collection<Task> tasks = this.getTasks();
+		// stores each id as it is checked to verify there are no duplicates
+		TreeSet<String> checkedIds = new TreeSet<String>();
+		
+		TaskList taskList = CurrentProject.getTaskList();
+		
+		// validate the array contains all tasks and all tasks are in the process
+		if (ids.length == tasks.size()) {
+			isValid = true;
+			
+			for (int i=0; i<ids.length && isValid; i++) {
+				Task t = null;
+				Process p = null;
+				
+				if (!checkedIds.contains(ids[i])) {
+					t = taskList.getTask(ids[i]);
+					p = t.getProcess();
+				}
+				
+				if (t != null && p != null && taskList.getTask(ids[i]).getProcess().equals(this)) {					
+					checkedIds.add(ids[i]);
+				}
+				else {
+					isValid = false;
+				}
+			}
+		}
+		
+		// validate the final size of the new set then apply the changes
+		if (isValid && checkedIds.size() == tasks.size()) {
+			for (int i=0; i<ids.length; i++) {
+				Element e = taskList.getTask(ids[i]).getContent();
+				Attribute a = e.getAttribute("process_weight");
+				
+				if (a == null) {
+					e.addAttribute(new Attribute("process_weight", i + ""));
+				}
+				else {
+					a.setValue(i + "");
+				}
+			}
+		}
+		
+		return isValid;
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		boolean equals;
+		
+		if (obj instanceof Process) {
+			Process p = (Process) obj;
+			
+			equals = this.getID().equals(p.getID());
+		}
+		else {
+			equals = false;
+		}
+		
+		return equals;
 	}
 
 	private void setAttr(String a, String value) {

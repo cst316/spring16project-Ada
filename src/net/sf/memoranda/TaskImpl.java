@@ -530,4 +530,19 @@ public class TaskImpl implements Task, Comparable {
 		}
 		return p;
 	}
+
+	/* (non-Javadoc)
+	 * @see net.sf.memoranda.Task#getProcessWeight()
+	 */
+	@Override
+	public int getProcessWeight() {
+		int weight = 0;
+		Attribute a = _element.getAttribute("process_weight");
+		
+		if (a != null) {
+			weight = Integer.parseInt(a.getValue());
+		}
+		
+		return weight;
+	}
 }
