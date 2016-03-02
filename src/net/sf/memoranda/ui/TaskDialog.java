@@ -8,6 +8,7 @@ import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
@@ -677,7 +678,15 @@ public class TaskDialog extends JDialog {
 	
 
     void saveTemplate_actionPerformed(ActionEvent e) {
-        //TODO: open template title dialog and handle as necessary.
+    	NameTaskTemplateDialog dlg = new NameTaskTemplateDialog(App.getFrame(), Local.getString("Name Task Template"));
+    	Dimension frmSize = App.getFrame().getSize();
+    	Point loc = App.getFrame().getLocation();
+    	dlg.setLocation((frmSize.width - dlg.getSize().width) / 2 + loc.x, (frmSize.height - dlg.getSize().height) / 2 + loc.y);
+    	dlg.setVisible(true);
+    	if (dlg.CANCELLED) {
+    		return;
+    	}
+    	String taskTemplateName = dlg.textField.getText();
     }
     
 
