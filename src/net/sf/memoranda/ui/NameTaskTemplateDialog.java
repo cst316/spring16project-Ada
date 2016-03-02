@@ -42,8 +42,8 @@ import net.sf.memoranda.EventsManager;
 import net.sf.memoranda.date.CalendarDate;
 import net.sf.memoranda.util.Local;
 
-public class NameTaskTemplateDialog extends JDialog implements WindowListener {	
-    public boolean CANCELLED = false;
+public class NameTaskTemplateDialog extends JDialog {	
+    public boolean CANCELLED = true;
     private String name = "";
     JPanel topPanel = new JPanel(new BorderLayout());
     JPanel bottomPanel = new JPanel(new BorderLayout());
@@ -64,7 +64,6 @@ public class NameTaskTemplateDialog extends JDialog implements WindowListener {
         catch (Exception ex) {
             new ExceptionDialog(ex);
         }
-        super.addWindowListener(this);
     }
     
     void jbInit() throws Exception {
@@ -120,32 +119,15 @@ public class NameTaskTemplateDialog extends JDialog implements WindowListener {
     }
     
     void okB_actionPerformed(ActionEvent e) {
+    	CANCELLED = false;
     	name = this.textField.getText();
         this.dispose();
     }
 
     void cancelB_actionPerformed(ActionEvent e) {
-        CANCELLED = true;
         this.dispose();
     }
     
-    public void windowOpened( WindowEvent e ) {}
-
-    public void windowClosing( WindowEvent e ) {
-        CANCELLED = true;
-        this.dispose();
-    }
-    
-    public void windowClosed( WindowEvent e ) {}
-
-	public void windowIconified( WindowEvent e ) {}
-
-	public void windowDeiconified( WindowEvent e ) {}
-
-	public void windowActivated( WindowEvent e ) {}
-
-	public void windowDeactivated( WindowEvent e ) {}
-	
 	public String getName() {
 		return name;
 	}

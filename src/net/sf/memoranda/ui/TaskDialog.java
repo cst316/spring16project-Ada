@@ -46,7 +46,9 @@ import javax.swing.JCheckBox;
 
 import net.sf.memoranda.CurrentProject;
 import net.sf.memoranda.date.CalendarDate;
+import net.sf.memoranda.util.CurrentStorage;
 import net.sf.memoranda.util.Local;
+import net.sf.memoranda.util.Util;
 
 /*$Id: TaskDialog.java,v 1.25 2005/12/01 08:12:26 alexeya Exp $*/
 public class TaskDialog extends JDialog {
@@ -683,10 +685,16 @@ public class TaskDialog extends JDialog {
     	Point loc = App.getFrame().getLocation();
     	dlg.setLocation((frmSize.width - dlg.getSize().width) / 2 + loc.x, (frmSize.height - dlg.getSize().height) / 2 + loc.y);
     	dlg.setVisible(true);
-    	if (dlg.CANCELLED) {
-    		return;
+    	if (!dlg.CANCELLED) {
+    		CurrentProject.getTemplateList().createTemplate(new CalendarDate((Date) this.jSpinnerStartDate.getModel().getValue()), 
+    				new CalendarDate((Date) this.jSpinnerEndDate.getModel().getValue()), 
+    				dlg.getName(), 
+    				this.jTextFieldType.getText(), 
+    				this.jComboBoxPriority.getSelectedIndex(), 
+    				Util.getMillisFromHours(this.effortField.getText()), 
+    				this.descriptionField.getText());
+    		CurrentStorage.get().storeTemplateList(CurrentProject.getTemplateList(), CurrentProject.get());
     	}
-    	String taskTemplateName = dlg.textField.getText();
     }
     
 
