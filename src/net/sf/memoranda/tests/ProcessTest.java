@@ -1,4 +1,4 @@
-package net.sf.memoranda;
+package net.sf.memoranda.tests;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -8,6 +8,11 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import net.sf.memoranda.CurrentProject;
+import net.sf.memoranda.Process;
+import net.sf.memoranda.ProcessList;
+import net.sf.memoranda.Task;
+import net.sf.memoranda.TaskList;
 import net.sf.memoranda.date.CalendarDate;
 
 public class ProcessTest {

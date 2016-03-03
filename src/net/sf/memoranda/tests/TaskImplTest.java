@@ -7,6 +7,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import net.sf.memoranda.CurrentProject;
+import net.sf.memoranda.Process;
+import net.sf.memoranda.ProcessList;
 import net.sf.memoranda.Task;
 import net.sf.memoranda.TaskList;
 import net.sf.memoranda.date.CalendarDate;
