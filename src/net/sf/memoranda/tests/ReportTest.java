@@ -1,4 +1,4 @@
-package net.sf.memoranda;
+package net.sf.memoranda.tests;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -10,6 +10,10 @@ import java.util.Collection;
 import org.junit.Before;
 import org.junit.Test;
 
+import net.sf.memoranda.CurrentProject;
+import net.sf.memoranda.Report;
+import net.sf.memoranda.ReportImpl;
+import net.sf.memoranda.Task;
 import net.sf.memoranda.util.FileStorage;
 
 public class ReportTest {

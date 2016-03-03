@@ -1,17 +1,13 @@
-package net.sf.memoranda;
+package net.sf.memoranda.tests;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
-import java.util.ArrayDeque;
 import java.util.Collection;
-import java.util.Deque;
 
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
-import net.sf.memoranda.date.CalendarDate;
-import net.sf.memoranda.util.Util;
+import net.sf.memoranda.CurrentProject;
 
 public class TaskListImplTest {
 

@@ -1,11 +1,14 @@
-package net.sf.memoranda;
+package net.sf.memoranda.tests;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import net.sf.memoranda.CurrentProject;
+import net.sf.memoranda.Task;
+import net.sf.memoranda.TaskList;
 import net.sf.memoranda.date.CalendarDate;
 
 public class TaskImplTest {
