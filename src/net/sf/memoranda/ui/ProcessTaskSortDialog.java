@@ -110,15 +110,15 @@ public class ProcessTaskSortDialog extends JDialog {
 			
 			{
 				JLabel title = new JLabel(Local.getString("Task"));
-				JLabel startDate = new JLabel(Local.getString("Start Date"));
-				JLabel endDate = new JLabel(Local.getString("End Date"));
+				JLabel status = new JLabel(Local.getString("Status"));
+				JLabel priority = new JLabel(Local.getString("Priority"));
 				
 				gc.gridx = 1;
 				taskInnerPanel.add(title, gc);
 				gc.gridx = 2;
-				taskInnerPanel.add(startDate, gc);
+				taskInnerPanel.add(status, gc);
 				gc.gridx = 3;
-				taskInnerPanel.add(endDate, gc);
+				taskInnerPanel.add(priority, gc);
 			}
 			
 			for (Task task : taskList) {
@@ -127,8 +127,8 @@ public class ProcessTaskSortDialog extends JDialog {
 				BasicArrowButton up = new BasicArrowButton(BasicArrowButton.NORTH);
 				BasicArrowButton dn = new BasicArrowButton(BasicArrowButton.SOUTH);
 				JLabel title = new JLabel(task.getText());
-				JLabel startDate = new JLabel(df.format(task.getStartDate().getDate()));
-				JLabel endDate = new JLabel(df.format(task.getEndDate().getDate()));
+				JLabel status = new JLabel(task.getStatusString());
+				JLabel priority = new JLabel(task.getPriorityString());
 				
 				gc.gridy = gc.gridy + 1;
 				gc.gridx = 0;
@@ -136,9 +136,9 @@ public class ProcessTaskSortDialog extends JDialog {
 				gc.anchor = GridBagConstraints.WEST;
 				taskInnerPanel.add(title, gc);
 				gc.gridx = 2;
-				taskInnerPanel.add(startDate, gc);
+				taskInnerPanel.add(status, gc);
 				gc.gridx = 3;
-				taskInnerPanel.add(endDate, gc);
+				taskInnerPanel.add(priority, gc);
 				gc.gridx = 4;
 				gc.anchor = GridBagConstraints.CENTER;
 				taskInnerPanel.add(up, gc);
