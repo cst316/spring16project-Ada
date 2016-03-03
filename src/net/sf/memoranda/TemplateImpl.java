@@ -36,9 +36,15 @@ public class TemplateImpl implements Template {
 		int months;
 		int years;
 		
-		days = endDate.getDay() - startDate.getDay();
-		months = endDate.getMonth() - startDate.getMonth();
-		years = endDate.getYear() - startDate.getYear();
+		if (endDate == null) {
+			days = -1;
+			months = -1;
+			years = -1;
+		} else {
+			days = endDate.getDay() - startDate.getDay();
+			months = endDate.getMonth() - startDate.getMonth();
+			years = endDate.getYear() - startDate.getYear();
+		}
 
 		setAttr("day_difference", Integer.toString(days));
 		setAttr("month_difference", Integer.toString(months));
