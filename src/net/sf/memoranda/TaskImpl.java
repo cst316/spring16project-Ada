@@ -42,7 +42,16 @@ public class TaskImpl implements Task, Comparable {
     }
 
     public CalendarDate getStartDate() {
-        return new CalendarDate(_element.getAttribute("startDate").getValue());
+    	CalendarDate date;
+    	Process p = getProcess();
+    	
+    	if (p == null) {
+    		date = new CalendarDate(_element.getAttribute("startDate").getValue());
+    	}
+    	else {
+    		date = p.getStartDate();
+    	}
+        return date;
     }
 
     public void setStartDate(CalendarDate date) {
@@ -50,6 +59,10 @@ public class TaskImpl implements Task, Comparable {
     }
 
     public CalendarDate getEndDate() {
+    	Process p = getProcess();
+    	if (p != null) {
+    		return p.getEndDate();
+    	}
 		String ed = _element.getAttribute("endDate").getValue();
 		if (ed != "")
 			return new CalendarDate(_element.getAttribute("endDate").getValue());
@@ -502,5 +515,34 @@ public class TaskImpl implements Task, Comparable {
 		}
 	}
 
-	
+	public Process getProcess() {
+		Attribute a = _element.getAttribute("process");
+		Process p = null;
+		
+		if (a != null) {
+			p = CurrentProject.getProcessList().getProcess(a.getValue());
+		}
+		else {
+			Task parent = this.getParentTask();
+			if (parent != null) {
+			p = parent.getProcess();	
+			}
+		}
+		return p;
+	}
+
+	/* (non-Javadoc)
+	 * @see net.sf.memoranda.Task#getProcessWeight()
+	 */
+	@Override
+	public int getProcessWeight() {
+		int weight = 0;
+		Attribute a = _element.getAttribute("process_weight");
+		
+		if (a != null) {
+			weight = Integer.parseInt(a.getValue());
+		}
+		
+		return weight;
+	}
 }
