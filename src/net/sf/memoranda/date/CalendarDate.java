@@ -151,7 +151,9 @@ public class CalendarDate {
 
     public boolean before(CalendarDate date) {
         if (date == null) return true;
-        return this.getCalendar().before(date.getCalendar());
+        Calendar cal = date.getCalendar();
+        Calendar _cal = this.getCalendar();
+        return _cal.before(cal);
     }
 
     public boolean after(CalendarDate date) {
