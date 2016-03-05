@@ -27,11 +27,11 @@ public class ReportTest {
 		store = new FileStorage();
 		tasks = CurrentProject.getTaskList().getTopLevelTasks();
 		String[] ids = new String[tasks.size()];
-		int i = 0;
+		int index = 0;
 		
 		for (Task t : tasks) {
-			ids[i] = t.getID();
-			i++;
+			ids[index] = t.getID();
+			index++;
 		}
 		
 		report = new ReportImpl();
