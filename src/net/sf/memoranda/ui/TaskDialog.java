@@ -45,6 +45,7 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.JCheckBox;
 
 import net.sf.memoranda.CurrentProject;
+import net.sf.memoranda.Template;
 import net.sf.memoranda.date.CalendarDate;
 import net.sf.memoranda.util.CurrentStorage;
 import net.sf.memoranda.util.Local;
@@ -686,8 +687,9 @@ public class TaskDialog extends JDialog {
     	dlg.setLocation((frmSize.width - dlg.getSize().width) / 2 + loc.x, (frmSize.height - dlg.getSize().height) / 2 + loc.y);
     	dlg.setVisible(true);
     	if (!dlg.CANCELLED) {
-    		CurrentProject.getTemplateList().createTemplate(new CalendarDate((Date) this.jSpinnerStartDate.getModel().getValue()), 
-    				new CalendarDate((Date) this.jSpinnerEndDate.getModel().getValue()), 
+    		CurrentProject.getTemplateList().createTemplate(
+    				new CalendarDate((Date) this.jSpinnerStartDate.getModel().getValue()), 
+    				getEndDate(), 
     				dlg.getName(), 
     				this.jTextFieldType.getText(), 
     				this.jComboBoxPriority.getSelectedIndex(), 
@@ -696,10 +698,70 @@ public class TaskDialog extends JDialog {
     		CurrentStorage.get().storeTemplateList(CurrentProject.getTemplateList(), CurrentProject.get());
     	}
     }
-    
 
+    /**
+     * Helper method for getting the end date or a null value of there is no end date.
+     */
+    private CalendarDate getEndDate() {
+    	CalendarDate endDate = null;
+    	
+    	if (jCheckBoxEndDate.isSelected()) {
+    		endDate = new CalendarDate((Date) this.jSpinnerEndDate.getModel().getValue());
+    	}
+    	
+    	return endDate;
+    }
+    
     void openTemplate_actionPerformed(ActionEvent e) {
-        //TODO: open template list and handle as necessary.
+    	// Open template list and handle as necessary.
+    	TemplateSelectDialog dialog = new TemplateSelectDialog(App.getFrame(), "Select Template");
+    	dialog.setLocationRelativeTo(this);
+    	dialog.setVisible(true);
+    	
+    	if (!dialog.isCancelled()) {
+    		Template template = dialog.getTemplate();
+    		
+    		if (template != null) {
+    			int[] dateDifference = template.getDateDifference();
+    			int priority = template.getPriority();
+    			long effort = template.getEffort();
+    			float effortInHours = ((float) effort) / 1000 / 60 / 60;
+    			String description = template.getDescription();
+    			String type = template.getType();
+    			
+    			// A negative date difference means there is no end date.
+    			if (dateDifference[0] < 0) {
+    				Util.debug("No end date");
+    		        jCheckBoxEndDate.setSelected(false);
+    				chkEndDate_actionPerformed(null);
+    			} else {
+    		        jCheckBoxEndDate.setSelected(true);
+    				chkEndDate_actionPerformed(null);
+    				
+    				// apply the date difference to the start date to get the end date
+    				Date startDate = (Date) jSpinnerStartDate.getModel().getValue();
+    				Calendar endDate = new CalendarDate(startDate).getCalendar();
+    				
+    				endDate.roll(Calendar.YEAR, dateDifference[2]);
+    				endDate.roll(Calendar.MONTH, dateDifference[1]);
+    				endDate.roll(Calendar.DAY_OF_MONTH, dateDifference[0]);
+    				
+    				jSpinnerEndDate.getModel().setValue(
+    						new CalendarDate(endDate).getDate());
+    			}
+    			
+    			// only assign values in the task if the values were defined in the template
+    			if (description != "") {
+    				descriptionField.setText(template.getDescription());
+    			}
+    			if (type != "") {
+    				jTextFieldType.setText(type);
+    			} 
+    			
+				effortField.setText(effortInHours + "");
+				jComboBoxPriority.setSelectedIndex(priority);
+    		}
+    	}
     }
     
 	void chkEndDate_actionPerformed(ActionEvent e) {
