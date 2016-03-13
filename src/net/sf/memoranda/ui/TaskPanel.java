@@ -27,6 +27,7 @@ import javax.swing.event.ListSelectionListener;
 import net.sf.memoranda.CurrentProject;
 import net.sf.memoranda.History;
 import net.sf.memoranda.NoteList;
+import net.sf.memoranda.Process;
 import net.sf.memoranda.Project;
 import net.sf.memoranda.ProjectListener;
 import net.sf.memoranda.ResourcesList;
@@ -51,6 +52,9 @@ public class TaskPanel extends JPanel {
     JButton editTaskB = new JButton();
     JButton removeTaskB = new JButton();
     JButton completeTaskB = new JButton();
+    JButton newProcessB = new JButton();
+    JButton editProcessB = new JButton();
+    JButton addProcessTaskB = new JButton();
     
 	JCheckBoxMenuItem ppShowActiveOnlyChB = new JCheckBoxMenuItem();
 		
@@ -177,6 +181,54 @@ public class TaskPanel extends JPanel {
         completeTaskB.setIcon(
             new ImageIcon(net.sf.memoranda.ui.AppFrame.class.getResource("resources/icons/todo_complete.png")));
 
+        newProcessB.setIcon(
+                new ImageIcon(net.sf.memoranda.ui.AppFrame.class.getResource("resources/icons/process_new.png")));
+        newProcessB.setEnabled(true);
+        newProcessB.setMaximumSize(new Dimension(24, 24));
+        newProcessB.setMinimumSize(new Dimension(24, 24));
+        newProcessB.setToolTipText(Local.getString("Create new process"));
+        newProcessB.setRequestFocusEnabled(false);
+        newProcessB.setPreferredSize(new Dimension(24, 24));
+        newProcessB.setFocusable(false);
+        newProcessB.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+            	newProcessB_actionPerformed(e);
+            }
+        });
+        newProcessB.setBorderPainted(false);
+        
+        editProcessB.setIcon(
+                new ImageIcon(net.sf.memoranda.ui.AppFrame.class.getResource("resources/icons/todo_edit.png")));
+        editProcessB.setEnabled(false);
+        editProcessB.setMaximumSize(new Dimension(24, 24));
+        editProcessB.setMinimumSize(new Dimension(24, 24));
+        editProcessB.setToolTipText(Local.getString("Edit process"));
+        editProcessB.setRequestFocusEnabled(false);
+        editProcessB.setPreferredSize(new Dimension(24, 24));
+        editProcessB.setFocusable(false);
+        editProcessB.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+            	editProcessB_actionPerformed(e);
+            }
+        });
+        editProcessB.setBorderPainted(false);
+        
+        addProcessTaskB.setIcon(
+                new ImageIcon(net.sf.memoranda.ui.AppFrame.class.getResource("resources/icons/todo_new.png")));
+        addProcessTaskB.setEnabled(false);
+        addProcessTaskB.setMaximumSize(new Dimension(24, 24));
+        addProcessTaskB.setMinimumSize(new Dimension(24, 24));
+        addProcessTaskB.setToolTipText(Local.getString("Add task to process"));
+        addProcessTaskB.setRequestFocusEnabled(false);
+        addProcessTaskB.setPreferredSize(new Dimension(24, 24));
+        addProcessTaskB.setFocusable(false);
+        addProcessTaskB.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+            	addProcessTaskB_actionPerformed(e);
+            }
+        });
+        addProcessTaskB.setBorderPainted(false);
+            
 		// added by rawsushi
 //		showActiveOnly.setBorderPainted(false);
 //		showActiveOnly.setFocusable(false);
@@ -322,6 +374,10 @@ public class TaskPanel extends JPanel {
         tasksToolBar.addSeparator(new Dimension(8, 24));
         tasksToolBar.add(editTaskB, null);
         tasksToolBar.add(completeTaskB, null);
+        tasksToolBar.addSeparator();new Dimension(8, 24);
+        tasksToolBar.add(newProcessB, null);
+        tasksToolBar.add(editProcessB, null);
+        tasksToolBar.add(addProcessTaskB, null);
 
 		//tasksToolBar.add(showActiveOnly, null);
         
@@ -350,15 +406,30 @@ public class TaskPanel extends JPanel {
         });
         taskTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             public void valueChanged(ListSelectionEvent e) {
-                boolean enbl = (taskTable.getRowCount() > 0)&&(taskTable.getSelectedRow() > -1);
-                editTaskB.setEnabled(enbl);ppEditTask.setEnabled(enbl);
-                removeTaskB.setEnabled(enbl);ppRemoveTask.setEnabled(enbl);
+                
+            	boolean taskSelected = false;
+            	boolean processSelected = false;
+            	Object selectedItem;
+            	
+            	if (taskTable.getRowCount() > 0 && taskTable.getSelectedRowCount() == 1) {
+            		selectedItem = taskTable.getModel().getValueAt(taskTable.getSelectedRow(), TaskTable.TASK);
+                	taskSelected = (selectedItem instanceof Task);
+                	processSelected = (selectedItem instanceof Process);
+            	}
+            	
+                editTaskB.setEnabled(taskSelected);
+                ppEditTask.setEnabled(taskSelected);
+                removeTaskB.setEnabled(taskSelected);
+                ppRemoveTask.setEnabled(taskSelected);
 				
-				ppCompleteTask.setEnabled(enbl);
-				completeTaskB.setEnabled(enbl);
-				ppAddSubTask.setEnabled(enbl);
+				ppCompleteTask.setEnabled(taskSelected);
+				completeTaskB.setEnabled(taskSelected);
+				ppAddSubTask.setEnabled(taskSelected);
 				//ppSubTasks.setEnabled(enbl); // default value to be over-written later depending on whether it has sub tasks
-				ppCalcTask.setEnabled(enbl); // default value to be over-written later depending on whether it has sub tasks
+				ppCalcTask.setEnabled(taskSelected); // default value to be over-written later depending on whether it has sub tasks
+				
+				editProcessB.setEnabled(processSelected);
+				addProcessTaskB.setEnabled(processSelected);
 				
 				/*if (taskTable.getCurrentRootTask() == null) {
 					ppParentTask.setEnabled(false);
@@ -367,16 +438,16 @@ public class TaskPanel extends JPanel {
 					ppParentTask.setEnabled(true);
 				}XXX*/
 				
-                if (enbl) {   
+                if (taskSelected) {   
     				String thisTaskId = taskTable.getModel().getValueAt(taskTable.getSelectedRow(), TaskTable.TASK_ID).toString();
     				
     				boolean hasSubTasks = CurrentProject.getTaskList().hasSubTasks(thisTaskId);
     				//ppSubTasks.setEnabled(hasSubTasks);
     				ppCalcTask.setEnabled(hasSubTasks);
     				Task t = CurrentProject.getTaskList().getTask(thisTaskId);
-                    parentPanel.calendar.jnCalendar.renderer.setTask(t);
+    				parentPanel.calendar.jnCalendar.renderer.setTask(t);
                     parentPanel.calendar.jnCalendar.updateUI();
-                }    
+                }
                 else {
                     parentPanel.calendar.jnCalendar.renderer.setTask(null);
                     parentPanel.calendar.jnCalendar.updateUI();
@@ -418,13 +489,27 @@ public class TaskPanel extends JPanel {
 		// - KEY:SPACE => finish Task.
 		taskTable.addKeyListener(new KeyListener() {
 			public void keyPressed(KeyEvent e){
-				if(taskTable.getSelectedRows().length>0 
-					&& e.getKeyCode()==KeyEvent.VK_DELETE)
-					ppRemoveTask_actionPerformed(null);
+				if(e.getKeyCode() == KeyEvent.VK_DELETE) {
+					// Only elect to delete a Process if it's the only item selected.
+					if (taskTable.getSelectedRowCount() == 1 &&
+							taskTable.getModel().getValueAt(taskTable.getSelectedRow(), TaskTable.TASK) instanceof Process) {
+						
+						// TODO
+					}
+					else {
+						ppRemoveTask_actionPerformed(null);
+					}
+				}
 				
 				else if(e.getKeyCode()==KeyEvent.VK_INSERT) {
 					if(taskTable.getSelectedRows().length>0) {
-						ppAddSubTask_actionPerformed(null);
+						Object o = taskTable.getModel().getValueAt(taskTable.getSelectedRow(), TaskTable.TASK);
+						if (o instanceof Task) {
+							ppAddSubTask_actionPerformed(null);
+						}
+						else if (o instanceof Process) {
+							addProcessTaskB_actionPerformed(null);							
+						}
 					}
 					else {
 						ppNewTask_actionPerformed(null);						
@@ -446,7 +531,14 @@ public class TaskPanel extends JPanel {
         Task t =
             CurrentProject.getTaskList().getTask(
                 taskTable.getModel().getValueAt(taskTable.getSelectedRow(), TaskTable.TASK_ID).toString());
-        TaskDialog dlg = new TaskDialog(App.getFrame(), Local.getString("Edit task"));
+        Process p = t.getProcess();
+        TaskDialog dlg;
+        if (p == null) {
+        	dlg = new TaskDialog(App.getFrame(), Local.getString("Edit task"), null);
+        }
+        else {
+        	dlg = new TaskDialog(App.getFrame(), Local.getString("Edit task"), p.getID());
+        }
         Dimension frmSize = App.getFrame().getSize();
         Point loc = App.getFrame().getLocation();
         dlg.setLocation((frmSize.width - dlg.getSize().width) / 2 + loc.x, (frmSize.height - dlg.getSize().height) / 2 + loc.y);
@@ -491,7 +583,7 @@ public class TaskPanel extends JPanel {
     }
 
     void newTaskB_actionPerformed(ActionEvent e) {
-        TaskDialog dlg = new TaskDialog(App.getFrame(), Local.getString("New task"));
+        TaskDialog dlg = new TaskDialog(App.getFrame(), Local.getString("New task"), null);
         
         //XXX String parentTaskId = taskTable.getCurrentRootTask();
         
@@ -522,7 +614,6 @@ public class TaskPanel extends JPanel {
     }
 
     void addSubTask_actionPerformed(ActionEvent e) {
-        TaskDialog dlg = new TaskDialog(App.getFrame(), Local.getString("New Task"));
         String parentTaskId = taskTable.getModel().getValueAt(taskTable.getSelectedRow(), TaskTable.TASK_ID).toString();
         
 //        Util.debug("Adding sub task under " + parentTaskId);
@@ -530,7 +621,15 @@ public class TaskPanel extends JPanel {
         Dimension frmSize = App.getFrame().getSize();
         Point loc = App.getFrame().getLocation();
 		Task parent = CurrentProject.getTaskList().getTask(parentTaskId);
+		Process parentProc = parent.getProcess();
 		CalendarDate todayD = CurrentDate.get();
+        TaskDialog dlg;
+        if (parentProc == null) {
+        	dlg = new TaskDialog(App.getFrame(), Local.getString("New Task"), null);
+        }
+        else {
+        	dlg = new TaskDialog(App.getFrame(), Local.getString("New Task"), parentProc.getID());
+        }
 		if (todayD.after(parent.getStartDate()))
 			dlg.setStartDate(todayD);
 		else
@@ -638,6 +737,7 @@ public class TaskPanel extends JPanel {
   }
 
     void removeTaskB_actionPerformed(ActionEvent e) {
+    	boolean hasProcess = false;
         String msg;
         String thisTaskId = taskTable.getModel().getValueAt(taskTable.getSelectedRow(), TaskTable.TASK_ID).toString();
         
@@ -646,58 +746,220 @@ public class TaskPanel extends JPanel {
              + "\n"+Local.getString("Are you sure?");
         else {        	
         	Task t = CurrentProject.getTaskList().getTask(thisTaskId);
+        	Process p = t.getProcess();
+        	// check if part of process
+        	if (p != null) {
+        		msg = Local.getString("Remove task")+"\n'" + t.getText() + Local.getString("' from process or project?");
+        		hasProcess = true;
+        	}
         	// check if there are subtasks
-			if(CurrentProject.getTaskList().hasSubTasks(thisTaskId)) {
+        	else if(CurrentProject.getTaskList().hasSubTasks(thisTaskId)) {
 				msg = Local.getString("Remove task")+"\n'" + t.getText() + Local.getString("' and all subtasks") +"\n"+Local.getString("Are you sure?");
 			}
 			else {		            
 				msg = Local.getString("Remove task")+"\n'" + t.getText() + "'\n"+Local.getString("Are you sure?");
 			}
         }
-        int n =
-            JOptionPane.showConfirmDialog(
-                App.getFrame(),
-                msg,
-                Local.getString("Remove task"),
-                JOptionPane.YES_NO_OPTION);
-        if (n != JOptionPane.YES_OPTION)
-            return;
-        Vector toremove = new Vector();
-        for (int i = 0; i < taskTable.getSelectedRows().length; i++) {
-            Task t =
-            CurrentProject.getTaskList().getTask(
-                taskTable.getModel().getValueAt(taskTable.getSelectedRows()[i], TaskTable.TASK_ID).toString());
-            if (t != null)
-                toremove.add(t);
+        if (hasProcess) {
+        	Task t = (Task) taskTable.getModel().getValueAt(taskTable.getSelectedRow(), TaskTable.TASK);
+    		int n  = JOptionPane.showOptionDialog(
+    				App.getFrame(),
+    				msg,
+    				Local.getString("Remove Task"),
+    				JOptionPane.DEFAULT_OPTION,
+    				JOptionPane.QUESTION_MESSAGE,
+    				null,
+    				new String[] {"Project", "Process", "Cancel"},
+    				0);
+    		
+    		if (n == 0) {
+    			CurrentProject.getTaskList().removeTask(t);
+    		}
+    		else if (n == 1) {
+    			t.getProcess().removeTask(t.getID());
+    		}
         }
-        for (int i = 0; i < toremove.size(); i++) {
-            CurrentProject.getTaskList().removeTask((Task)toremove.get(i));
-        }
-        taskTable.tableChanged();
-        CurrentStorage.get().storeTaskList(CurrentProject.getTaskList(), CurrentProject.get());
-        parentPanel.updateIndicators();
-        //taskTable.updateUI();
-
+        else {
+			int n = JOptionPane.showConfirmDialog(App.getFrame(), msg, Local.getString("Remove task"),
+					JOptionPane.YES_NO_OPTION);
+			if (n != JOptionPane.YES_OPTION)
+				return;
+			Vector<Task> toremove = new Vector<Task>();
+			for (int i = 0; i < taskTable.getSelectedRows().length; i++) {
+				Object o = taskTable.getModel().getValueAt(taskTable.getSelectedRows()[i], TaskTable.TASK);
+				if (o instanceof Task) {
+					toremove.add((Task) o);
+				}
+				/*Task t =
+				CurrentProject.getTaskList().getTask(
+				taskTable.getModel().getValueAt(taskTable.getSelectedRows()[i], TaskTable.TASK_ID).toString());
+				if (t != null)
+				toremove.add(t);*/
+			}
+			for (int i = 0; i < toremove.size(); i++) {
+				CurrentProject.getTaskList().removeTask(toremove.get(i));
+			}
+		}
+		
+		taskTable.tableChanged();
+		CurrentStorage.get().storeTaskList(CurrentProject.getTaskList(), CurrentProject.get());
+		CurrentStorage.get().storeProcessList(CurrentProject.getProcessList(), CurrentProject.get());
+		parentPanel.updateIndicators();
     }
 
 	void ppCompleteTask_actionPerformed(ActionEvent e) {
 		String msg;
-		Vector tocomplete = new Vector();
+		Vector<Task> tocomplete = new Vector<Task>();
 		for (int i = 0; i < taskTable.getSelectedRows().length; i++) {
-			Task t =
+			Object o = taskTable.getModel().getValueAt(taskTable.getSelectedRows()[i], TaskTable.TASK);
+			if (o instanceof Task) {
+				tocomplete.add((Task) o);
+			}
+			/*(Task t =
 			CurrentProject.getTaskList().getTask(
 				taskTable.getModel().getValueAt(taskTable.getSelectedRows()[i], TaskTable.TASK_ID).toString());
 			if (t != null)
-				tocomplete.add(t);
+				tocomplete.add(t);*/
 		}
 		for (int i = 0; i < tocomplete.size(); i++) {
-			Task t = (Task)tocomplete.get(i);
+			Task t = tocomplete.get(i);
 			t.setProgress(100);
 		}
 		taskTable.tableChanged();
 		CurrentStorage.get().storeTaskList(CurrentProject.getTaskList(), CurrentProject.get());
 		parentPanel.updateIndicators();
 		//taskTable.updateUI();
+	}
+	  
+	void newProcessB_actionPerformed(ActionEvent e) {
+		  ProcessDialog dialog = new ProcessDialog(App.getFrame(), "New Process", CurrentDate.get(), CurrentDate.get());
+		  dialog.setLocationRelativeTo(this);
+		  dialog.setVisible(true);
+		  
+		  if (!dialog.CANCELLED) {
+			  String name = dialog.getName();
+			  Date startDate = dialog.getStartDate();
+			  Date endDate = dialog.getEndDate();
+			  
+			  CurrentProject.getProcessList().createProcess(name, new CalendarDate(startDate), new CalendarDate(endDate));
+			  
+			  taskTable.tableChanged();
+			  CurrentStorage.get().storeProcessList(CurrentProject.getProcessList(), CurrentProject.get());
+			  parentPanel.updateIndicators();
+		  }
+	}
+	
+	void editProcessB_actionPerformed(ActionEvent e) {
+		Process selectedProcess = (Process) taskTable.getModel().getValueAt(taskTable.getSelectedRow(), TaskTable.TASK);
+		String processName = selectedProcess.getName();
+		String processId = selectedProcess.getID();
+		ProcessDialog dialog = new ProcessDialog(App.getFrame(), "Edit Process", selectedProcess.getStartDate(), selectedProcess.getEndDate());
+		dialog.setLocationRelativeTo(this);
+		dialog.nameTextField.setText(selectedProcess.getName());
+		dialog.setVisible(true);
+		
+		if (!dialog.CANCELLED) {
+			String name = dialog.getName();
+			Date startDate = dialog.getStartDate();
+			Date endDate = dialog.getEndDate();
+			
+			selectedProcess.setName(name);
+			selectedProcess.setStartDate(new CalendarDate(startDate));
+			selectedProcess.setEndDate(new CalendarDate(endDate));
+			
+			taskTable.tableChanged();
+			CurrentStorage.get().storeProcessList(CurrentProject.getProcessList(), CurrentProject.get());
+			parentPanel.updateIndicators();
+	        
+	        sortProcessTasks(processName, processId);
+		}
+	}
+	
+	// US-3 Task 49: Create add task wizard
+	// Show sorting dialog following task addition to process
+	void sortProcessTasks(String processName, String processId) {
+		ProcessTaskSortDialog ptsd = new ProcessTaskSortDialog(App.getFrame(), Local.getString("Sort Tasks for \"" + processName + "\":"), processId);
+		
+        Dimension frmSize = App.getFrame().getSize();
+        Point loc = App.getFrame().getLocation();
+        ptsd.setLocation((frmSize.width - ptsd.getSize().width) / 2 + loc.x, (frmSize.height - ptsd.getSize().height) / 2 + loc.y);
+        ptsd.setVisible(true);
+        if (ptsd.CANCELLED)
+            return;
+        
+		CurrentStorage.get().storeProcessList(CurrentProject.getProcessList(), CurrentProject.get());
+        taskTable.tableChanged();
+        parentPanel.updateIndicators();
+	}
+	
+	// US-3 Task 49: Create add task wizard
+	void addProcessTaskB_actionPerformed(ActionEvent e) {
+		// Get process name
+		Process selectedProcess = (Process) taskTable.getModel().getValueAt(taskTable.getSelectedRow(), TaskTable.TASK);
+		String processName = selectedProcess.getName();
+		String processId = selectedProcess.getID();
+		
+		Util.debug("ID: " + processId);
+		
+		// Button text
+		String[] options = new String[2];
+		options[0] = new String(Local.getString("Create New Task"));
+		options[1] = new String(Local.getString("Use Existing Task"));
+		
+		// Display option pane
+		int selection = JOptionPane.showOptionDialog(App.getFrame(), Local.getString("Select how you would like to add your task to \"" + processName + "\":"), Local.getString("Add Process Task"), 0, JOptionPane.INFORMATION_MESSAGE, null, options, null);
+		
+		// Selection handle
+		if (selection == 0) { // Create new task
+			TaskDialog taskDialog = new TaskDialog(App.getFrame(), Local.getString("New Task for \"" + processName + "\""), processId);
+			
+	        Dimension frmSize = App.getFrame().getSize();
+	        Point loc = App.getFrame().getLocation();
+	        taskDialog.jSpinnerStartDate.getModel().setValue(CurrentDate.get().getDate());
+	        taskDialog.jSpinnerEndDate.getModel().setValue(CurrentDate.get().getDate());
+	        taskDialog.setLocation((frmSize.width - taskDialog.getSize().width) / 2 + loc.x, (frmSize.height - taskDialog.getSize().height) / 2 + loc.y);
+	        taskDialog.setVisible(true);
+	        if (taskDialog.CANCELLED)
+	            return;
+	        
+	        CalendarDate sd = new CalendarDate(selectedProcess.getStartDate().getDate());
+	        CalendarDate ed = new CalendarDate(selectedProcess.getEndDate().getDate());
+	        long effort = Util.getMillisFromHours(taskDialog.effortField.getText());
+			Task newTask = CurrentProject.getTaskList().createTask(sd, ed, taskDialog.jTextFieldName.getText(), taskDialog.jTextFieldType.getText(), taskDialog.jComboBoxPriority.getSelectedIndex(),effort, taskDialog.descriptionField.getText(),null);
+			newTask.setProgress(((Integer)taskDialog.jSpinnerProgress.getValue()).intValue());
+			CurrentStorage.get().storeTaskList(CurrentProject.getTaskList(), CurrentProject.get());
+
+			selectedProcess.addTask(newTask.getID());
+			CurrentStorage.get().storeProcessList(CurrentProject.getProcessList(), CurrentProject.get());
+			CurrentStorage.get().storeTaskList(CurrentProject.getTaskList(), CurrentProject.get());
+	        taskTable.tableChanged();
+	        parentPanel.updateIndicators();
+	        
+	        sortProcessTasks(processName, processId);
+	        
+			
+		} else if (selection == 1) {
+			// Use existing
+			
+			TaskSelectionDialog tsd = new TaskSelectionDialog(App.getFrame(), "Tasks");
+			tsd.setLocationRelativeTo(this);
+			tsd.setVisible(true);
+			
+			if (!tsd.CANCELLED) {
+				String[] tasks = tsd.getSelectedTasks();
+				
+				for (int i = 0; i < tasks.length; i++) {
+					selectedProcess.addTask(tasks[i]);
+				}
+				
+				taskTable.tableChanged();
+				CurrentStorage.get().storeProcessList(CurrentProject.getProcessList(), CurrentProject.get());
+				CurrentStorage.get().storeTaskList(CurrentProject.getTaskList(), CurrentProject.get());
+				parentPanel.updateIndicators();
+		        
+		        sortProcessTasks(processName, processId);
+			}
+		}
 	}
 
 	// toggle "show active only"
@@ -714,8 +976,14 @@ public class TaskPanel extends JPanel {
 		if ((e.getClickCount() == 2) && (taskTable.getSelectedRow() > -1)){
 			// ignore "tree" column
 			//if(taskTable.getSelectedColumn() == 1) return;
+			Object o = taskTable.getModel().getValueAt(taskTable.getSelectedRow(), TaskTable.TASK);
 			
-			editTaskB_actionPerformed(null);
+			if (o instanceof Task) {
+				editTaskB_actionPerformed(null);
+			}
+			else if (o instanceof Process) {
+				editProcessB_actionPerformed(null);
+			}
 		}
         }
 
@@ -760,5 +1028,4 @@ public class TaskPanel extends JPanel {
   void ppCalcTask_actionPerformed(ActionEvent e) {
       calcTask_actionPerformed(e);
   }
-
 }

@@ -9,6 +9,7 @@
 package net.sf.memoranda.date;
 
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -65,6 +66,13 @@ public class CalendarDate {
         _month = d[1];
         _year = d[2];
 
+    }
+    
+    /**
+     * Convenience method to help streamline date formatting across the application.
+     */
+    public static SimpleDateFormat getSimpleDateFormat() {
+    	return (SimpleDateFormat) DateFormat.getDateInstance(DateFormat.SHORT);
     }
 
     public static CalendarDate today() {

@@ -1,14 +1,17 @@
 
 package net.sf.memoranda.ui;
 
+import net.sf.memoranda.Process;
 import net.sf.memoranda.Project;
 import net.sf.memoranda.Task;
 import net.sf.memoranda.date.CurrentDate;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Collection;
 import java.util.Date;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
@@ -45,10 +48,12 @@ public class TaskTreeTableCellRenderer extends DefaultTreeCellRenderer implement
             .getResource("resources/icons/task_failed.png"));
     static ImageIcon TASK_COMPLETED_ICON = new ImageIcon(net.sf.memoranda.ui.AppFrame.class
             .getResource("resources/icons/task_completed.png"));
+    static ImageIcon PROCESS_ICON = new ImageIcon(net.sf.memoranda.ui.AppFrame.class
+    		.getResource("resources/icons/process.png"));
     // reusable cellrenderers
     JLabel label = new JLabel();
     //JLabel tree_label = new JLabel();
-    TaskProgressLabel progressLabel;
+    ProgressLabel progressLabel;
     JPanel empty_panel = new JPanel();
     // get Task objects via table (maybe not most elegant solution)
     TaskTable table;
@@ -60,7 +65,7 @@ public class TaskTreeTableCellRenderer extends DefaultTreeCellRenderer implement
     public TaskTreeTableCellRenderer(TaskTable table) {
         super();
         this.table = table;
-        progressLabel = new TaskProgressLabel(table);
+        progressLabel = new ProgressLabel(table);
         label.setOpaque(true);
     }
 
@@ -72,63 +77,96 @@ public class TaskTreeTableCellRenderer extends DefaultTreeCellRenderer implement
                 tree, value, selected,
                 expanded, leaf, row,
                 hasFocus);
-        if (value instanceof Project)
-            return empty_panel;
-        if (!(value instanceof Task))
-            return empty_panel;
-        Task t = (Task) value; 
-        setText(t.getText());
-        setToolTipText(t.getDescription());
-        setIcon(getStatusIcon(t));
-        applyFont(t, this);
-        //return getTaskTreeCellRenderer(t, selected, hasFocus);
+        if (value instanceof Project) {
+        	return empty_panel;
+        }
+        else if (value instanceof Task) {
+            Task t = (Task) value; 
+            setText(t.getText());
+            setToolTipText(t.getDescription());
+            setIcon(getStatusIcon(t));
+            applyFont(t, this);
+            //return getTaskTreeCellRenderer(t, selected, hasFocus);
+        }
+        else if (value instanceof Process) {
+        	Process p = (Process) value;
+        	setFont(getFont().deriveFont(Font.BOLD));
+        	setForeground(Color.BLUE);
+        	setIcon(PROCESS_ICON);
+        	setText(p.getName());
+        }
+        else {
+        	return empty_panel;
+        }
+
         return this;
     }
 
     public Component getTableCellRendererComponent(JTable ignore, Object value, boolean selected,
-            boolean hasFocus, int row, int column) {        
-        Task t = (Task) table.getValueAt(row, 1);
-        if (column == 1) {
-            // this never happens because
-            // column 1 contains TreeTableModel
-            // and default renderer for it
-            // is JTree directly            
-            return table.getTree();
+            boolean hasFocus, int row, int column) {
+    	
+		if (column == 1) {
+			// this never happens because
+			// column 1 contains TreeTableModel
+			// and default renderer for it
+			// is JTree directly            
+			return table.getTree();
+		}
+    	
+    	Object o = table.getModel().getValueAt(row, TaskTable.TASK);
+        if (o instanceof Task) {
+			Task t = (Task) o;
+
+			// default values
+			// label.setOpaque(true);
+			label.setForeground(Color.BLACK);
+			label.setIcon(null);
+			// label.setToolTipText(t.getDescription()); //XXX Disabled because of bug 1596966
+			applyFont(t, label);
+			applySelectionStyle(selected, label);
+			applyFocus(hasFocus, label);
+			// if( column_name.equals("% " + Local.getString("done")) ){
+			if (column == 7) {
+				return getProgressCellRenderer(t, selected, hasFocus, column);
+			}
+			// if( column_name.equals("") ){
+			if (column == 0) {
+				return getPriorityIconCellRenderer(t, selected, hasFocus);
+			}
+			// if( column_name.equals(Local.getString("Start date")) ||
+			// column_name.equals(Local.getString("End date")) ){
+			if ((column == 3) || (column == 4)) {
+				label.setText(dateFormat.format((Date) value));
+				return label;
+			}
+			// if( column_name.equals( Local.getString("Status") ) ){
+			if (column == 6) {
+				label.setText(value.toString());
+				label.setForeground(getColorForTaskStatus(t, false));
+				return label;
+			}
+			label.setText(value.toString());
+		}
+        else if (o instanceof Process) {
+        	Process p = (Process) o;
+        	
+			applySelectionStyle(selected, label);
+			applyFocus(hasFocus, label);
+			label.setIcon(null);
+			
+			// date columns
+			if (column == 3 || column == 4) {
+				label.setText(dateFormat.format((Date) value));
+			}
+			// progress column
+			else if (column == 7) {
+				return getProgressCellRenderer(p, selected, hasFocus, column);
+			}
+			else {
+				label.setText("");
+			}
         }
-        // default values
-        // label.setOpaque(true);
-        label.setForeground(Color.BLACK);
-        label.setIcon(null);
-       // label.setToolTipText(t.getDescription()); //XXX Disabled because of bug 1596966
-        applyFont(t, label);
-        applySelectionStyle(selected, label);
-        applyFocus(hasFocus, label);
-        if (value == null) {
-            label.setText("");
-            return label;
-        }
-        // if( column_name.equals("% " + Local.getString("done")) ){
-        if (column == 7) {
-            return getProgressCellRenderer(t, selected, hasFocus, column);
-        }
-        // if( column_name.equals("") ){
-        if (column == 0) {
-            return getPriorityIconCellRenderer(t, selected, hasFocus);
-        }
-        // if( column_name.equals(Local.getString("Start date")) ||
-        // column_name.equals(Local.getString("End date")) ){
-        if ((column == 3) || (column == 4)) {
-            label.setText(dateFormat.format((Date) value));
-            return label;
-        }
-        // if( column_name.equals( Local.getString("Status") ) ){
-        if (column == 6) {
-            label.setText(value.toString());
-            label.setForeground(getColorForTaskStatus(t, false));
-            return label;
-        }
-        label.setText(value.toString());
-        return label;
+		return label;
     }
 
     /**
@@ -148,8 +186,29 @@ public class TaskTreeTableCellRenderer extends DefaultTreeCellRenderer implement
      * Component showing task progress
      */
     private Component getProgressCellRenderer(Task t, boolean selected, boolean hasFocus, int column) {
-        progressLabel.setTask(t);
+        progressLabel.setVal(t.getProgress());
         progressLabel.setColumn(column);
+        progressLabel.setColor(getColorForTaskStatus(t, true));
+        applyFocus(hasFocus, progressLabel);
+        return progressLabel;
+    }
+
+    /**
+     * Component showing task progress
+     */
+    private Component getProgressCellRenderer(Process p, boolean selected, boolean hasFocus, int column) {
+        Collection<Task> tasks = p.getTasks();
+    	
+    	progressLabel.setVal(p.getProgress());
+        progressLabel.setColumn(column);
+        
+        if (tasks.isEmpty()) {
+        	progressLabel.setColor(new Color(255, 255, 255));
+        }
+        else {
+        	progressLabel.setColor(getColorForTaskStatus((Task)tasks.toArray()[tasks.size()-1], true));
+        }
+        
         applyFocus(hasFocus, progressLabel);
         return progressLabel;
     }

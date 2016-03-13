@@ -28,6 +28,7 @@ public class CurrentProject {
     private static TaskList _tasklist = null;
     private static TemplateList _templatelist = null;
     private static NoteList _notelist = null;
+    private static ProcessList _processlist = null;
     private static ResourcesList _resources = null;
     private static Vector projectListeners = new Vector();
 
@@ -54,6 +55,7 @@ public class CurrentProject {
         _tasklist = CurrentStorage.get().openTaskList(_project);
         _templatelist = CurrentStorage.get().openTemplateList(_project);
         _notelist = CurrentStorage.get().openNoteList(_project);
+        _processlist = CurrentStorage.get().openProcessList(_project);
         _resources = CurrentStorage.get().openResourcesList(_project);
         AppFrame.addExitListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -82,18 +84,24 @@ public class CurrentProject {
     public static ResourcesList getResourcesList() {
             return _resources;
     }
+    
+    public static ProcessList getProcessList() {
+    	return _processlist;
+    }
 
     public static void set(Project project) {
         if (project.getID().equals(_project.getID())) return;
         TaskList newtasklist = CurrentStorage.get().openTaskList(project);
         TemplateList newtemplatelist = CurrentStorage.get().openTemplateList(project);
         NoteList newnotelist = CurrentStorage.get().openNoteList(project);
+        ProcessList newprocesslist = CurrentStorage.get().openProcessList(project);
         ResourcesList newresources = CurrentStorage.get().openResourcesList(project);
         notifyListenersBefore(project, newnotelist, newtasklist, newresources);
         _project = project;
         _tasklist = newtasklist;
         _templatelist = newtemplatelist;
         _notelist = newnotelist;
+        _processlist = newprocesslist;
         _resources = newresources;
         notifyListenersAfter();
         Context.put("LAST_OPENED_PROJECT_ID", project.getID());
@@ -124,6 +132,7 @@ public class CurrentProject {
         Storage storage = CurrentStorage.get();
 
         storage.storeNoteList(_notelist, _project);
+        storage.storeProcessList(_processlist, _project);
         storage.storeTaskList(_tasklist, _project); 
         storage.storeTemplateList(_templatelist, _project);
         storage.storeResourcesList(_resources, _project);
@@ -135,6 +144,7 @@ public class CurrentProject {
         _tasklist = null;
         _templatelist = null;
         _notelist = null;
+        _processlist = null;
         _resources = null;
     }
 }

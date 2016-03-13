@@ -63,6 +63,8 @@ public class TaskDialog extends JDialog {
     String[] priority = {Local.getString("Lowest"), Local.getString("Low"),
             Local.getString("Normal"), Local.getString("High"),
             Local.getString("Highest")};
+    
+    String processId = null;
 	
 	// Format Date
 	SimpleDateFormat sdf = (SimpleDateFormat)DateFormat.getDateInstance(DateFormat.SHORT);
@@ -566,8 +568,9 @@ public class TaskDialog extends JDialog {
         jPanelProgress.add(jSpinnerProgress, null);
 	}
 	
-    public TaskDialog(Frame frame, String title) {
+    public TaskDialog(Frame frame, String title, String processId) {
         super(frame, title, true);
+    	this.processId = processId;
         try {
             jbInit();            
             pack();
@@ -602,14 +605,25 @@ public class TaskDialog extends JDialog {
         drawName();
         drawType();   
         drawDescription();
-        drawEffort();
         drawStartDate();
         drawEndDate();
+        drawEffort();
         drawNotification();
         drawPriority();
         drawProgress();
         
         setConstraints();
+        
+        if (processId == null) { // Create New Task, not process task
+            jPanel6.add(jLabelStartDate, null);
+            jPanel6.add(jSpinnerStartDate, null);
+            jPanel6.add(jButtonStartDate, null);
+
+    		jPanel1.add(jCheckBoxEndDate, null);
+            jPanel1.add(jLabelEndDate, null);
+            jPanel1.add(jSpinnerEndDate, null);
+            jPanel1.add(jButtonEndDate, null);
+        }
 
         jPanel4.add(jLabelPriority, null);
         getContentPane().add(mPanel);
@@ -631,14 +645,7 @@ public class TaskDialog extends JDialog {
         jPanel8.add(descriptionScrollPane, null);
         areaPanel.add(jPanel2, BorderLayout.CENTER);
         jPanel2.add(jPanel6, null);
-        jPanel6.add(jLabelStartDate, null);
-        jPanel6.add(jSpinnerStartDate, null);
-        jPanel6.add(jButtonStartDate, null);
         jPanel2.add(jPanel1, null);
-		jPanel1.add(jCheckBoxEndDate, null);
-        jPanel1.add(jLabelEndDate, null);
-        jPanel1.add(jSpinnerEndDate, null);
-        jPanel1.add(jButtonEndDate, null);
         // added by rawsushi
         jPanel2.add(jPanelEffort, null);
 

@@ -28,6 +28,8 @@ public interface TaskList {
 	public boolean hasParentTask(String id);
 
 	public Collection<Task> getTopLevelTasks();
+	public Collection<Task> getTopLevelNoProcessTasks();
+	public Collection<Task> getActiveTopLevelNoProcessTasks(CalendarDate date);
 	
     public Collection<Task> getAllSubTasks(String taskId);
     public Collection<Task> getActiveSubTasks(String taskId,CalendarDate date);

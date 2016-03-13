@@ -23,6 +23,8 @@ import net.sf.memoranda.EventsManager;
 import net.sf.memoranda.Note;
 import net.sf.memoranda.NoteList;
 import net.sf.memoranda.NoteListImpl;
+import net.sf.memoranda.ProcessList;
+import net.sf.memoranda.ProcessListImpl;
 import net.sf.memoranda.Project;
 import net.sf.memoranda.ProjectManager;
 import net.sf.memoranda.ResourcesList;
@@ -228,8 +230,46 @@ public class FileStorage implements Storage {
         System.out.println("[DEBUG] Remove note:" + getNotePath(note));
         f.delete();
     }
+    
+    
 
-    /**
+    @Override
+	public ProcessList openProcessList(Project prj) {
+        String fn = JN_DOCPATH + prj.getID() + File.separator + ".processlist";
+
+        if (documentExists(fn)) {
+            /*DEBUG*/
+            System.out.println(
+                "[DEBUG] Open task list: "
+                    + JN_DOCPATH
+                    + prj.getID()
+                    + File.separator
+                    + ".processlist");
+            
+            Document processlistDoc = openDocument(fn);
+            return new ProcessListImpl(prj, processlistDoc);   
+        }
+        else {
+            /*DEBUG*/
+            System.out.println("[DEBUG] New task list created");
+            return new ProcessListImpl(prj);
+        }
+	}
+
+	@Override
+	public void storeProcessList(ProcessList pl, Project prj) {
+        /*DEBUG*/
+        System.out.println(
+            "[DEBUG] Save task list: "
+                + JN_DOCPATH
+                + prj.getID()
+                + File.separator
+                + ".processlist");
+        Document processlistDoc = pl.getXMLContent();
+        saveDocument(processlistDoc,JN_DOCPATH + prj.getID() + File.separator + ".processlist");
+	}
+
+	/**
      * @see net.sf.memoranda.util.Storage#openProjectManager()
      */
     public void openProjectManager() {
