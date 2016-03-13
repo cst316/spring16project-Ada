@@ -1,4 +1,4 @@
-package net.sf.memoranda;
+package net.sf.memoranda.tests;
 
 import static org.junit.Assert.*;
 
@@ -8,6 +8,9 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import net.sf.memoranda.CurrentProject;
+import net.sf.memoranda.Template;
+import net.sf.memoranda.TemplateList;
 import net.sf.memoranda.date.CalendarDate;
 import net.sf.memoranda.util.CurrentStorage;
 import net.sf.memoranda.util.FileStorage;
