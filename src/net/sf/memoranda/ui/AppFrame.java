@@ -19,6 +19,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -652,15 +654,27 @@ public class AppFrame extends JFrame {
     }
    
     protected void jMenuHelpBug_actionPerformed(ActionEvent e) {
-        Util.runBrowser(App.BUGS_TRACKER_URL);
+        try {
+            Util.runBrowser(App.BUGS_TRACKER_URL);
+        } catch (IOException ex) {
+            Logger.getLogger(AppFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
    
     protected void jMenuHelpWeb_actionPerformed(ActionEvent e) {
-        Util.runBrowser(App.WEBSITE_URL);
+        try {
+            Util.runBrowser(App.WEBSITE_URL);
+        } catch (IOException ex) {
+            Logger.getLogger(AppFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
    
     protected void jMenuHelpGuide_actionPerformed(ActionEvent e) {
-        Util.runBrowser(App.GUIDE_URL);
+        try {
+            Util.runBrowser(App.GUIDE_URL);
+        } catch (IOException ex) {
+            Logger.getLogger(AppFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
     
     //File | Exit action performed
