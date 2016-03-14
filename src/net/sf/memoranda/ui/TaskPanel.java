@@ -55,6 +55,7 @@ public class TaskPanel extends JPanel {
     JButton newProcessB = new JButton();
     JButton editProcessB = new JButton();
     JButton addProcessTaskB = new JButton();
+    JButton removeProcessB = new JButton();
     
 	JCheckBoxMenuItem ppShowActiveOnlyChB = new JCheckBoxMenuItem();
 		
@@ -228,6 +229,23 @@ public class TaskPanel extends JPanel {
             }
         });
         addProcessTaskB.setBorderPainted(false);
+        
+        removeProcessB.setIcon(
+        		new ImageIcon(net.sf.memoranda.ui.AppFrame.class.getResource(
+        				"resources/icons/process_delete.png")));
+        removeProcessB.setEnabled(false);
+        removeProcessB.setMaximumSize(new Dimension(24, 24));
+        removeProcessB.setMinimumSize(new Dimension(24, 24));
+        removeProcessB.setToolTipText(Local.getString("Remove process"));
+        removeProcessB.setRequestFocusEnabled(false);
+        removeProcessB.setPreferredSize(new Dimension(24, 24));
+        removeProcessB.setFocusable(false);
+        removeProcessB.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+            	removeProcessB_actionPerformed(event);
+            }
+        });
+        removeProcessB.setBorderPainted(false);
             
 		// added by rawsushi
 //		showActiveOnly.setBorderPainted(false);
@@ -378,6 +396,7 @@ public class TaskPanel extends JPanel {
         tasksToolBar.add(newProcessB, null);
         tasksToolBar.add(editProcessB, null);
         tasksToolBar.add(addProcessTaskB, null);
+        tasksToolBar.add(removeProcessB, null);
 
 		//tasksToolBar.add(showActiveOnly, null);
         
@@ -430,6 +449,7 @@ public class TaskPanel extends JPanel {
 				
 				editProcessB.setEnabled(processSelected);
 				addProcessTaskB.setEnabled(processSelected);
+				removeProcessB.setEnabled(processSelected);
 				
 				/*if (taskTable.getCurrentRootTask() == null) {
 					ppParentTask.setEnabled(false);
@@ -873,6 +893,14 @@ public class TaskPanel extends JPanel {
 	        
 	        sortProcessTasks(processName, processId);
 		}
+	}
+	
+	/**
+	 * Remove selected process.
+	 * @param event
+	 */
+	void removeProcessB_actionPerformed(ActionEvent event) {
+		// TODO remove process
 	}
 	
 	// US-3 Task 49: Create add task wizard
