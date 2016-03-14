@@ -54,29 +54,35 @@ public class TemplateImplTest {
 		CurrentStorage.get().storeTemplateList(templateList, CurrentProject.get());
 	}
 
+	// This test requires the .templatelist file to exist
+	// (i.e., this will not work on a clean install, or if file is missing)
 	@Test
 	public void testRetrieveTemplate() {
+		boolean exists = false;
 		_id = new String();
-		
+
 		for (String id : templateList.getIds()) {
 			_id = id;
+			exists = true;
 		}
 		
-		template = templateList.getTemplate(_id);
-		
-		assertTrue(template.getId().equals(_id));
-		
-		int[] diff = {END_DAY - START_DAY, END_MONTH - START_MONTH, END_YEAR - START_YEAR};
-		
-		for (int i = 0; i < diff.length; i++) {
-			assertTrue(template.getDateDifference()[i] == diff[i]);
+		if (exists) {
+			template = templateList.getTemplate(_id);
+			
+			assertTrue(template.getId().equals(_id));
+			
+			int[] diff = {END_DAY - START_DAY, END_MONTH - START_MONTH, END_YEAR - START_YEAR};
+			
+			for (int i = 0; i < diff.length; i++) {
+				assertTrue(template.getDateDifference()[i] == diff[i]);
+			}
+			
+			assertTrue(template.getTitle().equals(TITLE));
+			assertTrue(template.getType().equals(TYPE));
+			assertTrue(template.getPriority() == Template.PRIORITY_NORMAL);
+			assertTrue(template.getEffort() == 0);
+			assertTrue(template.getDescription().equals(DESCRIPTION));
 		}
-		
-		assertTrue(template.getTitle().equals(TITLE));
-		assertTrue(template.getType().equals(TYPE));
-		assertTrue(template.getPriority() == Template.PRIORITY_NORMAL);
-		assertTrue(template.getEffort() == 0);
-		assertTrue(template.getDescription().equals(DESCRIPTION));
 	}
 	
 	@Test
