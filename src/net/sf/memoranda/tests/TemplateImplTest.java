@@ -2,6 +2,8 @@ package net.sf.memoranda.tests;
 
 import static org.junit.Assert.*;
 
+import java.util.ArrayList;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -33,15 +35,16 @@ public class TemplateImplTest {
 	private static Template template = null;
 	private static TemplateList templateList = null;
 	
-	private static String _id = null;
+	private static ArrayList<String> testIds = null;
 
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
 		templateList = CurrentProject.getTemplateList();
+		testIds = new ArrayList<>();
 	}
 	
 	@Test
-	public void testSaveAndEditTemplate() {
+	public void testCreateAndEditTemplate() {
 		template = templateList.createTemplate(new CalendarDate(START_DAY, START_MONTH, START_YEAR), new CalendarDate(END_DAY, END_MONTH, END_YEAR), TITLE, TYPE, Template.PRIORITY_NORMAL, 0, DESCRIPTION);
 		
 		template.setDateDifference(new CalendarDate(START_DAY, START_MONTH, START_YEAR), new CalendarDate(END_DAY, END_MONTH, END_YEAR));
@@ -51,7 +54,8 @@ public class TemplateImplTest {
 		template.setTitle(TITLE);
 		template.setType(TYPE);
 		
-		CurrentStorage.get().storeTemplateList(templateList, CurrentProject.get());
+		// Test-specific statement
+		testIds.add(template.getId());
 	}
 
 	// Creates a template and tests that it is retrieved with all the correct values.
@@ -70,6 +74,9 @@ public class TemplateImplTest {
 		template = templateList.getTemplate(id);
 		
 		assertTrue(template.getId().equals(id));
+
+		// Test-specific statement
+		testIds.add(id);
 		
 		int[] diff = {END_DAY - START_DAY, END_MONTH - START_MONTH, END_YEAR - START_YEAR};
 		
@@ -85,13 +92,12 @@ public class TemplateImplTest {
 	}
 	
 	@Test
-	public void testRemoveTemplate() {
-		templateList.removeTemplate(template);
-	}
-	
-	@Test
 	public void testNullValues() {
 		Template t = templateList.createTemplate(null, null, "Empty Template", null, 0, 0, null);
+
+		// Test-specific statement
+		testIds.add(t.getId());
+		
 		int[] diff = t.getDateDifference();
 		
 		assertEquals(-1, diff[0]);
@@ -99,5 +105,21 @@ public class TemplateImplTest {
 		assertEquals(-1, diff[2]);
 		assertEquals("", t.getDescription());
 		assertEquals("", t.getType());
+	}
+	
+	/**
+	 * This tests the removeTemplate function
+	 * and deletes all of the test template objects from storage
+	 */
+	@Test
+	public void testRemoveTemplates() {
+		for (String id : testIds) {
+			templateList.removeTemplate(templateList.getTemplate(id));
+		}
+	}
+	
+	@Test
+	public void testSaveTemplate() {
+		CurrentStorage.get().storeTemplateList(templateList, CurrentProject.get());
 	}
 }
