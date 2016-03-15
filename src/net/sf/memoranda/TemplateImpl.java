@@ -135,9 +135,11 @@ public class TemplateImpl implements Template {
 
     public int getPriority() {
         Attribute pa = _element.getAttribute("priority");
-        if (pa == null)
-            return Template.PRIORITY_NORMAL;
-        return new Integer(pa.getValue()).intValue();
+        if (pa == null) {
+        	return Template.PRIORITY_NORMAL;
+        } else {
+        	return Integer.parseInt(pa.getValue());
+        }
     }
     
     public void setPriority(int p) {
