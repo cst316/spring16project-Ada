@@ -9,6 +9,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.Collection;
 import java.util.Date;
 import java.util.Vector;
 
@@ -896,11 +897,61 @@ public class TaskPanel extends JPanel {
 	}
 	
 	/**
-	 * Remove selected process.
+	 * US-6 Task 64: Task deletion option
+	 * Display JOptionPane to remove tasks from process or project
+	 * Displays alternate JOptionPane to confirm deletion if Process has no Tasks
 	 * @param event
 	 */
 	void removeProcessB_actionPerformed(ActionEvent event) {
-		// TODO remove process
+		boolean delete = true;
+		
+		Process selectedProcess = (Process) taskTable.getModel().getValueAt(taskTable.getSelectedRow(), TaskTable.TASK);
+		
+		// Check if process has tasks
+		if (selectedProcess.getTasks().size() > 0) {
+			// Text for JOptionPane buttons
+			String[] options = new String[2];
+			options[0] = new String(Local.getString("Delete"));
+			options[1] = new String(Local.getString("Keep"));
+					
+			int selection = JOptionPane.showOptionDialog(App.getFrame(), Local.getString("Delete or Keep Tasks?"), Local.getString(selectedProcess.getName()), 0, JOptionPane.INFORMATION_MESSAGE, null, options, null);
+			
+			Util.debug("You selected: " + selection);
+			
+			// All tasks within Process
+			Collection<Task> processTasks = CurrentProject.getProcessList().getProcess(selectedProcess.getID()).getTasks();
+			
+			if (selection == 0) { // Delete Tasks
+				for (Task t : processTasks) {
+	    			CurrentProject.getTaskList().removeTask(t);
+				}
+			} else if (selection == 1) { // Remove Tasks from Process
+				for (Task t : processTasks) {
+	    			selectedProcess.removeTask(t.getID());
+				}
+			} else {
+				delete = false;
+			}
+		} else {
+			// Confirm deletion
+			int n = JOptionPane.showConfirmDialog(App.getFrame(), Local.getString("Are you sure you want to delete this process?"), Local.getString("Remove Process"),
+					JOptionPane.YES_NO_OPTION);
+			
+			if (n != JOptionPane.YES_OPTION) {
+				delete = false;
+			}
+		}
+		
+		if (delete) {
+			// Delete process
+			CurrentProject.getProcessList().removeProcess(selectedProcess.getID());
+		}
+		
+		// Save and update UI
+		taskTable.tableChanged();
+		CurrentStorage.get().storeTaskList(CurrentProject.getTaskList(), CurrentProject.get());
+		CurrentStorage.get().storeProcessList(CurrentProject.getProcessList(), CurrentProject.get());
+		parentPanel.updateIndicators();
 	}
 	
 	// US-3 Task 49: Create add task wizard
