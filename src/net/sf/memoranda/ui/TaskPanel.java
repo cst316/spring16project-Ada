@@ -52,6 +52,7 @@ public class TaskPanel extends JPanel {
     JButton editTaskB = new JButton();
     JButton removeTaskB = new JButton();
     JButton completeTaskB = new JButton();
+    JButton editTemplateB = new JButton();
     JButton newProcessB = new JButton();
     JButton editProcessB = new JButton();
     JButton addProcessTaskB = new JButton();
@@ -180,6 +181,22 @@ public class TaskPanel extends JPanel {
         completeTaskB.setMaximumSize(new Dimension(24, 24));
         completeTaskB.setIcon(
             new ImageIcon(net.sf.memoranda.ui.AppFrame.class.getResource("resources/icons/todo_complete.png")));
+
+        editTemplateB.setBorderPainted(false);
+        editTemplateB.setFocusable(false);
+        editTemplateB.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                openEditTemplate();
+            }
+        });
+        editTemplateB.setPreferredSize(new Dimension(24, 24));
+        editTemplateB.setRequestFocusEnabled(true);
+        editTemplateB.setToolTipText(Local.getString("Edit template"));
+        editTemplateB.setMinimumSize(new Dimension(24, 24));
+        editTemplateB.setMaximumSize(new Dimension(24, 24));
+        editTemplateB.setIcon(
+            new ImageIcon(net.sf.memoranda.ui.AppFrame.class.getResource(
+            		"resources/icons/template_edit.png")));
 
         newProcessB.setIcon(
                 new ImageIcon(net.sf.memoranda.ui.AppFrame.class.getResource("resources/icons/process_new.png")));
@@ -374,7 +391,9 @@ public class TaskPanel extends JPanel {
         tasksToolBar.addSeparator(new Dimension(8, 24));
         tasksToolBar.add(editTaskB, null);
         tasksToolBar.add(completeTaskB, null);
-        tasksToolBar.addSeparator();new Dimension(8, 24);
+        tasksToolBar.addSeparator(new Dimension(8, 24));
+        tasksToolBar.add(editTemplateB, null);
+        tasksToolBar.addSeparator(new Dimension(8, 24));
         tasksToolBar.add(newProcessB, null);
         tasksToolBar.add(editProcessB, null);
         tasksToolBar.add(addProcessTaskB, null);
@@ -829,6 +848,20 @@ public class TaskPanel extends JPanel {
 		CurrentStorage.get().storeTaskList(CurrentProject.getTaskList(), CurrentProject.get());
 		parentPanel.updateIndicators();
 		//taskTable.updateUI();
+	}
+	
+	/**
+	 * Controls the dialog for editing templates.
+	 */
+	void openEditTemplate() {
+		TemplateSelectDialog dialog =
+				new TemplateSelectDialog(App.getFrame(), "Select template");
+		dialog.setLocationRelativeTo(this);
+		dialog.setVisible(true);
+		
+		if (!dialog.isCancelled() && dialog.getTemplate() != null) {
+			// TODO: Open template to edit
+		}
 	}
 	  
 	void newProcessB_actionPerformed(ActionEvent e) {
