@@ -897,7 +897,7 @@ public class TaskPanel extends JPanel {
 	}
 	
 	/**
-	 * US-6 Task 64: Task deletion option
+	 * US-6 Task 64: Task deletion option.
 	 * Display JOptionPane to remove tasks from process or project
 	 * Displays alternate JOptionPane to confirm deletion if Process has no Tasks
 	 * @param event
@@ -905,7 +905,10 @@ public class TaskPanel extends JPanel {
 	void removeProcessB_actionPerformed(ActionEvent event) {
 		boolean delete = true;
 		
-		Process selectedProcess = (Process) taskTable.getModel().getValueAt(taskTable.getSelectedRow(), TaskTable.TASK);
+		Process selectedProcess = (Process) taskTable.
+				getModel().
+				getValueAt(taskTable.getSelectedRow(), 
+						TaskTable.TASK);
 		
 		// Check if process has tasks
 		if (selectedProcess.getTasks().size() > 0) {
@@ -914,12 +917,22 @@ public class TaskPanel extends JPanel {
 			options[0] = new String(Local.getString("Delete"));
 			options[1] = new String(Local.getString("Keep"));
 					
-			int selection = JOptionPane.showOptionDialog(App.getFrame(), Local.getString("Delete or Keep Tasks?"), Local.getString(selectedProcess.getName()), 0, JOptionPane.INFORMATION_MESSAGE, null, options, null);
+			int selection = JOptionPane.
+					showOptionDialog(App.getFrame(), 
+							Local.getString("Delete or Keep Tasks?"), 
+							Local.getString(selectedProcess.getName()), 
+							0, 
+							JOptionPane.INFORMATION_MESSAGE, 
+							null, 
+							options, 
+							null);
 			
 			Util.debug("You selected: " + selection);
 			
 			// All tasks within Process
-			Collection<Task> processTasks = CurrentProject.getProcessList().getProcess(selectedProcess.getID()).getTasks();
+			Collection<Task> processTasks = CurrentProject.
+					getProcessList().
+					getProcess(selectedProcess.getID()).getTasks();
 			
 			if (selection == 0) { // Delete Tasks
 				for (Task t : processTasks) {
@@ -934,10 +947,12 @@ public class TaskPanel extends JPanel {
 			}
 		} else {
 			// Confirm deletion
-			int n = JOptionPane.showConfirmDialog(App.getFrame(), Local.getString("Are you sure you want to delete this process?"), Local.getString("Remove Process"),
+			int choice = JOptionPane.showConfirmDialog(App.getFrame(), 
+					Local.getString("Do you want to delete this process?"), 
+					Local.getString("Remove Process"),
 					JOptionPane.YES_NO_OPTION);
 			
-			if (n != JOptionPane.YES_OPTION) {
+			if (choice != JOptionPane.YES_OPTION) {
 				delete = false;
 			}
 		}
@@ -949,8 +964,10 @@ public class TaskPanel extends JPanel {
 		
 		// Save and update UI
 		taskTable.tableChanged();
-		CurrentStorage.get().storeTaskList(CurrentProject.getTaskList(), CurrentProject.get());
-		CurrentStorage.get().storeProcessList(CurrentProject.getProcessList(), CurrentProject.get());
+		CurrentStorage.get().storeTaskList(CurrentProject.getTaskList(), 
+				CurrentProject.get());
+		CurrentStorage.get().storeProcessList(CurrentProject.getProcessList(), 
+				CurrentProject.get());
 		parentPanel.updateIndicators();
 	}
 	
