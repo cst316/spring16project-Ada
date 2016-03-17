@@ -152,6 +152,14 @@ public class AppFrame extends JFrame {
         			pReport_actionPerformed(e);
         		}
         	};	
+        
+        public Action templatesAction =
+        		new AbstractAction(Local.getString("Templates")) {
+        	
+        		public void actionPerformed(ActionEvent event) {
+        			templates_actionPerformed(event);
+        		}
+        };
 	
     JMenuItem jMenuFileNewPrj = new JMenuItem();
         JMenuItem jMenuFileNewNote = new JMenuItem(workPanel.dailyItemsPanel.editorPanel.newAction);
@@ -164,6 +172,7 @@ public class AppFrame extends JFrame {
             workPanel.dailyItemsPanel.editorPanel.exportAction);
     // new option for Report
     JMenuItem jMenuFileReport = new JMenuItem(ReportAction);
+    JMenuItem menuFileTemplates = new JMenuItem(templatesAction);
     JMenuItem jMenuFileMin = new JMenuItem(minimizeAction);
 
     JMenuItem jMenuItem1 = new JMenuItem();
@@ -472,6 +481,8 @@ public class AppFrame extends JFrame {
         jMenuFile.add(jMenuFileExportNote);
         jMenuFile.add(jMenuFileImportNote);
         jMenuFile.add(jMenuFileImportPrj);
+        jMenuFile.addSeparator();
+        jMenuFile.add(menuFileTemplates);
         jMenuFile.addSeparator();
         jMenuFile.add(jMenuFileReport);
         jMenuFile.addSeparator();
@@ -1143,4 +1154,16 @@ public class AppFrame extends JFrame {
 				}
             }
         }
+            
+            // Templates menu action event
+            protected void templates_actionPerformed(ActionEvent e) {
+        		TemplateSelectDialog dialog =
+        				new TemplateSelectDialog(App.getFrame(), "Select template");
+        		dialog.setLocationRelativeTo(this);
+        		dialog.setVisible(true);
+        		
+        		if (!dialog.isCancelled() && dialog.getTemplate() != null) {
+        			// TODO: Open template to edit
+        		}
+            }
 }
