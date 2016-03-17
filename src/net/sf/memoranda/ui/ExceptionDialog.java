@@ -4,6 +4,8 @@ import java.awt.*;
 import javax.swing.*;
 import java.awt.event.*;
 import java.io.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import net.sf.memoranda.util.*;
 
 /*$Id: ExceptionDialog.java,v 1.2 2004/10/18 19:09:10 ivanrise Exp $*/
@@ -154,6 +156,10 @@ public class ExceptionDialog extends JDialog {
   }
 
   void reportB_actionPerformed(ActionEvent e) {
-      Util.runBrowser(App.BUGS_TRACKER_URL);
+      try {
+          Util.runBrowser(App.BUGS_TRACKER_URL);
+      } catch (IOException ex) {
+          Logger.getLogger(ExceptionDialog.class.getName()).log(Level.SEVERE, null, ex);
+      }
   }
 }
