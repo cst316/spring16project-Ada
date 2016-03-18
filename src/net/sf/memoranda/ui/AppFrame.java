@@ -1156,14 +1156,14 @@ public class AppFrame extends JFrame {
         }
             
             // Templates menu action event
-            protected void templates_actionPerformed(ActionEvent e) {
+            protected void templates_actionPerformed(ActionEvent event) {
         		TemplateSelectDialog dialog =
         				new TemplateSelectDialog(App.getFrame(), "Select template");
         		dialog.setLocationRelativeTo(this);
         		dialog.setVisible(true);
         		
         		if (!dialog.isCancelled() && dialog.getTemplate() != null) {
-        			// TODO: Open template to edit
+        			TemplateDialogInterface.openEditTemplate(dialog.getTemplate());
         		}
             }
 }
