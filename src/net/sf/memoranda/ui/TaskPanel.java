@@ -9,6 +9,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Vector;
 
@@ -33,6 +34,7 @@ import net.sf.memoranda.ProjectListener;
 import net.sf.memoranda.ResourcesList;
 import net.sf.memoranda.Task;
 import net.sf.memoranda.TaskList;
+import net.sf.memoranda.Template;
 import net.sf.memoranda.date.CalendarDate;
 import net.sf.memoranda.date.CurrentDate;
 import net.sf.memoranda.date.DateListener;
@@ -186,12 +188,12 @@ public class TaskPanel extends JPanel {
         editTemplateB.setFocusable(false);
         editTemplateB.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(ActionEvent event) {
-                openEditTemplate();
+                openSelectTemplate();
             }
         });
         editTemplateB.setPreferredSize(new Dimension(24, 24));
         editTemplateB.setRequestFocusEnabled(true);
-        editTemplateB.setToolTipText(Local.getString("Edit template"));
+        editTemplateB.setToolTipText(Local.getString("Open templates"));
         editTemplateB.setMinimumSize(new Dimension(24, 24));
         editTemplateB.setMaximumSize(new Dimension(24, 24));
         editTemplateB.setIcon(
@@ -553,14 +555,23 @@ public class TaskPanel extends JPanel {
         Process p = t.getProcess();
         TaskDialog dlg;
         if (p == null) {
-        	dlg = new TaskDialog(App.getFrame(), Local.getString("Edit task"), null);
-        }
-        else {
-        	dlg = new TaskDialog(App.getFrame(), Local.getString("Edit task"), p.getID());
+        	dlg = new TaskDialog(
+        			App.getFrame(),
+        			Local.getString("Edit task"),
+        			null,
+        			false);
+        } else {
+        	dlg = new TaskDialog(
+        			App.getFrame(),
+        			Local.getString("Edit task"),
+        			p.getID(),
+        			false);
         }
         Dimension frmSize = App.getFrame().getSize();
         Point loc = App.getFrame().getLocation();
-        dlg.setLocation((frmSize.width - dlg.getSize().width) / 2 + loc.x, (frmSize.height - dlg.getSize().height) / 2 + loc.y);
+        dlg.setLocation(
+        		(frmSize.width - dlg.getSize().width) / 2 + loc.x,
+        		(frmSize.height - dlg.getSize().height) / 2 + loc.y);
         dlg.jTextFieldName.setText(t.getText());
         dlg.jTextFieldType.setText(t.getType());
         dlg.descriptionField.setText(t.getDescription());
@@ -602,7 +613,11 @@ public class TaskPanel extends JPanel {
     }
 
     void newTaskB_actionPerformed(ActionEvent e) {
-        TaskDialog dlg = new TaskDialog(App.getFrame(), Local.getString("New task"), null);
+        TaskDialog dlg = new TaskDialog(
+        		App.getFrame(),
+        		Local.getString("New task"),
+        		null,
+        		false);
         
         //XXX String parentTaskId = taskTable.getCurrentRootTask();
         
@@ -644,10 +659,18 @@ public class TaskPanel extends JPanel {
 		CalendarDate todayD = CurrentDate.get();
         TaskDialog dlg;
         if (parentProc == null) {
-        	dlg = new TaskDialog(App.getFrame(), Local.getString("New Task"), null);
+        	dlg = new TaskDialog(
+        			App.getFrame(),
+        			Local.getString("New Task"),
+        			null,
+        			false);
         }
         else {
-        	dlg = new TaskDialog(App.getFrame(), Local.getString("New Task"), parentProc.getID());
+        	dlg = new TaskDialog(
+        			App.getFrame(),
+        			Local.getString("New Task"),
+        			parentProc.getID(),
+        			false);
         }
 		if (todayD.after(parent.getStartDate()))
 			dlg.setStartDate(todayD);
@@ -851,16 +874,97 @@ public class TaskPanel extends JPanel {
 	}
 	
 	/**
-	 * Controls the dialog for editing templates.
+	 * Controls the dialog for selecting templates.
 	 */
-	void openEditTemplate() {
-		TemplateSelectDialog dialog =
+	void openSelectTemplate() {
+		TemplateSelectDialog selectDialog =
 				new TemplateSelectDialog(App.getFrame(), "Select template");
-		dialog.setLocationRelativeTo(this);
-		dialog.setVisible(true);
+		selectDialog.setLocationRelativeTo(this);
+		selectDialog.setVisible(true);
 		
-		if (!dialog.isCancelled() && dialog.getTemplate() != null) {
-			// TODO: Open template to edit
+		if (!selectDialog.isCancelled() && selectDialog.getTemplate() != null) {
+			openEditTemplate(selectDialog.getTemplate());
+		}
+	}
+	
+	/**
+	 * Sets up and displays the TaskDialog configured for a template.
+	 */
+	private void openEditTemplate(Template template) {
+		TaskDialog editDialog = new TaskDialog(
+				App.getFrame(),
+				"Edit template",
+				null,
+				true);
+		
+		int[] dateDifference = template.getDateDifference();
+		int priority = template.getPriority();
+		long effort = template.getEffort();
+		float effortInHours = ((float) effort) / 1000 / 60 / 60;
+		String description = template.getDescription();
+		String name = template.getTitle();
+		String type = template.getType();
+		
+		// A negative date difference means there is no end date.
+		if (dateDifference[0] < 0) {
+			Util.debug("No end date");
+			editDialog.jCheckBoxEndDate.setSelected(false);
+		    editDialog.chkEndDate_actionPerformed(null);
+		} else {
+			editDialog.jCheckBoxEndDate.setSelected(true);
+		    editDialog.chkEndDate_actionPerformed(null);
+			
+			// apply the date difference to the start date to get the end date
+			Date startDate = (Date) editDialog.jSpinnerStartDate.getModel().getValue();
+			Calendar endDate = new CalendarDate(startDate).getCalendar();
+			
+			endDate.roll(Calendar.YEAR, dateDifference[2]);
+			endDate.roll(Calendar.MONTH, dateDifference[1]);
+			endDate.roll(Calendar.DAY_OF_MONTH, dateDifference[0]);
+			
+			editDialog.jSpinnerEndDate.getModel().setValue(
+					new CalendarDate(endDate).getDate());
+		}
+		editDialog.descriptionField.setText(description);
+		editDialog.jTextFieldName.setText(name);
+		editDialog.jTextFieldType.setText(type);
+		editDialog.effortField.setText(effortInHours + "");
+		editDialog.jComboBoxPriority.setSelectedIndex(priority);
+		
+		editDialog.setLocationRelativeTo(this);
+		editDialog.setVisible(true);
+		
+		if (!editDialog.CANCELLED) {
+			String newName = editDialog.jTextFieldName.getText();
+			String newType = editDialog.jTextFieldType.getText();
+			String newDescription = editDialog.descriptionField.getText();
+			long neweffort =
+					(long)
+					(Float.parseFloat(editDialog.effortField.getText())
+					* 1000 * 60 * 60);
+			int newPriority = editDialog.jComboBoxPriority.getSelectedIndex();
+			CalendarDate newStartDate =	new CalendarDate(
+					(Date) editDialog.jSpinnerStartDate.getModel().getValue());
+			CalendarDate newEndDate =
+					(editDialog.jCheckBoxEndDate.isSelected()
+					// assign the end date if end date is selected
+					? new CalendarDate((Date)
+							editDialog.
+							jSpinnerEndDate.
+							getModel().
+							getValue())
+					// if end date is not selected, return null
+					: null);
+			
+			template.setDateDifference(newStartDate, newEndDate);
+			template.setDescription(newDescription);
+			template.setEffort(neweffort);
+			template.setPriority(newPriority);
+			template.setTitle(newName);
+			template.setType(newType);
+			
+    		CurrentStorage.get().storeTemplateList(
+    				CurrentProject.getTemplateList(), CurrentProject.get());
 		}
 	}
 	  
@@ -944,7 +1048,11 @@ public class TaskPanel extends JPanel {
 		
 		// Selection handle
 		if (selection == 0) { // Create new task
-			TaskDialog taskDialog = new TaskDialog(App.getFrame(), Local.getString("New Task for \"" + processName + "\""), processId);
+			TaskDialog taskDialog = new TaskDialog(
+					App.getFrame(),
+					Local.getString("New Task for \"" + processName + "\""),
+					processId,
+					false);
 			
 	        Dimension frmSize = App.getFrame().getSize();
 	        Point loc = App.getFrame().getLocation();

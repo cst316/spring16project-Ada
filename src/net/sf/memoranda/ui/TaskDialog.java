@@ -11,8 +11,6 @@ import java.awt.GridLayout;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.text.DateFormat;
@@ -24,6 +22,7 @@ import java.util.Date;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
@@ -42,7 +41,6 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.JCheckBox;
 
 import net.sf.memoranda.CurrentProject;
 import net.sf.memoranda.Template;
@@ -58,6 +56,7 @@ public class TaskDialog extends JDialog {
     public boolean CANCELLED = true;
     boolean ignoreStartChanged = false;
     boolean ignoreEndChanged = false;
+    boolean isTemplate;
     
     // Strings
     String[] priority = {Local.getString("Lowest"), Local.getString("Low"),
@@ -188,6 +187,7 @@ public class TaskDialog extends JDialog {
                 saveTask_actionPerformed(e);
             }
         });
+        jButtonSaveTask.setVisible(!isTemplate);
 	}
 	
 	/**
@@ -198,11 +198,19 @@ public class TaskDialog extends JDialog {
         jButtonSaveTemplate.setMinimumSize(new Dimension(150, 26));
         jButtonSaveTemplate.setPreferredSize(new Dimension(150, 26));
         jButtonSaveTemplate.setText(Local.getString("Save as Template"));
-        jButtonSaveTemplate.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                saveTemplate_actionPerformed(e);
-            }
-        });
+        if (isTemplate) {
+        	jButtonSaveTemplate.addActionListener(new java.awt.event.ActionListener() {
+                public void actionPerformed(ActionEvent event) {
+                    saveTask_actionPerformed(event);
+                }
+        	});
+        } else {
+        	jButtonSaveTemplate.addActionListener(new java.awt.event.ActionListener() {
+                public void actionPerformed(ActionEvent event) {
+                    saveTemplate_actionPerformed(event);
+                }
+        	});
+        }
 	}
 	
 	/**
@@ -218,6 +226,7 @@ public class TaskDialog extends JDialog {
                 openTemplate_actionPerformed(e);
             }
         });
+        jButtonOpenTemplate.setVisible(!isTemplate);
 	}
 	
 	/**
@@ -540,6 +549,7 @@ public class TaskDialog extends JDialog {
                 setNotifB_actionPerformed(e);
             }
         });
+        jButtonNotification.setVisible(!isTemplate);
 	}
 	
 	/**
@@ -566,11 +576,13 @@ public class TaskDialog extends JDialog {
         // Panel to tie it together
         jPanelProgress.add(jLabelProgress, null);
         jPanelProgress.add(jSpinnerProgress, null);
+        jPanelProgress.setVisible(!isTemplate);
 	}
 	
-    public TaskDialog(Frame frame, String title, String processId) {
+    public TaskDialog(Frame frame, String title, String processId, boolean isTemplate) {
         super(frame, title, true);
     	this.processId = processId;
+    	this.isTemplate = isTemplate;
         try {
             jbInit();            
             pack();
