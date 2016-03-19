@@ -40,19 +40,22 @@ public class TaskTableSorter extends TaskTableModel{
 					compare = task1.getType().compareTo(task2.getType());
 					break;
 				case 3:
-					compare = task1.getStartDate().getDate().compareTo(task2.getStartDate().getDate());
+					// TODO compare task1 logged time to task2 logged time
 					break;
 				case 4:
+					compare = task1.getStartDate().getDate().compareTo(task2.getStartDate().getDate());
+					break;
+				case 5:
 					compare = task1.getEndDate().getDate().compareTo(task2.getEndDate().getDate());
 					break;
 				case 0: // task priority, same as 4
-				case 5:
+				case 6:
 					compare = task1.getPriority() - task2.getPriority();
 					break;
-				case 6:
+				case 7:
 					compare = task1.getStatus(CurrentDate.get()) - task2.getStatus(CurrentDate.get());
 					break;
-				case 7:
+				case 8:
 					compare = task1.getProgress() - task2.getProgress();
 					break;
 				}
@@ -65,13 +68,16 @@ public class TaskTableSorter extends TaskTableModel{
 				case 1:
 					compare = p1.getName().compareTo(p2.getName());
 					break;
-				case 3:
-					compare = p1.getStartDate().getDate().compareTo(p2.getStartDate().getDate());
+				case 2:
+					// TODO compare p1 logged time to p2 logged time
 					break;
 				case 4:
+					compare = p1.getStartDate().getDate().compareTo(p2.getStartDate().getDate());
+					break;
+				case 5:
 					compare = p1.getEndDate().getDate().compareTo(p2.getEndDate().getDate());
 					break;
-				case 7:
+				case 8:
 					compare = p1.getProgress() - p2.getProgress();
 					break;
 				default:
