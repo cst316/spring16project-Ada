@@ -154,15 +154,13 @@ public class TaskTreeTableCellRenderer extends DefaultTreeCellRenderer implement
 			applyFocus(hasFocus, label);
 			label.setIcon(null);
 			
-			// date columns
-			if (column == 4 || column == 5) {
+			if (column == 2) { // actual effort column
+				label.setText(value.toString());
+			} else if (column == 4 || column == 5) { // date columns
 				label.setText(dateFormat.format((Date) value));
-			}
-			// progress column
-			else if (column == 8) {
+			} else if (column == 8) { // progress column
 				return getProgressCellRenderer(p, selected, hasFocus, column);
-			}
-			else {
+			} else {
 				label.setText("");
 			}
         }

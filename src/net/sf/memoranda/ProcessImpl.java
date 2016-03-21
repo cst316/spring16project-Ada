@@ -201,6 +201,17 @@ public class ProcessImpl implements Process {
 		return filterActiveTasks(getTasks(), date);
 	}
 
+	@Override
+	public long getLoggedTime() {
+		long loggedTime = 0;
+		
+		for (Task task : this.getTasks()) {
+			// TODO loggedTime += task.{getLoggedTime};
+		}
+		
+		return loggedTime;
+	}
+
 	/* (non-Javadoc)
 	 * @see net.sf.memoranda.Process#setTaskOrder(java.lang.String[])
 	 */

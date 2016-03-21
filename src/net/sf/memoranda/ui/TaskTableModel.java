@@ -100,8 +100,7 @@ public class TaskTableModel extends AbstractTreeTableModel implements TreeTableM
 				o = p.getName();
 				break;
 			case 2:
-				// TODO get process logged time
-				o = "";
+				o = p.getLoggedTime() / 1000 / 60 / 60;
 				break;
 			case 4:
 				o = p.getStartDate().getDate();
