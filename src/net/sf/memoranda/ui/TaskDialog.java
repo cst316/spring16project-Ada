@@ -742,12 +742,13 @@ public class TaskDialog extends JDialog {
     	if (!dialog.isCancelled()) {
     		Template template = dialog.getTemplate();
     		
+                // remove the template if delete is selected
                 if (TemplateSelectDialog.remove == true){
                     TemplateList newtemplatelist = CurrentProject.getTemplateList();
                     newtemplatelist.removeTemplate(template);
                     TemplateSelectDialog.remove = false;
                 } 
-                
+                //populate the template if ok is selected
                 else if (template != null) {
     			int[] dateDifference = template.getDateDifference();
     			int priority = template.getPriority();

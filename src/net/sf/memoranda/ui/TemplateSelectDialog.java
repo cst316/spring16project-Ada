@@ -181,7 +181,7 @@ public class TemplateSelectDialog extends JDialog {
 	}
 	
 	/**
-	 * Sets up and defines the components and layout of the ok and cancel buttons.
+	 * Sets up and defines the components and layout of the ok, delete, and cancel buttons.
 	 */
 	private void drawButtons() {
 		okButton = new JButton();
