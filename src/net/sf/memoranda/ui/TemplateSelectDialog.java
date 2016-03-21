@@ -25,6 +25,7 @@ import javax.swing.border.Border;
 import net.sf.memoranda.CurrentProject;
 import net.sf.memoranda.Template;
 import net.sf.memoranda.TemplateList;
+import net.sf.memoranda.TemplateListImpl;
 import net.sf.memoranda.util.Local;
 
 /**
@@ -37,6 +38,7 @@ public class TemplateSelectDialog extends JDialog {
 	private static final long serialVersionUID = 1L;
 
 	private boolean cancelled = true;
+        public static boolean remove = false;
 	
 	private Border defaultBorder;
 	
@@ -203,7 +205,8 @@ public class TemplateSelectDialog extends JDialog {
 		deleteButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(ActionEvent event) {
         		cancelled = false;
-        		//TemplateList.removeTemplate(TemplateSelectDialog.this.getTemplate());
+                        remove = true;
+        		TemplateSelectDialog.this.dispose();
                         
             }
         });

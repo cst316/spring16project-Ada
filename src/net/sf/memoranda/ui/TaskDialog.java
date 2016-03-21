@@ -44,6 +44,8 @@ import javax.swing.event.ListSelectionListener;
 
 import net.sf.memoranda.CurrentProject;
 import net.sf.memoranda.Template;
+import net.sf.memoranda.TemplateList;
+import net.sf.memoranda.TemplateListImpl;
 import net.sf.memoranda.date.CalendarDate;
 import net.sf.memoranda.util.CurrentStorage;
 import net.sf.memoranda.util.Local;
@@ -220,7 +222,7 @@ public class TaskDialog extends JDialog {
         jButtonOpenTemplate.setMaximumSize(new Dimension(150, 26));
         jButtonOpenTemplate.setMinimumSize(new Dimension(150, 26));
         jButtonOpenTemplate.setPreferredSize(new Dimension(150, 26));
-        jButtonOpenTemplate.setText(Local.getString("Open Template"));
+        jButtonOpenTemplate.setText(Local.getString("Template List"));
         jButtonOpenTemplate.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 openTemplate_actionPerformed(e);
@@ -606,7 +608,7 @@ public class TaskDialog extends JDialog {
 		drawSaveTask();
 		drawSaveTemplate();
 		drawOpenTemplate();
-        
+                 
         this.getRootPane().setDefaultButton(jButtonSaveTask);
         mPanel.setBorder(mBorder);
         //areaPanel.setBorder(areaBorder);
@@ -740,7 +742,13 @@ public class TaskDialog extends JDialog {
     	if (!dialog.isCancelled()) {
     		Template template = dialog.getTemplate();
     		
-    		if (template != null) {
+                if (TemplateSelectDialog.remove == true){
+                    TemplateList newtemplatelist = CurrentProject.getTemplateList();
+                    newtemplatelist.removeTemplate(template);
+                    TemplateSelectDialog.remove = false;
+                } 
+                
+                else if (template != null) {
     			int[] dateDifference = template.getDateDifference();
     			int priority = template.getPriority();
     			long effort = template.getEffort();
