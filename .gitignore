@@ -5,4 +5,8 @@ README.txt
 .settings
 .project
 .DS_Store
+<<<<<<< OURS
 /classes/
+/ada/nbproject/private/
+=======
+>>>>>>> THEIRS
