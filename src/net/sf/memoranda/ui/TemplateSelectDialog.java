@@ -17,6 +17,7 @@ import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
@@ -206,8 +207,13 @@ public class TemplateSelectDialog extends JDialog {
             public void actionPerformed(ActionEvent event) {
         		cancelled = false;
                         remove = true;
+                        int n = JOptionPane.showConfirmDialog(
+                            App.getFrame(),
+                            "this cannot be undone",
+                            Local.getString("Remove Template?"),
+                            JOptionPane.YES_NO_OPTION);
+                            if (n != JOptionPane.YES_OPTION) return;
         		TemplateSelectDialog.this.dispose();
-                        
             }
         });
 		deleteButton.setEnabled(false);
