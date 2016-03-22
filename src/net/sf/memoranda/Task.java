@@ -9,8 +9,10 @@
 package net.sf.memoranda;
 
 import java.util.Collection;
+import java.util.Map;
 
 import net.sf.memoranda.date.CalendarDate;
+import net.sf.memoranda.util.LogPair;
 
 /**
  * 
@@ -47,6 +49,40 @@ public interface Task {
     
     int getProgress();
     void setProgress(int p);
+    
+    /**
+     * Calculates total logged time for all logged instances in the Task.
+     * @return Logged time in milliseconds
+     */
+    long getLoggedTime();
+    
+    /**
+     * Gets all instances of logged times for the Task.
+     * @return A Map of the logged time index with a pair of Dates (String) and Times (Long)
+     */
+    Map<Integer, LogPair> getLoggedTimes();
+    
+    /**
+     * Appends a logged time to the Task.
+     * @param date The date of the log
+     * @param len The amount of time spent
+     */
+    void addLoggedTime(String date, long len);
+    
+    /**
+     * Edits a logged time at a specific index.
+     * @param index The index of the logged time within the Task
+     * @param date The new value for the date
+     * @param len The new value for the amount of time spent
+     */
+    void editLoggedTime(int index, String date, long len);
+    
+    /**
+     * Removes a logged time index from the Task.
+     * @param index The index of the logged time within the Task
+     * @return If deletion was successful
+     */
+    boolean removeLoggedTime(int index);
     
     int getPriority();
     void setPriority(int p);

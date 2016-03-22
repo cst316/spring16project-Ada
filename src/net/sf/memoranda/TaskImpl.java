@@ -10,11 +10,16 @@ package net.sf.memoranda;
 
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Vector;
+
 import java.util.Calendar;
 
 import net.sf.memoranda.date.CalendarDate;
 import net.sf.memoranda.date.CurrentDate;
+import net.sf.memoranda.util.LogPair;
+import net.sf.memoranda.util.Util;
 import nu.xom.Attribute;
 import nu.xom.Element;
 import nu.xom.Elements;
@@ -340,6 +345,87 @@ public class TaskImpl implements Task, Comparable {
         if ((p >= 0) && (p <= 100))
             setAttr("progress", new Integer(p).toString());
     }
+    
+    public long getLoggedTime() {
+    	long loggedTime = 0;
+    	
+    	Element thisElement = _element.getFirstChildElement("loggedTime");
+    	if (thisElement != null) {
+    		Elements instances = thisElement.getChildElements();
+    		
+    		for (int i = 0; i < instances.size(); i++) {
+    			Element instance = instances.get(i);
+
+    			loggedTime += Long.parseLong(instance.getAttributeValue("len"));
+    		}
+    	}
+    	
+    	return loggedTime;
+    }
+    
+    public Map<Integer, LogPair> getLoggedTimes() {
+    	Map<Integer, LogPair> map = new HashMap<>();
+    	
+    	Element thisElement = _element.getFirstChildElement("loggedTime");
+    	if (thisElement != null) {
+    		Elements instances = thisElement.getChildElements();
+    		
+    		for (int i = 0; i < instances.size(); i++) {
+    			Element instance = instances.get(i);
+    			
+    			map.put(i, new LogPair(instance.getAttributeValue("date"), Long.parseLong(instance.getAttributeValue("len"))));
+    		}
+    	}
+    	
+    	return map;
+    }
+    
+    public void addLoggedTime(String date, long len) {
+    	Element log = _element.getFirstChildElement("loggedTime");
+    	if (log == null) {
+    		log = new Element("loggedTime");
+    		
+    		Element instance = new Element("log");
+    		instance.addAttribute(new Attribute("date", date));
+    		instance.addAttribute(new Attribute("len", Long.toString(len)));
+    		
+    		log.appendChild(instance);
+    		_element.appendChild(log);
+    	}
+    	else {
+    		Element instance = new Element("log");
+    		instance.addAttribute(new Attribute("date", date));
+    		instance.addAttribute(new Attribute("len", Long.toString(len)));
+    		
+    		log.appendChild(instance);
+    	}
+    }
+    
+    public void editLoggedTime(int index, String date, long len) {
+    	Element log = _element.getFirstChildElement("loggedTime");
+		Elements instances = log.getChildElements();
+    	if (log != null) {
+    		Element instance = instances.get(index);
+    		instance.removeAttribute(instance.getAttribute("date"));
+    		instance.removeAttribute(instance.getAttribute("len"));
+    		
+    		instance.addAttribute(new Attribute("date", date));
+    		instance.addAttribute(new Attribute("len", Long.toString(len)));
+    	}
+    }
+    
+    public boolean removeLoggedTime(int index) {
+    	Element log = _element.getFirstChildElement("loggedTime");
+    	if (log != null) {
+    		log.removeChild(index);
+    		
+    		return true;
+    	}
+    	
+    	return false;
+    }
+    
+    
     /**
      * @see net.sf.memoranda.Task#getPriority()
      */

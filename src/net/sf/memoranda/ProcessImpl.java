@@ -206,7 +206,7 @@ public class ProcessImpl implements Process {
 		long loggedTime = 0;
 		
 		for (Task task : this.getTasks()) {
-			// TODO loggedTime += task.{getLoggedTime};
+			loggedTime += task.getLoggedTime();
 		}
 		
 		return loggedTime;

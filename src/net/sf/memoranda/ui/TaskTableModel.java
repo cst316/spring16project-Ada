@@ -132,8 +132,7 @@ public class TaskTableModel extends AbstractTreeTableModel implements TreeTableM
 				o = t;
 				break;
 			case 2:
-				// TODO get task logged time
-				o = "";
+				o = t.getLoggedTime();
 				break;
 			case 3:
 				o = t.getType();

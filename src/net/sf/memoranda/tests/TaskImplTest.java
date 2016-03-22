@@ -2,6 +2,8 @@ package net.sf.memoranda.tests;
 
 import static org.junit.Assert.assertTrue;
 
+import java.util.Map;
+
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -12,11 +14,17 @@ import net.sf.memoranda.ProcessList;
 import net.sf.memoranda.Task;
 import net.sf.memoranda.TaskList;
 import net.sf.memoranda.date.CalendarDate;
+import net.sf.memoranda.util.LogPair;
+import net.sf.memoranda.util.Util;
 
 public class TaskImplTest {
 
 	private static final String TYPE_A = "Type A";
 	private static final String TYPE_B = "Type B";
+	
+	private static final int LOG_A = 3600000;
+	private static final int LOG_B = 1800000;
+	private static final int LOG_C = 600000;
 	
 	private static Task task;
 	private static TaskList taskList;
@@ -60,5 +68,83 @@ public class TaskImplTest {
 		
 		assertTrue(yesterday.equals(t.getStartDate()));
 		assertTrue(yesterday.equals(t.getEndDate()));
+	}
+	
+	/**
+	 * Helper method to setup Tasks with logged times.
+	 */
+	private void setupTaskWithLoggedTimes() {
+		// Task creation
+		task = taskList.createTask(CalendarDate.today(), CalendarDate.today(), "Log Test", TYPE_A, 0, 0, "Description", null);
+		
+		// Add logged times
+		task.addLoggedTime(CalendarDate.yesterday().toString(), LOG_A);
+		task.addLoggedTime(CalendarDate.yesterday().toString(), LOG_B);
+		task.addLoggedTime(CalendarDate.today().toString(), LOG_C);
+	}
+	
+	/**
+	 * Tests adding logged time to a Task.
+	 */
+	@Test
+	public void testAddLoggedTime() {
+		setupTaskWithLoggedTimes();
+		
+		// Calculate
+		long result = LOG_A + LOG_B + LOG_C;
+		
+		assertTrue(result == task.getLoggedTime());
+	}
+	
+	/**
+	 * Tests getting a map of all logged time instances for a Task.
+	 */
+	@Test
+	public void testGetLoggedTimes() {
+		setupTaskWithLoggedTimes();
+		
+		long actual = 0;
+		
+		Map<Integer, LogPair> map = task.getLoggedTimes();
+		
+		for (LogPair lp : map.values()) {
+			actual += lp.getLength();
+		}
+		
+		long expected = LOG_A + LOG_B + LOG_C;
+		
+		assertTrue(expected == actual);
+	}
+	
+	/**
+	 * Tests editing a specific instance of logged time within a Task.
+	 */
+	@Test
+	public void testEditLoggedTime() {
+		setupTaskWithLoggedTimes();
+		
+		// Edit second instance
+		task.editLoggedTime(1, CalendarDate.today().toString(), LOG_C);
+		
+		long result = LOG_A + LOG_C + LOG_C;
+		
+		assertTrue(result == task.getLoggedTime());
+	}
+	
+	/**
+	 * Tests removing a specific instance of logged time within a Task.
+	 */
+	@Test
+	public void testRemoveLoggedTime() {
+		Util.debug("remove");
+		
+		setupTaskWithLoggedTimes();
+		
+		// Remove second instance
+		assertTrue(task.removeLoggedTime(1));
+		
+		long result = LOG_A + LOG_C;
+		
+		assertTrue(result == task.getLoggedTime());
 	}
 }
