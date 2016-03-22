@@ -37,7 +37,7 @@ public class TaskTableSorter extends TaskTableModel{
 					compare = task1.getText().compareTo(task2.getText());
 					break;
 				case 2:
-					// TODO compare task1 logged time to task2 logged time
+					compare = (int) (task1.getLoggedTime() - task2.getLoggedTime());
 					break;
 				case 3:
 					compare = task1.getType().compareTo(task2.getType());
