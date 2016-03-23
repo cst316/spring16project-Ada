@@ -47,6 +47,7 @@ import net.sf.memoranda.ProjectListener;
 import net.sf.memoranda.Report;
 import net.sf.memoranda.ResourcesList;
 import net.sf.memoranda.TaskList;
+import net.sf.memoranda.TemplateList;
 import net.sf.memoranda.date.CurrentDate;
 import net.sf.memoranda.ui.htmleditor.HTMLEditor;
 import net.sf.memoranda.util.Configuration;
@@ -1162,7 +1163,13 @@ public class AppFrame extends JFrame {
         		dialog.setLocationRelativeTo(this);
         		dialog.setVisible(true);
         		
-        		if (!dialog.isCancelled() && dialog.getTemplate() != null) {
+                            if (TemplateSelectDialog.remove == true){
+                                TemplateList newtemplatelist = CurrentProject.getTemplateList();
+                                newtemplatelist.removeTemplate(dialog.getTemplate());
+                                TemplateSelectDialog.remove = false;
+                                return;
+                }
+                            if (!dialog.isCancelled() && dialog.getTemplate() != null) {
         			TemplateDialogInterface.openEditTemplate(dialog.getTemplate());
         		}
             }

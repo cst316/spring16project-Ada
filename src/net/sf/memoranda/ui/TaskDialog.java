@@ -747,6 +747,7 @@ public class TaskDialog extends JDialog {
                     TemplateList newtemplatelist = CurrentProject.getTemplateList();
                     newtemplatelist.removeTemplate(template);
                     TemplateSelectDialog.remove = false;
+                    return;
                 } 
                 //populate the template if ok is selected
                 else if (template != null) {
