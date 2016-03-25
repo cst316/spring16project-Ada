@@ -572,33 +572,32 @@ public class TaskImpl implements Task, Comparable {
 	}
 	
 	/**
-	 * Analysis is conducted by comparing the estimated effort (hours)
-	 * against the amount of days it took to complete the task (measured 8hrs/day)
-	 * If a task is completed more than a day (8+ hours) behind schedule, it is considered underestimation
-	 * If a task is completed within one work day, it is considered an accurate estimation
-	 * If a task is completed more than a day (8+ hours) ahead of schedule, it is an overestimation
+	 * Analyzes estimated effort against actual effort.
+	 * 
+	 * If a task had an actual that was <10% of estimate,
+	 * the analysis is considered overestimated.
+	 * 
+	 * If a task was completed within 10% of the estimate,
+	 * the analysis is considered accurate.
+	 * 
+	 * If a task had an actual that was >10% of estimate,
+	 * the analysis is considered underestimated.
 	 */
-	public int getAnalysis() {
-		long effort = getEffort();
+	public int getAccuracy() {
+		float est = (float)getEffort();
+		float act = (float)getLoggedTime();
 		
-		CalendarDate endCalDate = getEndDate();
-		Date endDate = CalendarDate.toDate(endCalDate.getDay(), endCalDate.getMonth(), endCalDate.getYear());
-		
-		CalendarDate startCalDate = getStartDate();
-		Date startDate = CalendarDate.toDate(startCalDate.getDay(), startCalDate.getMonth(), startCalDate.getYear());
-		
-		int diffInHours = (int)( (endDate.getTime() - startDate.getTime()) 
-                / (1000 * 60 * 60) );
-		
-		if (effort <= diffInHours) {
-			if (diffInHours - effort <= 8) {
-				return ANALYSIS_ACCURATE;
-			} else {
+		if (est > 0) {
+			if (act / est < 0.90) {
+				return ANALYSIS_OVERESTIMATED;
+			} else if (act / est > 1.10) {
 				return ANALYSIS_UNDERESTIMATED;
+			} else {
+				return ANALYSIS_ACCURATE;
 			}
-		} else {
-			return ANALYSIS_OVERESTIMATED;
 		}
+		
+		return ANALYSIS_UNKNOWN;
 	}
 
 	public Process getProcess() {

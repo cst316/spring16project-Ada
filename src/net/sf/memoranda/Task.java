@@ -37,6 +37,7 @@ public interface Task {
     public static final int ANALYSIS_UNDERESTIMATED = 0;
     public static final int ANALYSIS_ACCURATE = 1;
     public static final int ANALYSIS_OVERESTIMATED = 2;
+    public static final int ANALYSIS_UNKNOWN = 3;
     
     CalendarDate getStartDate();
     void setStartDate(CalendarDate date);
@@ -122,7 +123,7 @@ public interface Task {
     void setType(String type);
     String getType();
     
-    int getAnalysis();
+    int getAccuracy();
 
     Task getParentTask();
     String getParentId();
