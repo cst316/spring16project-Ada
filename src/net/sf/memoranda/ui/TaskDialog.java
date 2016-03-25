@@ -8,6 +8,7 @@ import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
@@ -44,7 +45,9 @@ import javax.swing.event.ListSelectionListener;
 import javax.swing.JCheckBox;
 
 import net.sf.memoranda.CurrentProject;
+import net.sf.memoranda.Template;
 import net.sf.memoranda.date.CalendarDate;
+import net.sf.memoranda.util.CurrentStorage;
 import net.sf.memoranda.util.Local;
 import net.sf.memoranda.util.Util;
 
@@ -140,26 +143,30 @@ public class TaskDialog extends JDialog {
 	
     // Buttons
     JButton jButtonCancel = new JButton();
-    JButton jButtonOk = new JButton();
+    JButton jButtonSaveTask = new JButton();
+    JButton jButtonSaveTemplate = new JButton();
+    JButton jButtonOpenTemplate = new JButton();
 	
 	/**
 	 * Draws the UI for the Header
+	 * SS: This seems to be redundant from a UI standpoint so I am taking it out.
 	 */
+    /*
 	private void drawHeader() {
         header.setFont(new java.awt.Font("Dialog", 0, 20));
         header.setForeground(new Color(0, 0, 124));
-        header.setText(Local.getString("To-Do"));
+        header.setText(Local.getString("To-do"));
         header.setIcon(new ImageIcon(net.sf.memoranda.ui.TaskDialog.class.getResource(
             "resources/icons/task48.png")));
 	}
-	
+	*/
 	/**
 	 * Draws the UI for the Cancel button
 	 */
 	private void drawCancel() {
-        jButtonCancel.setMaximumSize(new Dimension(100, 26));
-        jButtonCancel.setMinimumSize(new Dimension(100, 26));
-        jButtonCancel.setPreferredSize(new Dimension(100, 26));
+        jButtonCancel.setMaximumSize(new Dimension(150, 26));
+        jButtonCancel.setMinimumSize(new Dimension(150, 26));
+        jButtonCancel.setPreferredSize(new Dimension(150, 26));
         jButtonCancel.setText(Local.getString("Cancel"));
         jButtonCancel.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -169,16 +176,46 @@ public class TaskDialog extends JDialog {
 	}
 	
 	/**
-	 * Draws the UI for the OK Button
+	 * Draws the UI for the Save Task Button
 	 */
-	private void drawOk() {
-        jButtonOk.setMaximumSize(new Dimension(100, 26));
-        jButtonOk.setMinimumSize(new Dimension(100, 26));
-        jButtonOk.setPreferredSize(new Dimension(100, 26));
-        jButtonOk.setText(Local.getString("Ok"));
-        jButtonOk.addActionListener(new java.awt.event.ActionListener() {
+	private void drawSaveTask() {
+        jButtonSaveTask.setMaximumSize(new Dimension(150, 26));
+        jButtonSaveTask.setMinimumSize(new Dimension(150, 26));
+        jButtonSaveTask.setPreferredSize(new Dimension(150, 26));
+        jButtonSaveTask.setText(Local.getString("Save Task"));
+        jButtonSaveTask.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                okB_actionPerformed(e);
+                saveTask_actionPerformed(e);
+            }
+        });
+	}
+	
+	/**
+	 * Draws the UI for the Save Template Button
+	 */
+	private void drawSaveTemplate() {
+        jButtonSaveTemplate.setMaximumSize(new Dimension(150, 26));
+        jButtonSaveTemplate.setMinimumSize(new Dimension(150, 26));
+        jButtonSaveTemplate.setPreferredSize(new Dimension(150, 26));
+        jButtonSaveTemplate.setText(Local.getString("Save as Template"));
+        jButtonSaveTemplate.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                saveTemplate_actionPerformed(e);
+            }
+        });
+	}
+	
+	/**
+	 * Draws the UI for the Open Template Button
+	 */
+	private void drawOpenTemplate() {
+        jButtonOpenTemplate.setMaximumSize(new Dimension(150, 26));
+        jButtonOpenTemplate.setMinimumSize(new Dimension(150, 26));
+        jButtonOpenTemplate.setPreferredSize(new Dimension(150, 26));
+        jButtonOpenTemplate.setText(Local.getString("Open Template"));
+        jButtonOpenTemplate.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                openTemplate_actionPerformed(e);
             }
         });
 	}
@@ -547,22 +584,24 @@ public class TaskDialog extends JDialog {
 	this.setResizable(false);
 	this.setSize(new Dimension(430,300));
         mBorder = BorderFactory.createEmptyBorder(5, 5, 5, 5);
-        areaBorder = BorderFactory.createEtchedBorder(Color.white, 
-            new Color(142, 142, 142));
-        border4 = BorderFactory.createEmptyBorder(0, 5, 0, 5);
+        //areaBorder = BorderFactory.createEtchedBorder(Color.white, 
+        //    new Color(142, 142, 142));
+        //border4 = BorderFactory.createEmptyBorder(0, 5, 0, 5);
         border8 = BorderFactory.createEtchedBorder(Color.white, 
             new Color(178, 178, 178));
         
         drawCancel();
-		drawOk();
+		drawSaveTask();
+		drawSaveTemplate();
+		drawOpenTemplate();
         
-        this.getRootPane().setDefaultButton(jButtonOk);
+        this.getRootPane().setDefaultButton(jButtonSaveTask);
         mPanel.setBorder(mBorder);
-        areaPanel.setBorder(areaBorder);
-        dialogTitlePanel.setBackground(Color.WHITE);
-        dialogTitlePanel.setBorder(border4);
+        //areaPanel.setBorder(areaBorder);
+        //dialogTitlePanel.setBackground(Color.WHITE);
+        //dialogTitlePanel.setBorder(border4);
         
-        drawHeader();
+        //drawHeader();
         drawName();
         drawType();   
         drawDescription();
@@ -590,7 +629,9 @@ public class TaskDialog extends JDialog {
         getContentPane().add(mPanel);
         mPanel.add(areaPanel, BorderLayout.CENTER);
         mPanel.add(buttonsPanel, BorderLayout.SOUTH);
-        buttonsPanel.add(jButtonOk, null);
+        buttonsPanel.add(jButtonOpenTemplate, null);
+        buttonsPanel.add(jButtonSaveTemplate, null);
+        buttonsPanel.add(jButtonSaveTask, null);
         buttonsPanel.add(jButtonCancel, null);
         this.getContentPane().add(dialogTitlePanel, BorderLayout.NORTH);
         dialogTitlePanel.add(header, null);
@@ -636,8 +677,8 @@ public class TaskDialog extends JDialog {
 		this.endDateMax = max;
 	}
 	
-    void okB_actionPerformed(ActionEvent e) {
-	CANCELLED = false;
+    void saveTask_actionPerformed(ActionEvent e) {
+    	CANCELLED = false;
         this.dispose();
     }
 
@@ -645,6 +686,91 @@ public class TaskDialog extends JDialog {
         this.dispose();
     }
 	
+
+    void saveTemplate_actionPerformed(ActionEvent e) {
+    	NameTaskTemplateDialog dlg = new NameTaskTemplateDialog(App.getFrame(), Local.getString("Name Task Template"));
+    	Dimension frmSize = App.getFrame().getSize();
+    	Point loc = App.getFrame().getLocation();
+    	dlg.setLocation((frmSize.width - dlg.getSize().width) / 2 + loc.x, (frmSize.height - dlg.getSize().height) / 2 + loc.y);
+    	dlg.setVisible(true);
+    	if (!dlg.CANCELLED) {
+    		CurrentProject.getTemplateList().createTemplate(
+    				new CalendarDate((Date) this.jSpinnerStartDate.getModel().getValue()), 
+    				getEndDate(), 
+    				dlg.getName(), 
+    				this.jTextFieldType.getText(), 
+    				this.jComboBoxPriority.getSelectedIndex(), 
+    				Util.getMillisFromHours(this.effortField.getText()), 
+    				this.descriptionField.getText());
+    		CurrentStorage.get().storeTemplateList(CurrentProject.getTemplateList(), CurrentProject.get());
+    	}
+    }
+
+    /**
+     * Helper method for getting the end date or a null value of there is no end date.
+     */
+    private CalendarDate getEndDate() {
+    	CalendarDate endDate = null;
+    	
+    	if (jCheckBoxEndDate.isSelected()) {
+    		endDate = new CalendarDate((Date) this.jSpinnerEndDate.getModel().getValue());
+    	}
+    	
+    	return endDate;
+    }
+    
+    void openTemplate_actionPerformed(ActionEvent e) {
+    	// Open template list and handle as necessary.
+    	TemplateSelectDialog dialog = new TemplateSelectDialog(App.getFrame(), "Select Template");
+    	dialog.setLocationRelativeTo(this);
+    	dialog.setVisible(true);
+    	
+    	if (!dialog.isCancelled()) {
+    		Template template = dialog.getTemplate();
+    		
+    		if (template != null) {
+    			int[] dateDifference = template.getDateDifference();
+    			int priority = template.getPriority();
+    			long effort = template.getEffort();
+    			float effortInHours = ((float) effort) / 1000 / 60 / 60;
+    			String description = template.getDescription();
+    			String type = template.getType();
+    			
+    			// A negative date difference means there is no end date.
+    			if (dateDifference[0] < 0) {
+    				Util.debug("No end date");
+    		        jCheckBoxEndDate.setSelected(false);
+    				chkEndDate_actionPerformed(null);
+    			} else {
+    		        jCheckBoxEndDate.setSelected(true);
+    				chkEndDate_actionPerformed(null);
+    				
+    				// apply the date difference to the start date to get the end date
+    				Date startDate = (Date) jSpinnerStartDate.getModel().getValue();
+    				Calendar endDate = new CalendarDate(startDate).getCalendar();
+    				
+    				endDate.roll(Calendar.YEAR, dateDifference[2]);
+    				endDate.roll(Calendar.MONTH, dateDifference[1]);
+    				endDate.roll(Calendar.DAY_OF_MONTH, dateDifference[0]);
+    				
+    				jSpinnerEndDate.getModel().setValue(
+    						new CalendarDate(endDate).getDate());
+    			}
+    			
+    			// only assign values in the task if the values were defined in the template
+    			if (description != "") {
+    				descriptionField.setText(template.getDescription());
+    			}
+    			if (type != "") {
+    				jTextFieldType.setText(type);
+    			} 
+    			
+				effortField.setText(effortInHours + "");
+				jComboBoxPriority.setSelectedIndex(priority);
+    		}
+    	}
+    }
+    
 	void chkEndDate_actionPerformed(ActionEvent e) {
 		jSpinnerEndDate.setEnabled(jCheckBoxEndDate.isSelected());
 		jButtonEndDate.setEnabled(jCheckBoxEndDate.isSelected());
