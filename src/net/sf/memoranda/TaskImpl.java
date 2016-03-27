@@ -9,17 +9,14 @@
 package net.sf.memoranda;
 
 import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 import java.util.Vector;
-
+import java.util.ArrayList;
 import java.util.Calendar;
 
 import net.sf.memoranda.date.CalendarDate;
 import net.sf.memoranda.date.CurrentDate;
 import net.sf.memoranda.util.LogPair;
-import net.sf.memoranda.util.Util;
 import nu.xom.Attribute;
 import nu.xom.Element;
 import nu.xom.Elements;
@@ -363,8 +360,8 @@ public class TaskImpl implements Task, Comparable {
     	return loggedTime;
     }
     
-    public Map<Integer, LogPair> getLoggedTimes() {
-    	Map<Integer, LogPair> map = new HashMap<>();
+    public List<LogPair> getLoggedTimes() {
+    	ArrayList<LogPair> list = new ArrayList<>();
     	
     	Element thisElement = _element.getFirstChildElement("loggedTime");
     	if (thisElement != null) {
@@ -373,11 +370,11 @@ public class TaskImpl implements Task, Comparable {
     		for (int i = 0; i < instances.size(); i++) {
     			Element instance = instances.get(i);
     			
-    			map.put(i, new LogPair(instance.getAttributeValue("date"), Long.parseLong(instance.getAttributeValue("len"))));
+    			list.add(new LogPair(instance.getAttributeValue("date"), Long.parseLong(instance.getAttributeValue("len"))));
     		}
     	}
     	
-    	return map;
+    	return list;
     }
     
     public void addLoggedTime(String date, long len) {

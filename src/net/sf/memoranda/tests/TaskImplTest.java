@@ -2,7 +2,7 @@ package net.sf.memoranda.tests;
 
 import static org.junit.Assert.assertTrue;
 
-import java.util.Map;
+import java.util.List;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -105,10 +105,10 @@ public class TaskImplTest {
 		
 		long actual = 0;
 		
-		Map<Integer, LogPair> map = task.getLoggedTimes();
+		List<LogPair> list = task.getLoggedTimes();
 		
-		for (LogPair lp : map.values()) {
-			actual += lp.getLength();
+		for (int i = 0; i < list.size(); i++) {
+			actual += list.get(i).getLength();
 		}
 		
 		long expected = LOG_A + LOG_B + LOG_C;

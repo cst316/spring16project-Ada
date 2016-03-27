@@ -9,7 +9,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.text.DateFormat;
-import java.util.Map.Entry;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
@@ -118,11 +118,13 @@ public class LoggedTimeDialog extends JDialog {
 		
 		logInnerPanel = new JPanel(new GridBagLayout());
 		
-		for (Entry<Integer, LogPair> entry : task.getLoggedTimes().entrySet()) {
+		List<LogPair> list = task.getLoggedTimes();
+		
+		for (int i = 0; i < list.size(); i++) {
 			JRadioButton radioButton = new JRadioButton();
 			DateFormat dateFormat = CalendarDate.getSimpleDateFormat();
-			CalendarDate entryDate = new CalendarDate(entry.getValue().getDate());
-			long effortInHours = entry.getValue().getLength() / 1000 / 60 / 60;
+			CalendarDate entryDate = new CalendarDate(list.get(i).getDate());
+			long effortInHours = list.get(i).getLength() / 1000 / 60 / 60;
 			JLabel hours = new JLabel(effortInHours + "");
 			JLabel date = new JLabel(dateFormat.format(entryDate.getDate()));
 			

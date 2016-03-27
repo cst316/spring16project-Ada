@@ -9,18 +9,18 @@ import java.util.Collection;
  */
 public interface Report {
 	
-	public static final int STYLE_MINIMUM = 0;
-	public static final int STYLE_MEDIUM = 1;
-	public static final int STYLE_MAXIMUM = 2;
+	static final int STYLE_MINIMUM = 0;
+	static final int STYLE_MEDIUM = 1;
+	static final int STYLE_MAXIMUM = 2;
 	
-	public int getStyle();
-	public void setStyle(int style);
+	int getStyle();
+	void setStyle(int style);
 	
-	public Collection<Task> getTasks();
-	public void setTasks(String[] ids);
+	Collection<Task> getTasks();
+	void setTasks(String[] ids);
 	
-	public void exportHtml();
-	public void exportHtmlMin();
-	public void exportHtmlMed();
-	public void exportHtmlMax();
+	void exportHtml();
+	void exportHtmlMin();
+	void exportHtmlMed();
+	void exportHtmlMax();
 }

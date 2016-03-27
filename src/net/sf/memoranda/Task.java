@@ -9,7 +9,7 @@
 package net.sf.memoranda;
 
 import java.util.Collection;
-import java.util.Map;
+import java.util.List;
 
 import net.sf.memoranda.date.CalendarDate;
 import net.sf.memoranda.util.LogPair;
@@ -59,9 +59,9 @@ public interface Task {
     
     /**
      * Gets all instances of logged times for the Task.
-     * @return A Map of the logged time index with a pair of Dates (String) and Times (Long)
+     * @return A List of LogPairs of Dates (String) and Times (Long)
      */
-    Map<Integer, LogPair> getLoggedTimes();
+    List<LogPair> getLoggedTimes();
     
     /**
      * Appends a logged time to the Task.
