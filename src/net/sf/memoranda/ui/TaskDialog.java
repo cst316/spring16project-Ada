@@ -743,10 +743,10 @@ public class TaskDialog extends JDialog {
     		Template template = dialog.getTemplate();
     		
                 // remove the template if delete is selected
-                if (TemplateSelectDialog.remove == true){
+                if (dialog.remove == true){
                     TemplateList newtemplatelist = CurrentProject.getTemplateList();
                     newtemplatelist.removeTemplate(template);
-                    TemplateSelectDialog.remove = false;
+                    dialog.remove = false;
                     return;
                 } 
                 //populate the template if ok is selected

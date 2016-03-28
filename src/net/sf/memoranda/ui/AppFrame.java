@@ -1163,10 +1163,10 @@ public class AppFrame extends JFrame {
         		dialog.setLocationRelativeTo(this);
         		dialog.setVisible(true);
         		
-                            if (TemplateSelectDialog.remove == true){
+                            if (dialog.remove == true){
                                 TemplateList newtemplatelist = CurrentProject.getTemplateList();
                                 newtemplatelist.removeTemplate(dialog.getTemplate());
-                                TemplateSelectDialog.remove = false;
+                                dialog.remove = false;
                                 return;
                 }
                             if (!dialog.isCancelled() && dialog.getTemplate() != null) {

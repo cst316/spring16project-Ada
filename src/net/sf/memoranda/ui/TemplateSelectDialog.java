@@ -39,7 +39,7 @@ public class TemplateSelectDialog extends JDialog {
 	private static final long serialVersionUID = 1L;
 
 	private boolean cancelled = true;
-        public static boolean remove = false;
+        public boolean remove = false;
 	
 	private Border defaultBorder;
 	
@@ -212,7 +212,7 @@ public class TemplateSelectDialog extends JDialog {
                             "this cannot be undone",
                             Local.getString("Remove Template?"),
                             JOptionPane.YES_NO_OPTION);
-                            if (n != JOptionPane.YES_OPTION) return;
+                            if (n != JOptionPane.YES_OPTION){return;}
         		TemplateSelectDialog.this.dispose();
             }
         });

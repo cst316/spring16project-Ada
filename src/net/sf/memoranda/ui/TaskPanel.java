@@ -35,6 +35,7 @@ import net.sf.memoranda.ResourcesList;
 import net.sf.memoranda.Task;
 import net.sf.memoranda.TaskList;
 import net.sf.memoranda.Template;
+import net.sf.memoranda.TemplateList;
 import net.sf.memoranda.date.CalendarDate;
 import net.sf.memoranda.date.CurrentDate;
 import net.sf.memoranda.date.DateListener;
@@ -882,7 +883,14 @@ public class TaskPanel extends JPanel {
 		selectDialog.setLocationRelativeTo(this);
 		selectDialog.setVisible(true);
 		
-		if (!selectDialog.isCancelled() && selectDialog.getTemplate() != null) {
+                if (selectDialog.remove == true){
+                                TemplateList newtemplatelist = CurrentProject.getTemplateList();
+                                newtemplatelist.removeTemplate(selectDialog.getTemplate());
+                                selectDialog.remove = false;
+                                return;
+                }
+                            
+                else if (!selectDialog.isCancelled() && selectDialog.getTemplate() != null) {
 			TemplateDialogInterface.openEditTemplate(selectDialog.getTemplate());
 		}
 	}
