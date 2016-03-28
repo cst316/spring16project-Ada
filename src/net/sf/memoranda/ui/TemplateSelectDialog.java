@@ -206,14 +206,22 @@ public class TemplateSelectDialog extends JDialog {
 		deleteButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(ActionEvent event) {
         		cancelled = false;
-                        remove = true;
                         int n = JOptionPane.showConfirmDialog(
                             App.getFrame(),
                             "this cannot be undone",
                             Local.getString("Remove Template?"),
                             JOptionPane.YES_NO_OPTION);
-                            if (n != JOptionPane.YES_OPTION){return;}
-        		TemplateSelectDialog.this.dispose();
+                            if (n == JOptionPane.YES_OPTION){
+                                remove = true;
+                                TemplateSelectDialog.this.dispose();
+                                return;
+                            }
+                            if (n == JOptionPane.NO_OPTION){
+                                remove = false;
+                                cancelled = true;
+                                return;
+                            }
+        		//TemplateSelectDialog.this.dispose();
             }
         });
 		deleteButton.setEnabled(false);
