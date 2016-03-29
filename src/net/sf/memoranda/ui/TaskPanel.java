@@ -34,6 +34,7 @@ import net.sf.memoranda.ProjectListener;
 import net.sf.memoranda.ResourcesList;
 import net.sf.memoranda.Task;
 import net.sf.memoranda.TaskList;
+import net.sf.memoranda.TemplateList;
 import net.sf.memoranda.date.CalendarDate;
 import net.sf.memoranda.date.CurrentDate;
 import net.sf.memoranda.date.DateListener;
@@ -53,6 +54,7 @@ public class TaskPanel extends JPanel {
     JButton editTaskB = new JButton();
     JButton removeTaskB = new JButton();
     JButton completeTaskB = new JButton();
+    JButton editTemplateB = new JButton();
     JButton newProcessB = new JButton();
     JButton editProcessB = new JButton();
     JButton addProcessTaskB = new JButton();
@@ -182,6 +184,22 @@ public class TaskPanel extends JPanel {
         completeTaskB.setMaximumSize(new Dimension(24, 24));
         completeTaskB.setIcon(
             new ImageIcon(net.sf.memoranda.ui.AppFrame.class.getResource("resources/icons/todo_complete.png")));
+
+        editTemplateB.setBorderPainted(false);
+        editTemplateB.setFocusable(false);
+        editTemplateB.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                openSelectTemplate();
+            }
+        });
+        editTemplateB.setPreferredSize(new Dimension(24, 24));
+        editTemplateB.setRequestFocusEnabled(true);
+        editTemplateB.setToolTipText(Local.getString("Open templates"));
+        editTemplateB.setMinimumSize(new Dimension(24, 24));
+        editTemplateB.setMaximumSize(new Dimension(24, 24));
+        editTemplateB.setIcon(
+            new ImageIcon(net.sf.memoranda.ui.AppFrame.class.getResource(
+            		"resources/icons/template_edit.png")));
 
         newProcessB.setIcon(
                 new ImageIcon(net.sf.memoranda.ui.AppFrame.class.getResource("resources/icons/process_new.png")));
@@ -393,7 +411,9 @@ public class TaskPanel extends JPanel {
         tasksToolBar.addSeparator(new Dimension(8, 24));
         tasksToolBar.add(editTaskB, null);
         tasksToolBar.add(completeTaskB, null);
-        tasksToolBar.addSeparator();new Dimension(8, 24);
+        tasksToolBar.addSeparator(new Dimension(8, 24));
+        tasksToolBar.add(editTemplateB, null);
+        tasksToolBar.addSeparator(new Dimension(8, 24));
         tasksToolBar.add(newProcessB, null);
         tasksToolBar.add(editProcessB, null);
         tasksToolBar.add(addProcessTaskB, null);
@@ -555,14 +575,23 @@ public class TaskPanel extends JPanel {
         Process p = t.getProcess();
         TaskDialog dlg;
         if (p == null) {
-        	dlg = new TaskDialog(App.getFrame(), Local.getString("Edit task"), null);
-        }
-        else {
-        	dlg = new TaskDialog(App.getFrame(), Local.getString("Edit task"), p.getID());
+        	dlg = new TaskDialog(
+        			App.getFrame(),
+        			Local.getString("Edit task"),
+        			null,
+        			false);
+        } else {
+        	dlg = new TaskDialog(
+        			App.getFrame(),
+        			Local.getString("Edit task"),
+        			p.getID(),
+        			false);
         }
         Dimension frmSize = App.getFrame().getSize();
         Point loc = App.getFrame().getLocation();
-        dlg.setLocation((frmSize.width - dlg.getSize().width) / 2 + loc.x, (frmSize.height - dlg.getSize().height) / 2 + loc.y);
+        dlg.setLocation(
+        		(frmSize.width - dlg.getSize().width) / 2 + loc.x,
+        		(frmSize.height - dlg.getSize().height) / 2 + loc.y);
         dlg.jTextFieldName.setText(t.getText());
         dlg.jTextFieldType.setText(t.getType());
         dlg.descriptionField.setText(t.getDescription());
@@ -604,7 +633,11 @@ public class TaskPanel extends JPanel {
     }
 
     void newTaskB_actionPerformed(ActionEvent e) {
-        TaskDialog dlg = new TaskDialog(App.getFrame(), Local.getString("New task"), null);
+        TaskDialog dlg = new TaskDialog(
+        		App.getFrame(),
+        		Local.getString("New task"),
+        		null,
+        		false);
         
         //XXX String parentTaskId = taskTable.getCurrentRootTask();
         
@@ -646,10 +679,18 @@ public class TaskPanel extends JPanel {
 		CalendarDate todayD = CurrentDate.get();
         TaskDialog dlg;
         if (parentProc == null) {
-        	dlg = new TaskDialog(App.getFrame(), Local.getString("New Task"), null);
+        	dlg = new TaskDialog(
+        			App.getFrame(),
+        			Local.getString("New Task"),
+        			null,
+        			false);
         }
         else {
-        	dlg = new TaskDialog(App.getFrame(), Local.getString("New Task"), parentProc.getID());
+        	dlg = new TaskDialog(
+        			App.getFrame(),
+        			Local.getString("New Task"),
+        			parentProc.getID(),
+        			false);
         }
 		if (todayD.after(parent.getStartDate()))
 			dlg.setStartDate(todayD);
@@ -851,6 +892,27 @@ public class TaskPanel extends JPanel {
 		parentPanel.updateIndicators();
 		//taskTable.updateUI();
 	}
+	
+	/**
+	 * Controls the dialog for selecting templates.
+	 */
+	void openSelectTemplate() {
+		TemplateSelectDialog selectDialog =
+				new TemplateSelectDialog(App.getFrame(), "Select template");
+		selectDialog.setLocationRelativeTo(this);
+		selectDialog.setVisible(true);
+		
+                if (selectDialog.remove == true){
+                                TemplateList newtemplatelist = CurrentProject.getTemplateList();
+                                newtemplatelist.removeTemplate(selectDialog.getTemplate());
+                                selectDialog.remove = false;
+                                return;
+                }
+                            
+                else if (!selectDialog.isCancelled() && selectDialog.getTemplate() != null) {
+			TemplateDialogInterface.openEditTemplate(selectDialog.getTemplate());
+		}
+	}
 	  
 	void newProcessB_actionPerformed(ActionEvent e) {
 		  ProcessDialog dialog = new ProcessDialog(App.getFrame(), "New Process", CurrentDate.get(), CurrentDate.get());
@@ -1007,7 +1069,11 @@ public class TaskPanel extends JPanel {
 		
 		// Selection handle
 		if (selection == 0) { // Create new task
-			TaskDialog taskDialog = new TaskDialog(App.getFrame(), Local.getString("New Task for \"" + processName + "\""), processId);
+			TaskDialog taskDialog = new TaskDialog(
+					App.getFrame(),
+					Local.getString("New Task for \"" + processName + "\""),
+					processId,
+					false);
 			
 	        Dimension frmSize = App.getFrame().getSize();
 	        Point loc = App.getFrame().getLocation();
