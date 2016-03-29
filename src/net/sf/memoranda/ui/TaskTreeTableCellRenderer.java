@@ -58,6 +58,7 @@ public class TaskTreeTableCellRenderer extends DefaultTreeCellRenderer implement
     // reusable cellrenderers
     JLabel label = new JLabel();
     JButton jButtonAddTime = new JButton();
+    JPanel jPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
     //JLabel tree_label = new JLabel();
     ProgressLabel progressLabel;
     JPanel empty_panel = new JPanel();
@@ -235,7 +236,7 @@ public class TaskTreeTableCellRenderer extends DefaultTreeCellRenderer implement
     	JPanel panel = new JPanel();
     	panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
     	label.setText((t.getLoggedTime() / 1000 / 60 / 60) + "");
-    	
+        
     	if (selected) {
     		panel.setBackground(table.getSelectionBackground());
     	} else {
@@ -243,6 +244,8 @@ public class TaskTreeTableCellRenderer extends DefaultTreeCellRenderer implement
     	}
 
     	panel.add(label);
+        drawAddTime();
+        panel.add(jButtonAddTime);
     	return panel;
     }
 
