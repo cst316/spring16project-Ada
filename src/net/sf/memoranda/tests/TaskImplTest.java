@@ -1,5 +1,7 @@
 package net.sf.memoranda.tests;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.List;
@@ -43,11 +45,19 @@ public class TaskImplTest {
 	}
 
 	/**
-	 * Save new task via constructor and setting type
+	 * Save new task via constructor and setting type.
 	 */
 	@Test
 	public void testSaveAndRetrieveType() {
-		task = taskList.createTask(CalendarDate.today(), CalendarDate.today(), "Name", TYPE_A, 0, 0, "Description", null);
+		task = taskList.createTask(
+				CalendarDate.today(),
+				CalendarDate.today(),
+				"Name",
+				TYPE_A,
+				0,
+				0,
+				"Description",
+				null);
 		assertTrue(task.getType().equals(TYPE_A));
 		
 		task.setType(TYPE_B);
@@ -58,16 +68,24 @@ public class TaskImplTest {
 	public void testDatesWithProcess() {
 		CalendarDate yesterday = new CalendarDate(1, 3, 2016);
 		CalendarDate today = new CalendarDate(2, 3, 2016);
-		Process p = processList.createProcess("test", yesterday, yesterday);
-		Task t = taskList.createTask(today, today, "text", "type", 0, 0, "description", null);
+		Process process = processList.createProcess("test", yesterday, yesterday);
+		Task task = taskList.createTask(
+				today,
+				today,
+				"text",
+				"type",
+				0,
+				0,
+				"description",
+				null);
 		
-		assertTrue(today.equals(t.getStartDate()));
-		assertTrue(today.equals(t.getEndDate()));
+		assertTrue(today.equals(task.getStartDate()));
+		assertTrue(today.equals(task.getEndDate()));
 		
-		p.addTask(t.getID());
+		process.addTask(task.getID());
 		
-		assertTrue(yesterday.equals(t.getStartDate()));
-		assertTrue(yesterday.equals(t.getEndDate()));
+		assertTrue(yesterday.equals(task.getStartDate()));
+		assertTrue(yesterday.equals(task.getEndDate()));
 	}
 	
 	/**
@@ -75,7 +93,15 @@ public class TaskImplTest {
 	 */
 	private void setupTaskWithLoggedTimes() {
 		// Task creation
-		task = taskList.createTask(CalendarDate.today(), CalendarDate.today(), "Log Test", TYPE_A, 0, 0, "Description", null);
+		task = taskList.createTask(
+				CalendarDate.today(),
+				CalendarDate.today(),
+				"Log Test",
+				TYPE_A,
+				0,
+				0,
+				"Description",
+				null);
 		
 		// Add logged times
 		task.addLoggedTime(CalendarDate.yesterday().toString(), LOG_A);
@@ -94,6 +120,15 @@ public class TaskImplTest {
 		long result = LOG_A + LOG_B + LOG_C;
 		
 		assertTrue(result == task.getLoggedTime());
+		
+		// Add negative logged time
+		task.addLoggedTime(CalendarDate.today().toString(), -1000L);
+		assertEquals(result, task.getLoggedTime());
+		
+		// Add zero logged time
+		int logCount = task.getLoggedTimes().size();
+		task.addLoggedTime(CalendarDate.today().toString(), 0L);
+		assertEquals(logCount, task.getLoggedTimes().size());
 	}
 	
 	/**
@@ -129,6 +164,21 @@ public class TaskImplTest {
 		long result = LOG_A + LOG_C + LOG_C;
 		
 		assertTrue(result == task.getLoggedTime());
+		
+		// Edit time with negative value
+		task.editLoggedTime(1, CalendarDate.today().toString(), -1000L);
+		assertEquals(result, task.getLoggedTime());
+		
+		// Edit time with zero value
+		task.editLoggedTime(1, CalendarDate.today().toString(), 0L);
+		assertEquals(result, task.getLoggedTime());
+		
+		// Edit time with invalid index
+		task.editLoggedTime(
+				task.getLoggedTimes().size(),
+				CalendarDate.today().toString(),
+				LOG_C);
+		assertTrue(result == task.getLoggedTime());
 	}
 	
 	/**
@@ -146,5 +196,8 @@ public class TaskImplTest {
 		long result = LOG_A + LOG_C;
 		
 		assertTrue(result == task.getLoggedTime());
+		
+		// Remove using invalid index
+		assertFalse(task.removeLoggedTime(task.getLoggedTimes().size()));
 	}
 }

@@ -379,7 +379,9 @@ public class TaskImpl implements Task, Comparable {
     
     public void addLoggedTime(String date, long len) {
     	Element log = _element.getFirstChildElement("loggedTime");
-    	if (log == null) {
+    	if (len <= 0) {
+    		// do not log times that are zero or less
+    	} else if (log == null) {
     		log = new Element("loggedTime");
     		
     		Element instance = new Element("log");
@@ -388,8 +390,7 @@ public class TaskImpl implements Task, Comparable {
     		
     		log.appendChild(instance);
     		_element.appendChild(log);
-    	}
-    	else {
+    	} else {
     		Element instance = new Element("log");
     		instance.addAttribute(new Attribute("date", date));
     		instance.addAttribute(new Attribute("len", Long.toString(len)));
@@ -401,7 +402,7 @@ public class TaskImpl implements Task, Comparable {
     public void editLoggedTime(int index, String date, long len) {
     	Element log = _element.getFirstChildElement("loggedTime");
 		Elements instances = log.getChildElements();
-    	if (log != null) {
+    	if (log != null && len > 0 && index < log.getChildCount()) {
     		Element instance = instances.get(index);
     		instance.removeAttribute(instance.getAttribute("date"));
     		instance.removeAttribute(instance.getAttribute("len"));
@@ -412,14 +413,15 @@ public class TaskImpl implements Task, Comparable {
     }
     
     public boolean removeLoggedTime(int index) {
+    	boolean removed = false;
+    	
     	Element log = _element.getFirstChildElement("loggedTime");
-    	if (log != null) {
+    	if (log != null && index < log.getChildCount()) {
     		log.removeChild(index);
-    		
-    		return true;
+    		removed = true;
     	}
     	
-    	return false;
+    	return removed;
     }
     
     
