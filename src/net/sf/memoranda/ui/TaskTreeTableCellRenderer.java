@@ -8,6 +8,7 @@ import net.sf.memoranda.date.CurrentDate;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.text.DateFormat;
@@ -15,6 +16,7 @@ import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
 import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -136,7 +138,10 @@ public class TaskTreeTableCellRenderer extends DefaultTreeCellRenderer implement
 			// if( column_name.equals("") ){
 			if (column == 0) {
 				return getPriorityIconCellRenderer(t, selected, hasFocus);
-			}  
+			}
+			if (column == 2) {
+				return getActualEffortCellRenderer(t, selected, hasFocus);
+			}
 			// if( column_name.equals(Local.getString("Start date")) ||
 			// column_name.equals(Local.getString("End date")) ){
 			if ((column == 4) || (column == 5)) {
@@ -160,7 +165,6 @@ public class TaskTreeTableCellRenderer extends DefaultTreeCellRenderer implement
 			
 			if (column == 2) { // actual effort column 
 				label.setText(value.toString());
-                                drawAddTime();
 			} else if (column == 4 || column == 5) { // date columns
 				label.setText(dateFormat.format((Date) value));
 			} else if (column == 8) { // progress column
@@ -221,6 +225,25 @@ public class TaskTreeTableCellRenderer extends DefaultTreeCellRenderer implement
         label.setIcon(getPriorityIcon(t));
         label.setToolTipText(t.getDescription());
         return label;
+    }
+    
+    private Component getActualEffortCellRenderer(
+    		Task t,
+    		boolean selected,
+    		boolean hasFocus) {
+    	
+    	JPanel panel = new JPanel();
+    	panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+    	label.setText((t.getLoggedTime() / 1000 / 60 / 60) + "");
+    	
+    	if (selected) {
+    		panel.setBackground(table.getSelectionBackground());
+    	} else {
+    		panel.setBackground(table.getBackground());
+    	}
+
+    	panel.add(label);
+    	return panel;
     }
 
     // some convenience methods
