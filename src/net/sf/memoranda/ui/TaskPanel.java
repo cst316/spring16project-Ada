@@ -906,10 +906,8 @@ public class TaskPanel extends JPanel {
                                 TemplateList newtemplatelist = CurrentProject.getTemplateList();
                                 newtemplatelist.removeTemplate(selectDialog.getTemplate());
                                 selectDialog.remove = false;
-                                return;
-                }
-                            
-                else if (!selectDialog.isCancelled() && selectDialog.getTemplate() != null) {
+                               
+                } else if (!selectDialog.isCancelled() && selectDialog.getTemplate() != null) {
 			TemplateDialogInterface.openEditTemplate(selectDialog.getTemplate());
 		}
 	}

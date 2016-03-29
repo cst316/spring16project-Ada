@@ -1167,9 +1167,8 @@ public class AppFrame extends JFrame {
                                 TemplateList newtemplatelist = CurrentProject.getTemplateList();
                                 newtemplatelist.removeTemplate(dialog.getTemplate());
                                 dialog.remove = false;
-                                return;
-                }
-                            if (!dialog.isCancelled() && dialog.getTemplate() != null) {
+                                
+                            } else if (!dialog.isCancelled() && dialog.getTemplate() != null) {
         			TemplateDialogInterface.openEditTemplate(dialog.getTemplate());
         		}
             }

@@ -214,14 +214,11 @@ public class TemplateSelectDialog extends JDialog {
                             if (n == JOptionPane.YES_OPTION){
                                 remove = true;
                                 TemplateSelectDialog.this.dispose();
-                                return;
                             }
-                            if (n == JOptionPane.NO_OPTION){
+                            else if (n == JOptionPane.NO_OPTION){
                                 remove = false;
                                 cancelled = true;
-                                return;
                             }
-        		//TemplateSelectDialog.this.dispose();
             }
         });
 		deleteButton.setEnabled(false);
