@@ -9,12 +9,14 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.event.ActionEvent;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -23,6 +25,7 @@ import javax.swing.JTree;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeCellRenderer;
+import net.sf.memoranda.util.Local;
 
 /**
  * 
@@ -52,6 +55,7 @@ public class TaskTreeTableCellRenderer extends DefaultTreeCellRenderer implement
     		.getResource("resources/icons/process.png"));
     // reusable cellrenderers
     JLabel label = new JLabel();
+    JButton jButtonAddTime = new JButton();
     //JLabel tree_label = new JLabel();
     ProgressLabel progressLabel;
     JPanel empty_panel = new JPanel();
@@ -132,7 +136,7 @@ public class TaskTreeTableCellRenderer extends DefaultTreeCellRenderer implement
 			// if( column_name.equals("") ){
 			if (column == 0) {
 				return getPriorityIconCellRenderer(t, selected, hasFocus);
-			}
+			}  
 			// if( column_name.equals(Local.getString("Start date")) ||
 			// column_name.equals(Local.getString("End date")) ){
 			if ((column == 4) || (column == 5)) {
@@ -154,8 +158,9 @@ public class TaskTreeTableCellRenderer extends DefaultTreeCellRenderer implement
 			applyFocus(hasFocus, label);
 			label.setIcon(null);
 			
-			if (column == 2) { // actual effort column
+			if (column == 2) { // actual effort column 
 				label.setText(value.toString());
+                                drawAddTime();
 			} else if (column == 4 || column == 5) { // date columns
 				label.setText(dateFormat.format((Date) value));
 			} else if (column == 8) { // progress column
@@ -314,6 +319,25 @@ public class TaskTreeTableCellRenderer extends DefaultTreeCellRenderer implement
         System.err.println("Problem finding priority icon");
         return null;
     }
+    /**
+	 * Draws the UI for the Add Time Button
+	 */
+	private void drawAddTime() {
+        jButtonAddTime.setMaximumSize(new Dimension(100, 26));
+        jButtonAddTime.setMinimumSize(new Dimension(100, 26));
+        jButtonAddTime.setPreferredSize(new Dimension(100, 26));
+        jButtonAddTime.setText(Local.getString("Add Time"));
+        jButtonAddTime.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                AddTime_actionPerformed(e);
+            }
+
+            private void AddTime_actionPerformed(ActionEvent e) {
+                //TODO open the log time dialong
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+        });
+	}
     
     
 }
