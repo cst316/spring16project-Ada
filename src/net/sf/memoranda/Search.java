@@ -24,8 +24,15 @@ public interface Search {
 
 			@Override
 			public int compare(Task t1, Task t2) {
-				return t1.getStartDate().getDate().compareTo(
+				int compare = t1.getStartDate().getDate().compareTo(
 						t2.getStartDate().getDate());
+				if (compare == 0) {
+					compare = t1.getText().compareTo(t2.getText());
+				}
+				if (compare == 0) {
+					compare = t1.getID().compareTo(t2.getID());
+				}
+				return compare;
 			}	
 		});
 		
@@ -60,7 +67,12 @@ public interface Search {
 
 			@Override
 			public int compare(Template t1, Template t2) {
-				return t1.getTitle().compareTo(t2.getTitle());
+				int compare = t1.getTitle().compareTo(
+						t2.getTitle());
+				if (compare == 0) {
+					compare = t1.getId().compareTo(t2.getId());
+				}
+				return compare;
 			}
 		});
 		
@@ -89,8 +101,15 @@ public interface Search {
 
 			@Override
 			public int compare(Process p1, Process p2) {
-				return p1.getStartDate().getDate().compareTo(
+				int compare = p1.getStartDate().getDate().compareTo(
 						p2.getStartDate().getDate());
+				if (compare == 0) {
+					compare = p1.getName().compareTo(p2.getName());
+				}
+				if (compare == 0) {
+					compare = p1.getID().compareTo(p2.getID());
+				}
+				return compare;
 			}
 		});
 		
@@ -114,7 +133,15 @@ public interface Search {
 
 			@Override
 			public int compare(Note n1, Note n2) {
-				return n1.getDate().getDate().compareTo(n2.getDate().getDate());
+				int compare = n1.getDate().getDate().compareTo(
+						n2.getDate().getDate());
+				if (compare == 0) {
+					compare = n1.getTitle().compareTo(n2.getTitle());
+				}
+				if (compare == 0) {
+					compare = n1.getId().compareTo(n2.getId());
+				}
+				return compare;
 			}
 		});
 		

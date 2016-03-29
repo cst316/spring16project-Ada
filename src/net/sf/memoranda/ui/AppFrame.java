@@ -31,6 +31,7 @@ import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.JToolBar;
@@ -42,11 +43,16 @@ import net.sf.memoranda.CurrentProject;
 import net.sf.memoranda.History;
 import net.sf.memoranda.Note;
 import net.sf.memoranda.NoteList;
+import net.sf.memoranda.ProcessList;
 import net.sf.memoranda.Project;
 import net.sf.memoranda.ProjectListener;
+import net.sf.memoranda.ProjectManager;
 import net.sf.memoranda.Report;
 import net.sf.memoranda.ResourcesList;
+import net.sf.memoranda.Search;
+import net.sf.memoranda.Task;
 import net.sf.memoranda.TaskList;
+import net.sf.memoranda.Template;
 import net.sf.memoranda.TemplateList;
 import net.sf.memoranda.date.CurrentDate;
 import net.sf.memoranda.ui.htmleditor.HTMLEditor;
@@ -160,6 +166,14 @@ public class AppFrame extends JFrame {
         		public void actionPerformed(ActionEvent event) {
         			templates_actionPerformed(event);
         		}
+        	};
+        	
+        public Action searchAction = new AbstractAction(Local.getString("Search")) {
+
+			@Override
+			public void actionPerformed(ActionEvent event) {
+				pSearch_actionPerformed(event);
+			}
         };
 	
     JMenuItem jMenuFileNewPrj = new JMenuItem();
@@ -174,6 +188,7 @@ public class AppFrame extends JFrame {
     // new option for Report
     JMenuItem jMenuFileReport = new JMenuItem(ReportAction);
     JMenuItem menuFileTemplates = new JMenuItem(templatesAction);
+    JMenuItem jMenuFileSearch = new JMenuItem(searchAction);
     JMenuItem jMenuFileMin = new JMenuItem(minimizeAction);
 
     JMenuItem jMenuItem1 = new JMenuItem();
@@ -486,6 +501,8 @@ public class AppFrame extends JFrame {
         jMenuFile.add(menuFileTemplates);
         jMenuFile.addSeparator();
         jMenuFile.add(jMenuFileReport);
+        jMenuFile.addSeparator();
+        jMenuFile.add(jMenuFileSearch);
         jMenuFile.addSeparator();
         jMenuFile.add(jMenuEditPref);
         jMenuFile.addSeparator();
@@ -1172,5 +1189,11 @@ public class AppFrame extends JFrame {
                             if (!dialog.isCancelled() && dialog.getTemplate() != null) {
         			TemplateDialogInterface.openEditTemplate(dialog.getTemplate());
         		}
+            }
+                            
+            protected void pSearch_actionPerformed(ActionEvent event) {
+            	SearchDialog dialog = new SearchDialog(this, "Search", "", true);
+            	dialog.setLocationRelativeTo(this);
+            	dialog.setVisible(true);
             }
 }
