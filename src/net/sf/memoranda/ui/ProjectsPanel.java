@@ -10,6 +10,8 @@ import java.awt.Point;
 import java.awt.SystemColor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.KeyListener;
@@ -28,6 +30,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import javax.swing.JTextField;
 import javax.swing.JToolBar;
 import javax.swing.SwingConstants;
 import javax.swing.event.ListSelectionEvent;
@@ -88,6 +91,8 @@ public class ProjectsPanel extends JPanel implements ExpandablePanel {
 			ppNewProject_actionPerformed(e);
 		}
 	};
+	private final Component horizontalStrut = Box.createHorizontalStrut(20);
+	private final JTextField searchField = new JTextField();
 
 	
 	public ProjectsPanel() {
@@ -122,9 +127,34 @@ public class ProjectsPanel extends JPanel implements ExpandablePanel {
 
 		toggleButton.setIcon(expIcon);
 		toggleButton.setMargin(new Insets(0, 0, 0, 0));
+
+		searchField.setHorizontalAlignment(SwingConstants.LEFT);
+		searchField.setMaximumSize(new Dimension(300, 20));
+		searchField.setMinimumSize(new Dimension(100, 20));
+		searchField.setPreferredSize(new Dimension(150, 20));
+		searchField.setText("Search");
+		searchField.addFocusListener(new FocusListener() {
+            @Override
+            public void focusGained(FocusEvent event) {
+            	// Erase input
+            	searchField.setText("");
+            }
+
+            @Override
+            public void focusLost(FocusEvent event) {
+            	// Reset input
+            	searchField.setText(Local.getString("Search"));
+            }
+		});
+		searchField.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent event) {
+				searchField_actionPerformed(null);
+			}
+		});
+		
 		buttonsPanel.setMinimumSize(new Dimension(70, 22));
 		buttonsPanel.setOpaque(false);
-		buttonsPanel.setPreferredSize(new Dimension(80, 22));
+		buttonsPanel.setPreferredSize(new Dimension(250, 22));
 		buttonsPanel.setRequestFocusEnabled(false);
 		buttonsPanel.setLayout(flowLayout1);
 		toolbarPanel.setBackground(SystemColor.textHighlight);
@@ -217,6 +247,10 @@ public class ProjectsPanel extends JPanel implements ExpandablePanel {
 				ppOpenB_actionPerformed(e);
 			}
 		});
+		
+		buttonsPanel.add(searchField);
+		
+		buttonsPanel.add(horizontalStrut);
 		ppOpenB.setIcon(
 			new ImageIcon(
 				net.sf.memoranda.ui.AppFrame.class.getResource(
@@ -454,6 +488,21 @@ public class ProjectsPanel extends JPanel implements ExpandablePanel {
 		ppDeleteProject.setEnabled(enabled);
 		ppOpenProject.setEnabled(enabled);
 		ppProperties.setEnabled(enabled);		
+	}
+	
+	/**
+	 * Opens SearchDialog after enter key press detected within searchField.
+	 * @param e
+	 */
+	void searchField_actionPerformed(ActionEvent event) {
+		// Open search dialog
+		SearchDialog dlg = new SearchDialog(App.getFrame(), 
+				Local.getString("Search"), searchField.getText(), false);
+		dlg.setLocationRelativeTo(App.getFrame());
+		dlg.setVisible(true);
+		
+		// Reset search field
+		toolbarPanel.requestFocus();
 	}
 
 }
