@@ -581,20 +581,22 @@ public class TaskImpl implements Task, Comparable {
 	 * the analysis is considered underestimated.
 	 */
 	public int getAccuracy() {
+		int accuracy = ANALYSIS_UNKNOWN;
+		
 		float est = (float)getEffort();
 		float act = (float)getLoggedTime();
 		
-		if (est > 0) {
+		if (est > 0 && this.isCompleted()) {
 			if (act / est < 0.90) {
-				return ANALYSIS_OVERESTIMATED;
+				accuracy = ANALYSIS_OVERESTIMATED;
 			} else if (act / est > 1.10) {
-				return ANALYSIS_UNDERESTIMATED;
+				accuracy = ANALYSIS_UNDERESTIMATED;
 			} else {
-				return ANALYSIS_ACCURATE;
+				accuracy = ANALYSIS_ACCURATE;
 			}
 		}
 		
-		return ANALYSIS_UNKNOWN;
+		return accuracy;
 	}
 
 	public Process getProcess() {
