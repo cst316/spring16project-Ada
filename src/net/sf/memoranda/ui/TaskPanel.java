@@ -527,6 +527,40 @@ public class TaskPanel extends JPanel {
 
     }
 
+    void logTimeB_actionPerformed(ActionEvent e) {
+        Task t =
+            CurrentProject.getTaskList().getTask(
+                taskTable.getModel().getValueAt(taskTable.getSelectedRow(), TaskTable.TASK_ID).toString());
+        Process p = t.getProcess();
+        LogEffortDialog dlg;
+        if (p == null) {
+        	dlg = new LogEffortDialog(App.getFrame(), Local.getString("Log effort"), null);
+        }
+        else {
+        	dlg = new LogEffortDialog(App.getFrame(), Local.getString("Log effort"), p.getID());
+        }
+        Dimension frmSize = App.getFrame().getSize();
+        Point loc = App.getFrame().getLocation();
+        dlg.setLocation((frmSize.width - dlg.getSize().width) / 2 + loc.x, (frmSize.height - dlg.getSize().height) / 2 + loc.y);
+        dlg.jSpinnerLogDate.getModel().setValue(t.getStartDate().getDate());    
+        dlg.timeField.setText("0.0");
+		dlg.jSpinnerProgress.setValue(new Integer(t.getProgress()));	
+        dlg.setVisible(true);
+        if (dlg.CANCELLED) {
+        	return;
+        }
+        CalendarDate ld = new CalendarDate((Date) dlg.jSpinnerLogDate.getModel().getValue());
+        t.addLoggedTime(ld.toString(), Util.getMillisFromHours(dlg.timeField.getText()));
+        t.setEffort(Util.getMillisFromHours(dlg.timeField.getText()));
+        t.setProgress(((Integer)dlg.jSpinnerProgress.getValue()).intValue());
+        // CurrentProject.getTaskList().adjustParentTasks(t);
+        CurrentStorage.get().storeTaskList(CurrentProject.getTaskList(), CurrentProject.get());
+        taskTable.tableChanged();
+        parentPanel.updateIndicators();
+        // taskTable.updateUI();
+    }
+    
+    
     void editTaskB_actionPerformed(ActionEvent e) {
         Task t =
             CurrentProject.getTaskList().getTask(
@@ -581,6 +615,7 @@ public class TaskPanel extends JPanel {
         parentPanel.updateIndicators();
         //taskTable.updateUI();
     }
+    
 
     void newTaskB_actionPerformed(ActionEvent e) {
         TaskDialog dlg = new TaskDialog(App.getFrame(), Local.getString("New task"), null);
