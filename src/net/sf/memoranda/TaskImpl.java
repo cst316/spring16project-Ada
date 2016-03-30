@@ -370,7 +370,10 @@ public class TaskImpl implements Task, Comparable {
     		for (int i = 0; i < instances.size(); i++) {
     			Element instance = instances.get(i);
     			
-    			list.add(new LogPair(instance.getAttributeValue("date"), Long.parseLong(instance.getAttributeValue("len"))));
+    			list.add(new LogPair(
+    					instance.getAttributeValue("date"),
+    					Long.parseLong(instance.getAttributeValue("len")),
+    					i));
     		}
     	}
     	

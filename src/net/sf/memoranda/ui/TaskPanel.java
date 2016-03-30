@@ -1031,6 +1031,11 @@ public class TaskPanel extends JPanel {
 							(Task) object);
 					dialog.setLocationRelativeTo(App.getFrame());
 					dialog.setVisible(true);
+					
+					CurrentStorage.get().storeTaskList(
+							CurrentProject.getTaskList(),
+							CurrentProject.get());
+					taskTable.tableChanged();
 				} 
 			}
         }

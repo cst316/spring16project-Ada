@@ -70,7 +70,6 @@ public class LogEffortDialog extends JDialog {
     JPanel dialogTitlePanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
     JPanel jPanel2 = new JPanel(new GridLayout(2, 2));
     JPanel jPanel6 = new JPanel(new FlowLayout(FlowLayout.LEFT));
-    JPanel jPanel3 = new JPanel(new FlowLayout(FlowLayout.LEFT));
 	
     // Borders
     Border mBorder;
@@ -285,9 +284,7 @@ public class LogEffortDialog extends JDialog {
         // added by rawsushi
         jPanel2.add(jPanelTime, null);
 
-        jPanel2.add(jPanel3, null);
-        
-        jPanel3.add(jButtonNotification, null);
+        jPanel2.add(new JPanel(), null);
         
         jPanel2.add(jPanelProgress);
     }

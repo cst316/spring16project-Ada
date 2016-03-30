@@ -9,13 +9,17 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.text.DateFormat;
-import java.util.List;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.TreeSet;
 
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
@@ -38,6 +42,8 @@ public class LoggedTimeDialog extends JDialog {
 	private boolean cancelled = true;
 	
 	private Border defaultBorder;
+	private HashMap<JRadioButton, LogPair> logsMap;
+	private JRadioButton selectedRadioButton;
 	private Task task;
 	
 	// Header
@@ -50,7 +56,8 @@ public class LoggedTimeDialog extends JDialog {
 	private JPanel logPanel;
 	private JPanel logInnerPanel;
     
-	// Edit and Delete Buttons
+	// Buttons
+	private JButton addButton;
 	private JButton editButton;
 	private JButton deleteButton;
 	private JPanel buttonPanel;
@@ -58,6 +65,7 @@ public class LoggedTimeDialog extends JDialog {
 	public LoggedTimeDialog(Frame frame, String title, Task task) {
 		super(frame, title, true);
 		this.task = task;
+		this.logsMap = new HashMap<JRadioButton, LogPair>();
 		
 		try {
 			jbInit();
@@ -108,7 +116,34 @@ public class LoggedTimeDialog extends JDialog {
 	 */
 	private void drawLogPanel() {
 		GridBagConstraints gc = new GridBagConstraints();
+		TreeSet<LogPair> logsTreeSet = new TreeSet<LogPair>(new Comparator<LogPair>() {
+
+			@Override
+			public int compare(LogPair lp1, LogPair lp2) {
+				int compare = new CalendarDate(lp1.getDate()).getDate().compareTo(
+						new CalendarDate(lp2.getDate()).getDate());
+				
+				if (compare == 0) {
+					compare = lp1.getIndex() - lp2.getIndex();
+				}
+				
+				return compare;
+			}
+		});
+		
+		logsMap.clear();
+		selectedRadioButton = null;
+		if (editButton != null) {
+			editButton.setEnabled(false);
+		}
+		if (deleteButton != null) {
+			deleteButton.setEnabled(false);
+		}
+		if (logPanel != null) {
+			this.getContentPane().remove(logPanel);
+		}
 		logButtonGroup = new ButtonGroup();
+		
 		gc.ipadx = 3;
 		gc.ipady = 3;
 		gc.gridy = -1;
@@ -118,13 +153,13 @@ public class LoggedTimeDialog extends JDialog {
 		
 		logInnerPanel = new JPanel(new GridBagLayout());
 		
-		List<LogPair> list = task.getLoggedTimes();
+		logsTreeSet.addAll(task.getLoggedTimes());
 		
-		for (int i = 0; i < list.size(); i++) {
+		for (LogPair logPair : logsTreeSet) {
 			JRadioButton radioButton = new JRadioButton();
 			DateFormat dateFormat = CalendarDate.getSimpleDateFormat();
-			CalendarDate entryDate = new CalendarDate(list.get(i).getDate());
-			long effortInHours = list.get(i).getLength() / 1000 / 60 / 60;
+			CalendarDate entryDate = new CalendarDate(logPair.getDate());
+			float effortInHours = (float)logPair.getLength() / 1000f / 60f / 60f;
 			JLabel hours = new JLabel(effortInHours + "");
 			JLabel date = new JLabel(dateFormat.format(entryDate.getDate()));
 			
@@ -138,16 +173,21 @@ public class LoggedTimeDialog extends JDialog {
 			gc.gridx = 2;
 			logInnerPanel.add(date, gc);
 			
-			logButtonGroup.add(radioButton);
+			logButtonGroup.add(radioButton);			
+			logsMap.put(radioButton, logPair);
 			
 			// The edit and delete buttons need to be enabled once a log is selected.
 			radioButton.addActionListener(new java.awt.event.ActionListener() {
 
 				@Override
 				public void actionPerformed(ActionEvent event) {
-					editButton.setEnabled(true);
-					deleteButton.setEnabled(true);
-			        LoggedTimeDialog.this.getRootPane().setDefaultButton(editButton);
+					if (selectedRadioButton == null) {
+						editButton.setEnabled(true);
+						deleteButton.setEnabled(true);
+				        getRootPane().setDefaultButton(editButton);
+					}
+					
+					selectedRadioButton = radioButton;
 				}
 			});
 		}
@@ -165,6 +205,17 @@ public class LoggedTimeDialog extends JDialog {
 	 * Sets up and defines the components and layout of the ok and cancel buttons.
 	 */
 	private void drawButtons() {
+		addButton = new JButton();
+		addButton.setMaximumSize(new Dimension(100, 26));
+		addButton.setMinimumSize(new Dimension(100, 26));
+		addButton.setPreferredSize(new Dimension(100, 26));
+		addButton.setText(Local.getString("Add"));
+		addButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+            	openLogEffortDialog(false);
+            }
+        });
+		
 		editButton = new JButton();
 		editButton.setMaximumSize(new Dimension(100, 26));
 		editButton.setMinimumSize(new Dimension(100, 26));
@@ -172,7 +223,7 @@ public class LoggedTimeDialog extends JDialog {
 		editButton.setText(Local.getString("Edit"));
 		editButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(ActionEvent event) {
-            	// TODO edit
+            	openLogEffortDialog(true);
             }
         });
 		editButton.setEnabled(false);
@@ -184,15 +235,79 @@ public class LoggedTimeDialog extends JDialog {
         deleteButton.setText(Local.getString("Delete"));
         deleteButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(ActionEvent event) {
-                // TODO delete
+                deleteSelectedLog();
             }
         });
         deleteButton.setEnabled(false);
         
         buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         buttonPanel.setBorder(defaultBorder);
+        buttonPanel.add(addButton);
         buttonPanel.add(editButton);
         buttonPanel.add(deleteButton);
         this.getContentPane().add(buttonPanel, BorderLayout.SOUTH);
+	}
+	
+	private void openLogEffortDialog(boolean isEdit) {
+		LogPair logPair = null;
+		LogEffortDialog dialog = new LogEffortDialog(
+    			App.getFrame(),
+    			"Time log",
+    			"Time log");
+		
+		if (isEdit) {
+			logPair = logsMap.get(selectedRadioButton);
+			long millis = logPair.getLength();
+			float hours = ((float)millis / 1000f / 60f / 60f);
+			dialog.timeField.setText(hours + "");
+			
+			CalendarDate date = new CalendarDate(logPair.getDate());
+			dialog.jSpinnerLogDate.getModel().setValue(date.getDate());
+			//dialog.jSpinnerLogDate.getModel().setValue("");
+		}
+		
+		dialog.jSpinnerProgress.getModel().setValue(task.getProgress());
+    	dialog.setLocationRelativeTo(App.getFrame());
+    	dialog.setVisible(true);
+    	
+    	if (!dialog.CANCELLED) {
+    		CalendarDate date = new CalendarDate(
+    				(Date) dialog.jSpinnerLogDate.getModel().getValue());
+    		int progress = ((Integer)dialog.jSpinnerProgress.getValue());
+    		try {
+				float hours = Float.parseFloat(dialog.timeField.getText());
+				long millis = (long) (hours * 1000f * 60f * 60f);
+				
+				if (isEdit) {
+					task.editLoggedTime(
+							logPair.getIndex(),
+							date.toString(),
+							millis);
+				} else {
+					task.addLoggedTime(date.toString(), millis);
+				}
+				
+				task.setProgress(progress);
+				drawLogPanel();
+				pack();
+			} catch (NumberFormatException e) {
+				JOptionPane.showMessageDialog(
+						this,
+						"Invalid hours: " + dialog.timeField.getText());
+			}
+    	}
+	}
+	
+	private void deleteSelectedLog() {
+		int selection = JOptionPane.showConfirmDialog(
+				this,
+				"Are you sure you wish to delete the log?");
+		
+		if (selection == JOptionPane.YES_OPTION) {
+			LogPair logPair = logsMap.get(selectedRadioButton);
+			task.removeLoggedTime(logPair.getIndex());
+			drawLogPanel();
+			pack();
+		}
 	}
 }

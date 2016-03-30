@@ -101,7 +101,7 @@ public class TaskTableModel extends AbstractTreeTableModel implements TreeTableM
 				object = process.getName();
 				break;
 			case 3:
-				object = process.getLoggedTime() / 1000 / 60 / 60;
+				object = (float)process.getLoggedTime() / 1000f / 60f / 60f;
 				break;
 			case 5:
 				object = process.getStartDate().getDate();
@@ -135,7 +135,7 @@ public class TaskTableModel extends AbstractTreeTableModel implements TreeTableM
 				object = "";
 				break;
 			case 3:
-				object = task.getLoggedTime() / 1000 / 60 / 60;
+				object = (float)task.getLoggedTime() / 1000f / 60f / 60f;
 				break;
 			case 4:
 				object = task.getType();
