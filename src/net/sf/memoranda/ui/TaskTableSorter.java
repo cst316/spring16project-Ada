@@ -27,8 +27,8 @@ public class TaskTableSorter extends TaskTableModel{
 		public int compare(Object o1, Object o2){
 			int compare = 0;
 			if (sorting_column == -1) {
-			}
-			else if (o1 instanceof Task && o2 instanceof Task) {
+				// do nothing
+			} else if (o1 instanceof Task && o2 instanceof Task) {
 				Task task1 = (Task) o1;
 				Task task2 = (Task) o2;
 				// based on TaskTableModel.columnNames
@@ -37,30 +37,36 @@ public class TaskTableSorter extends TaskTableModel{
 					compare = task1.getText().compareTo(task2.getText());
 					break;
 				case 2:
-					compare = (int) (task1.getLoggedTime() - task2.getLoggedTime());
-					break;
 				case 3:
-					compare = task1.getType().compareTo(task2.getType());
+					compare = (int) (task1.getLoggedTime()
+							- task2.getLoggedTime());
 					break;
 				case 4:
-					compare = task1.getStartDate().getDate().compareTo(task2.getStartDate().getDate());
+					compare = task1.getType().compareTo(task2.getType());
 					break;
 				case 5:
-					compare = task1.getEndDate().getDate().compareTo(task2.getEndDate().getDate());
+					compare = task1.getStartDate().getDate().compareTo(
+							task2.getStartDate().getDate());
+					break;
+				case 6:
+					compare = task1.getEndDate().getDate().compareTo(
+							task2.getEndDate().getDate());
 					break;
 				case 0: // task priority, same as 4
-				case 6:
+				case 7:
 					compare = task1.getPriority() - task2.getPriority();
 					break;
-				case 7:
-					compare = task1.getStatus(CurrentDate.get()) - task2.getStatus(CurrentDate.get());
-					break;
 				case 8:
+					compare = task1.getStatus(CurrentDate.get())
+							- task2.getStatus(CurrentDate.get());
+					break;
+				case 9:
 					compare = task1.getProgress() - task2.getProgress();
 					break;
+				default:
+					compare = task1.getText().compareTo(task2.getText());	
 				}
-			}
-			else if (o1 instanceof Process && o2 instanceof Process) {
+			} else if (o1 instanceof Process && o2 instanceof Process) {
 				Process p1 = (Process) o1;
 				Process p2 = (Process) o2;
 				
@@ -69,23 +75,25 @@ public class TaskTableSorter extends TaskTableModel{
 					compare = p1.getName().compareTo(p2.getName());
 					break;
 				case 2:
+				case 3:
 					compare = (int) (p1.getLoggedTime() - p2.getLoggedTime());
 					break;
-				case 4:
-					compare = p1.getStartDate().getDate().compareTo(p2.getStartDate().getDate());
-					break;
 				case 5:
-					compare = p1.getEndDate().getDate().compareTo(p2.getEndDate().getDate());
+					compare = p1.getStartDate().getDate().compareTo(
+							p2.getStartDate().getDate());
 					break;
-				case 8:
+				case 6:
+					compare = p1.getEndDate().getDate().compareTo(
+							p2.getEndDate().getDate());
+					break;
+				case 9:
 					compare = p1.getProgress() - p2.getProgress();
 					break;
 				default:
 					compare = p1.getName().compareTo(p2.getName());
 					break;
 				}
-			}
-			else {
+			} else {
 				compare = (o1 instanceof Task ? -1 : 1);
 				if (TaskTableSorter.this.opposite) {
 					compare *= -1;
