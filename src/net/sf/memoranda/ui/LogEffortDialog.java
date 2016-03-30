@@ -151,7 +151,7 @@ public class LogEffortDialog extends JDialog {
 		// Label
         jLabelTime.setMaximumSize(new Dimension(100, 16));
         jLabelTime.setMinimumSize(new Dimension(60, 16));
-        jLabelTime.setText(Local.getString("Est Time(hrs)"));
+        jLabelTime.setText(Local.getString("Time(hrs)"));
         
         // Field
         timeField.setBorder(border8);
