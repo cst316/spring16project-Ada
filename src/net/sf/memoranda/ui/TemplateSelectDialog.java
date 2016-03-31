@@ -17,6 +17,7 @@ import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
@@ -25,6 +26,7 @@ import javax.swing.border.Border;
 import net.sf.memoranda.CurrentProject;
 import net.sf.memoranda.Template;
 import net.sf.memoranda.TemplateList;
+import net.sf.memoranda.TemplateListImpl;
 import net.sf.memoranda.util.Local;
 
 /**
@@ -37,6 +39,7 @@ public class TemplateSelectDialog extends JDialog {
 	private static final long serialVersionUID = 1L;
 
 	private boolean cancelled = true;
+        public boolean remove = false;
 	
 	private Border defaultBorder;
 	
@@ -57,7 +60,8 @@ public class TemplateSelectDialog extends JDialog {
 	private JPanel templatePanel;
 	private JPanel templateInnerPanel;
     
-	// OK and Cancel Buttons
+	// OK, Delete, and Cancel Buttons
+        private JButton deleteButton;
 	private JButton okButton;
 	private JButton cancelButton;
 	private JPanel buttonPanel;
@@ -161,6 +165,7 @@ public class TemplateSelectDialog extends JDialog {
 				@Override
 				public void actionPerformed(ActionEvent event) {
 					okButton.setEnabled(true);
+                                        deleteButton.setEnabled(true);
 			        TemplateSelectDialog.this.getRootPane().setDefaultButton(okButton);
 			        selectedRadioButton = (JRadioButton) event.getSource();
 				}
@@ -177,7 +182,7 @@ public class TemplateSelectDialog extends JDialog {
 	}
 	
 	/**
-	 * Sets up and defines the components and layout of the ok and cancel buttons.
+	 * Sets up and defines the components and layout of the ok, delete, and cancel buttons.
 	 */
 	private void drawButtons() {
 		okButton = new JButton();
@@ -192,6 +197,31 @@ public class TemplateSelectDialog extends JDialog {
             }
         });
 		okButton.setEnabled(false);
+                
+                deleteButton = new JButton();
+		deleteButton.setMaximumSize(new Dimension(100, 26));
+		deleteButton.setMinimumSize(new Dimension(100, 26));
+		deleteButton.setPreferredSize(new Dimension(100, 26));
+		deleteButton.setText(Local.getString("Delete"));
+		deleteButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+        		cancelled = false;
+                        int n = JOptionPane.showConfirmDialog(
+                            App.getFrame(),
+                            "this cannot be undone",
+                            Local.getString("Remove Template?"),
+                            JOptionPane.YES_NO_OPTION);
+                            if (n == JOptionPane.YES_OPTION){
+                                remove = true;
+                                TemplateSelectDialog.this.dispose();
+                            }
+                            else if (n == JOptionPane.NO_OPTION){
+                                remove = false;
+                                cancelled = true;
+                            }
+            }
+        });
+		deleteButton.setEnabled(false);
         
         cancelButton = new JButton();
         cancelButton.setMaximumSize(new Dimension(100, 26));
@@ -208,6 +238,7 @@ public class TemplateSelectDialog extends JDialog {
         buttonPanel.setBorder(defaultBorder);
         buttonPanel.add(okButton);
         buttonPanel.add(cancelButton);
+        buttonPanel.add(deleteButton);
         this.getContentPane().add(buttonPanel, BorderLayout.SOUTH);
 	}
 }

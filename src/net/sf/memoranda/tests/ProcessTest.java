@@ -264,4 +264,41 @@ public class ProcessTest {
 			index++;
 		}
 	}
+		
+	@Test
+	/**
+	 * Tests the Process.getLoggedTime method.
+	 */
+	public void testGetLoggedTime() {
+		CalendarDate date = CalendarDate.today();
+		long timeA = 1 * 1000 * 60 * 60;
+		long timeB = 2 * 1000 * 60 * 60;
+		
+		Task t1 = tl.createTask(
+				date,
+				date,
+				"text",
+				"type",
+				0,
+				timeA + timeB,
+				"description",
+				null);
+		Task t2 = tl.createTask(
+				date,
+				date,
+				"text",
+				"type",
+				0,
+				timeA + timeB,
+				"description",
+				null);
+		Process process = pl.createProcess("name", date, date);
+		
+		process.addTask(t1.getID());
+		process.addTask(t2.getID());
+		t1.addLoggedTime(date.toString(), timeA);
+		t2.addLoggedTime(date.toString(), timeB);
+		
+		assertEquals(timeA+timeB, process.getLoggedTime());
+	}
 }

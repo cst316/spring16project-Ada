@@ -2,6 +2,7 @@ package net.sf.memoranda.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
@@ -9,12 +10,14 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.Collection;
 import java.util.Date;
 import java.util.Vector;
 
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JComponent;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -33,6 +36,7 @@ import net.sf.memoranda.ProjectListener;
 import net.sf.memoranda.ResourcesList;
 import net.sf.memoranda.Task;
 import net.sf.memoranda.TaskList;
+import net.sf.memoranda.TemplateList;
 import net.sf.memoranda.date.CalendarDate;
 import net.sf.memoranda.date.CurrentDate;
 import net.sf.memoranda.date.DateListener;
@@ -52,9 +56,11 @@ public class TaskPanel extends JPanel {
     JButton editTaskB = new JButton();
     JButton removeTaskB = new JButton();
     JButton completeTaskB = new JButton();
+    JButton editTemplateB = new JButton();
     JButton newProcessB = new JButton();
     JButton editProcessB = new JButton();
     JButton addProcessTaskB = new JButton();
+    JButton removeProcessB = new JButton();
     
 	JCheckBoxMenuItem ppShowActiveOnlyChB = new JCheckBoxMenuItem();
 		
@@ -181,6 +187,22 @@ public class TaskPanel extends JPanel {
         completeTaskB.setIcon(
             new ImageIcon(net.sf.memoranda.ui.AppFrame.class.getResource("resources/icons/todo_complete.png")));
 
+        editTemplateB.setBorderPainted(false);
+        editTemplateB.setFocusable(false);
+        editTemplateB.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                openSelectTemplate();
+            }
+        });
+        editTemplateB.setPreferredSize(new Dimension(24, 24));
+        editTemplateB.setRequestFocusEnabled(true);
+        editTemplateB.setToolTipText(Local.getString("Open templates"));
+        editTemplateB.setMinimumSize(new Dimension(24, 24));
+        editTemplateB.setMaximumSize(new Dimension(24, 24));
+        editTemplateB.setIcon(
+            new ImageIcon(net.sf.memoranda.ui.AppFrame.class.getResource(
+            		"resources/icons/template_edit.png")));
+
         newProcessB.setIcon(
                 new ImageIcon(net.sf.memoranda.ui.AppFrame.class.getResource("resources/icons/process_new.png")));
         newProcessB.setEnabled(true);
@@ -228,6 +250,23 @@ public class TaskPanel extends JPanel {
             }
         });
         addProcessTaskB.setBorderPainted(false);
+        
+        removeProcessB.setIcon(
+        		new ImageIcon(net.sf.memoranda.ui.AppFrame.class.getResource(
+        				"resources/icons/process_delete.png")));
+        removeProcessB.setEnabled(false);
+        removeProcessB.setMaximumSize(new Dimension(24, 24));
+        removeProcessB.setMinimumSize(new Dimension(24, 24));
+        removeProcessB.setToolTipText(Local.getString("Remove process"));
+        removeProcessB.setRequestFocusEnabled(false);
+        removeProcessB.setPreferredSize(new Dimension(24, 24));
+        removeProcessB.setFocusable(false);
+        removeProcessB.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+            	removeProcessB_actionPerformed(event);
+            }
+        });
+        removeProcessB.setBorderPainted(false);
             
 		// added by rawsushi
 //		showActiveOnly.setBorderPainted(false);
@@ -374,10 +413,13 @@ public class TaskPanel extends JPanel {
         tasksToolBar.addSeparator(new Dimension(8, 24));
         tasksToolBar.add(editTaskB, null);
         tasksToolBar.add(completeTaskB, null);
-        tasksToolBar.addSeparator();new Dimension(8, 24);
+        tasksToolBar.addSeparator(new Dimension(8, 24));
+        tasksToolBar.add(editTemplateB, null);
+        tasksToolBar.addSeparator(new Dimension(8, 24));
         tasksToolBar.add(newProcessB, null);
         tasksToolBar.add(editProcessB, null);
         tasksToolBar.add(addProcessTaskB, null);
+        tasksToolBar.add(removeProcessB, null);
 
 		//tasksToolBar.add(showActiveOnly, null);
         
@@ -430,6 +472,7 @@ public class TaskPanel extends JPanel {
 				
 				editProcessB.setEnabled(processSelected);
 				addProcessTaskB.setEnabled(processSelected);
+				removeProcessB.setEnabled(processSelected);
 				
 				/*if (taskTable.getCurrentRootTask() == null) {
 					ppParentTask.setEnabled(false);
@@ -530,6 +573,40 @@ public class TaskPanel extends JPanel {
 
     }
 
+    void logTimeB_actionPerformed(ActionEvent e) {
+        Task t =
+            CurrentProject.getTaskList().getTask(
+                taskTable.getModel().getValueAt(taskTable.getSelectedRow(), TaskTable.TASK_ID).toString());
+        Process p = t.getProcess();
+        LogEffortDialog dlg;
+        if (p == null) {
+        	dlg = new LogEffortDialog(App.getFrame(), Local.getString("Log effort"), null);
+        }
+        else {
+        	dlg = new LogEffortDialog(App.getFrame(), Local.getString("Log effort"), p.getID());
+        }
+        Dimension frmSize = App.getFrame().getSize();
+        Point loc = App.getFrame().getLocation();
+        dlg.setLocation((frmSize.width - dlg.getSize().width) / 2 + loc.x, (frmSize.height - dlg.getSize().height) / 2 + loc.y);
+        dlg.jSpinnerLogDate.getModel().setValue(t.getStartDate().getDate());    
+        dlg.timeField.setText("0.0");
+		dlg.jSpinnerProgress.setValue(new Integer(t.getProgress()));	
+        dlg.setVisible(true);
+        if (dlg.CANCELLED) {
+        	return;
+        }
+        CalendarDate ld = new CalendarDate((Date) dlg.jSpinnerLogDate.getModel().getValue());
+        t.addLoggedTime(ld.toString(), Util.getMillisFromHours(dlg.timeField.getText()));
+        t.setEffort(Util.getMillisFromHours(dlg.timeField.getText()));
+        t.setProgress(((Integer)dlg.jSpinnerProgress.getValue()).intValue());
+        // CurrentProject.getTaskList().adjustParentTasks(t);
+        CurrentStorage.get().storeTaskList(CurrentProject.getTaskList(), CurrentProject.get());
+        taskTable.tableChanged();
+        parentPanel.updateIndicators();
+        // taskTable.updateUI();
+    }
+    
+    
     void editTaskB_actionPerformed(ActionEvent e) {
         Task t =
             CurrentProject.getTaskList().getTask(
@@ -537,14 +614,23 @@ public class TaskPanel extends JPanel {
         Process p = t.getProcess();
         TaskDialog dlg;
         if (p == null) {
-        	dlg = new TaskDialog(App.getFrame(), Local.getString("Edit task"), null);
-        }
-        else {
-        	dlg = new TaskDialog(App.getFrame(), Local.getString("Edit task"), p.getID());
+        	dlg = new TaskDialog(
+        			App.getFrame(),
+        			Local.getString("Edit task"),
+        			null,
+        			false);
+        } else {
+        	dlg = new TaskDialog(
+        			App.getFrame(),
+        			Local.getString("Edit task"),
+        			p.getID(),
+        			false);
         }
         Dimension frmSize = App.getFrame().getSize();
         Point loc = App.getFrame().getLocation();
-        dlg.setLocation((frmSize.width - dlg.getSize().width) / 2 + loc.x, (frmSize.height - dlg.getSize().height) / 2 + loc.y);
+        dlg.setLocation(
+        		(frmSize.width - dlg.getSize().width) / 2 + loc.x,
+        		(frmSize.height - dlg.getSize().height) / 2 + loc.y);
         dlg.jTextFieldName.setText(t.getText());
         dlg.jTextFieldType.setText(t.getType());
         dlg.descriptionField.setText(t.getDescription());
@@ -584,9 +670,14 @@ public class TaskPanel extends JPanel {
         parentPanel.updateIndicators();
         //taskTable.updateUI();
     }
+    
 
     void newTaskB_actionPerformed(ActionEvent e) {
-        TaskDialog dlg = new TaskDialog(App.getFrame(), Local.getString("New task"), null);
+        TaskDialog dlg = new TaskDialog(
+        		App.getFrame(),
+        		Local.getString("New task"),
+        		null,
+        		false);
         
         //XXX String parentTaskId = taskTable.getCurrentRootTask();
         
@@ -628,10 +719,18 @@ public class TaskPanel extends JPanel {
 		CalendarDate todayD = CurrentDate.get();
         TaskDialog dlg;
         if (parentProc == null) {
-        	dlg = new TaskDialog(App.getFrame(), Local.getString("New Task"), null);
+        	dlg = new TaskDialog(
+        			App.getFrame(),
+        			Local.getString("New Task"),
+        			null,
+        			false);
         }
         else {
-        	dlg = new TaskDialog(App.getFrame(), Local.getString("New Task"), parentProc.getID());
+        	dlg = new TaskDialog(
+        			App.getFrame(),
+        			Local.getString("New Task"),
+        			parentProc.getID(),
+        			false);
         }
 		if (todayD.after(parent.getStartDate()))
 			dlg.setStartDate(todayD);
@@ -833,6 +932,25 @@ public class TaskPanel extends JPanel {
 		parentPanel.updateIndicators();
 		//taskTable.updateUI();
 	}
+	
+	/**
+	 * Controls the dialog for selecting templates.
+	 */
+	void openSelectTemplate() {
+		TemplateSelectDialog selectDialog =
+				new TemplateSelectDialog(App.getFrame(), "Select template");
+		selectDialog.setLocationRelativeTo(this);
+		selectDialog.setVisible(true);
+		
+                if (selectDialog.remove == true){
+                                TemplateList newtemplatelist = CurrentProject.getTemplateList();
+                                newtemplatelist.removeTemplate(selectDialog.getTemplate());
+                                selectDialog.remove = false;
+                               
+                } else if (!selectDialog.isCancelled() && selectDialog.getTemplate() != null) {
+			TemplateDialogInterface.openEditTemplate(selectDialog.getTemplate());
+		}
+	}
 	  
 	void newProcessB_actionPerformed(ActionEvent e) {
 		  ProcessDialog dialog = new ProcessDialog(App.getFrame(), "New Process", CurrentDate.get(), CurrentDate.get());
@@ -878,6 +996,81 @@ public class TaskPanel extends JPanel {
 		}
 	}
 	
+	/**
+	 * US-6 Task 64: Task deletion option.
+	 * Display JOptionPane to remove tasks from process or project
+	 * Displays alternate JOptionPane to confirm deletion if Process has no Tasks
+	 * @param event
+	 */
+	void removeProcessB_actionPerformed(ActionEvent event) {
+		boolean delete = true;
+		
+		Process selectedProcess = (Process) taskTable.
+				getModel().
+				getValueAt(taskTable.getSelectedRow(), 
+						TaskTable.TASK);
+		
+		// Check if process has tasks
+		if (selectedProcess.getTasks().size() > 0) {
+			// Text for JOptionPane buttons
+			String[] options = new String[2];
+			options[0] = new String(Local.getString("Delete"));
+			options[1] = new String(Local.getString("Keep"));
+					
+			int selection = JOptionPane.
+					showOptionDialog(App.getFrame(), 
+							Local.getString("Delete or Keep Tasks?"), 
+							Local.getString(selectedProcess.getName()), 
+							0, 
+							JOptionPane.INFORMATION_MESSAGE, 
+							null, 
+							options, 
+							null);
+			
+			Util.debug("You selected: " + selection);
+			
+			// All tasks within Process
+			Collection<Task> processTasks = CurrentProject.
+					getProcessList().
+					getProcess(selectedProcess.getID()).getTasks();
+			
+			if (selection == 0) { // Delete Tasks
+				for (Task t : processTasks) {
+	    			CurrentProject.getTaskList().removeTask(t);
+				}
+			} else if (selection == 1) { // Remove Tasks from Process
+				for (Task t : processTasks) {
+	    			selectedProcess.removeTask(t.getID());
+				}
+			} else {
+				delete = false;
+			}
+		} else {
+			// Confirm deletion
+			int choice = JOptionPane.showConfirmDialog(App.getFrame(), 
+					Local.getString("Do you want to delete this process?"), 
+					Local.getString("Remove Process"),
+					JOptionPane.YES_NO_OPTION);
+			
+			if (choice != JOptionPane.YES_OPTION) {
+				delete = false;
+			}
+		}
+		
+		if (delete) {
+			// Delete process
+			CurrentProject.getProcessList().removeProcess(selectedProcess.getID());
+		}
+		
+		// Save and update UI
+		taskTable.tableChanged();
+		CurrentStorage.get().storeTaskList(CurrentProject.getTaskList(), 
+				CurrentProject.get());
+		CurrentStorage.get().storeProcessList(CurrentProject.getProcessList(), 
+				CurrentProject.get());
+		parentPanel.updateIndicators();
+	}
+	
 	// US-3 Task 49: Create add task wizard
 	// Show sorting dialog following task addition to process
 	void sortProcessTasks(String processName, String processId) {
@@ -914,7 +1107,11 @@ public class TaskPanel extends JPanel {
 		
 		// Selection handle
 		if (selection == 0) { // Create new task
-			TaskDialog taskDialog = new TaskDialog(App.getFrame(), Local.getString("New Task for \"" + processName + "\""), processId);
+			TaskDialog taskDialog = new TaskDialog(
+					App.getFrame(),
+					Local.getString("New Task for \"" + processName + "\""),
+					processId,
+					false);
 			
 	        Dimension frmSize = App.getFrame().getSize();
 	        Point loc = App.getFrame().getLocation();
@@ -975,34 +1172,50 @@ public class TaskPanel extends JPanel {
 
     class PopupListener extends MouseAdapter {
 
-        public void mouseClicked(MouseEvent e) {
-		if ((e.getClickCount() == 2) && (taskTable.getSelectedRow() > -1)){
-			// ignore "tree" column
-			//if(taskTable.getSelectedColumn() == 1) return;
-			Object o = taskTable.getModel().getValueAt(taskTable.getSelectedRow(), TaskTable.TASK);
-			
-			if (o instanceof Task) {
-				editTaskB_actionPerformed(null);
+        public void mouseClicked(MouseEvent event) {
+        	if (taskTable.getSelectedRow() > -1) {
+        		Object object = taskTable.getModel().getValueAt(
+        				taskTable.getSelectedRow(),
+        				TaskTable.TASK);
+        		
+				if (event.getClickCount() == 2) {
+					if (object instanceof Task) {
+						editTaskB_actionPerformed(null);
+					} else if (object instanceof Process) {
+						editProcessB_actionPerformed(null);
+					}
+					// Checks if the log effort button was clicked.
+				} else if (object instanceof Task
+						&& taskTable.getSelectedColumn() == 2) {
+					
+					LoggedTimeDialog dialog = new LoggedTimeDialog(
+							App.getFrame(),
+							"Logged time",
+							(Task) object);
+					dialog.setLocationRelativeTo(App.getFrame());
+					dialog.setVisible(true);
+					
+					CurrentStorage.get().storeTaskList(
+							CurrentProject.getTaskList(),
+							CurrentProject.get());
+					taskTable.tableChanged();
+				} 
 			}
-			else if (o instanceof Process) {
-				editProcessB_actionPerformed(null);
-			}
-		}
         }
 
-                public void mousePressed(MouseEvent e) {
-                    maybeShowPopup(e);
-                }
+        public void mousePressed(MouseEvent event) {
+            maybeShowPopup(event);
+        }
 
-                public void mouseReleased(MouseEvent e) {
-                    maybeShowPopup(e);
-                }
+        public void mouseReleased(MouseEvent event) {
+            maybeShowPopup(event);
+        }
 
-                private void maybeShowPopup(MouseEvent e) {
-                    if (e.isPopupTrigger()) {
-                        taskPPMenu.show(e.getComponent(), e.getX(), e.getY());
-                    }
-                }
+        private void maybeShowPopup(MouseEvent event) {
+            if (event.isPopupTrigger()) {
+                taskPPMenu.show(event.getComponent(), event.getX(), event.getY());
+            }
+        }
 
     }
 

@@ -9,8 +9,10 @@
 package net.sf.memoranda;
 
 import java.util.Collection;
+import java.util.List;
 
 import net.sf.memoranda.date.CalendarDate;
+import net.sf.memoranda.util.LogPair;
 
 /**
  * 
@@ -35,6 +37,7 @@ public interface Task {
     public static final int ANALYSIS_UNDERESTIMATED = 0;
     public static final int ANALYSIS_ACCURATE = 1;
     public static final int ANALYSIS_OVERESTIMATED = 2;
+    public static final int ANALYSIS_UNKNOWN = 3;
     
     CalendarDate getStartDate();
     void setStartDate(CalendarDate date);
@@ -47,6 +50,40 @@ public interface Task {
     
     int getProgress();
     void setProgress(int p);
+    
+    /**
+     * Calculates total logged time for all logged instances in the Task.
+     * @return Logged time in milliseconds
+     */
+    long getLoggedTime();
+    
+    /**
+     * Gets all instances of logged times for the Task.
+     * @return A List of LogPairs of Dates (String) and Times (Long)
+     */
+    List<LogPair> getLoggedTimes();
+    
+    /**
+     * Appends a logged time to the Task.
+     * @param date The date of the log
+     * @param len The amount of time spent
+     */
+    void addLoggedTime(String date, long len);
+    
+    /**
+     * Edits a logged time at a specific index.
+     * @param index The index of the logged time within the Task
+     * @param date The new value for the date
+     * @param len The new value for the amount of time spent
+     */
+    void editLoggedTime(int index, String date, long len);
+    
+    /**
+     * Removes a logged time index from the Task.
+     * @param index The index of the logged time within the Task
+     * @return If deletion was successful
+     */
+    boolean removeLoggedTime(int index);
     
     int getPriority();
     void setPriority(int p);
@@ -86,7 +123,7 @@ public interface Task {
     void setType(String type);
     String getType();
     
-    int getAnalysis();
+    int getAccuracy();
 
     Task getParentTask();
     String getParentId();

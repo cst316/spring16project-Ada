@@ -24,6 +24,12 @@ public interface Process {
 	public Collection<Task> getActiveTasks(CalendarDate date);
 	
 	/**
+	 * Calculates the total logged time for all tasks in the process.
+	 * @return	Logged time in milliseconds
+	 */
+	long getLoggedTime();
+	
+	/**
 	 * Sets the order of the tasks in the process identical to the order of the
 	 * ids in the array provided.
 	 * @param ids	IDs of the tasks

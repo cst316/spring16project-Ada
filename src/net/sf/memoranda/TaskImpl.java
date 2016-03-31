@@ -9,13 +9,18 @@
 package net.sf.memoranda;
 
 import java.util.Collection;
-import java.util.Date;
+import java.util.List;
 import java.util.Vector;
+import java.util.ArrayList;
 import java.util.Calendar;
 
 import net.sf.memoranda.date.CalendarDate;
 import net.sf.memoranda.date.CurrentDate;
+<<<<<<< HEAD
 import net.sf.memoranda.util.Util;
+=======
+import net.sf.memoranda.util.LogPair;
+>>>>>>> master
 import nu.xom.Attribute;
 import nu.xom.Element;
 import nu.xom.Elements;
@@ -350,6 +355,92 @@ public class TaskImpl implements Task, Comparable {
         if ((p >= 0) && (p <= 100))
             setAttr("progress", new Integer(p).toString());
     }
+    
+    public long getLoggedTime() {
+    	long loggedTime = 0;
+    	
+    	Element thisElement = _element.getFirstChildElement("loggedTime");
+    	if (thisElement != null) {
+    		Elements instances = thisElement.getChildElements();
+    		
+    		for (int i = 0; i < instances.size(); i++) {
+    			Element instance = instances.get(i);
+
+    			loggedTime += Long.parseLong(instance.getAttributeValue("len"));
+    		}
+    	}
+    	
+    	return loggedTime;
+    }
+    
+    public List<LogPair> getLoggedTimes() {
+    	ArrayList<LogPair> list = new ArrayList<>();
+    	
+    	Element thisElement = _element.getFirstChildElement("loggedTime");
+    	if (thisElement != null) {
+    		Elements instances = thisElement.getChildElements();
+    		
+    		for (int i = 0; i < instances.size(); i++) {
+    			Element instance = instances.get(i);
+    			
+    			list.add(new LogPair(
+    					instance.getAttributeValue("date"),
+    					Long.parseLong(instance.getAttributeValue("len")),
+    					i));
+    		}
+    	}
+    	
+    	return list;
+    }
+    
+    public void addLoggedTime(String date, long len) {
+    	Element log = _element.getFirstChildElement("loggedTime");
+    	if (len <= 0) {
+    		// do not log times that are zero or less
+    	} else if (log == null) {
+    		log = new Element("loggedTime");
+    		
+    		Element instance = new Element("log");
+    		instance.addAttribute(new Attribute("date", date));
+    		instance.addAttribute(new Attribute("len", Long.toString(len)));
+    		
+    		log.appendChild(instance);
+    		_element.appendChild(log);
+    	} else {
+    		Element instance = new Element("log");
+    		instance.addAttribute(new Attribute("date", date));
+    		instance.addAttribute(new Attribute("len", Long.toString(len)));
+    		
+    		log.appendChild(instance);
+    	}
+    }
+    
+    public void editLoggedTime(int index, String date, long len) {
+    	Element log = _element.getFirstChildElement("loggedTime");
+		Elements instances = log.getChildElements();
+    	if (log != null && len > 0 && index < log.getChildCount()) {
+    		Element instance = instances.get(index);
+    		instance.removeAttribute(instance.getAttribute("date"));
+    		instance.removeAttribute(instance.getAttribute("len"));
+    		
+    		instance.addAttribute(new Attribute("date", date));
+    		instance.addAttribute(new Attribute("len", Long.toString(len)));
+    	}
+    }
+    
+    public boolean removeLoggedTime(int index) {
+    	boolean removed = false;
+    	
+    	Element log = _element.getFirstChildElement("loggedTime");
+    	if (log != null && index < log.getChildCount()) {
+    		log.removeChild(index);
+    		removed = true;
+    	}
+    	
+    	return removed;
+    }
+    
+    
     /**
      * @see net.sf.memoranda.Task#getPriority()
      */
@@ -496,33 +587,34 @@ public class TaskImpl implements Task, Comparable {
 	}
 	
 	/**
-	 * Analysis is conducted by comparing the estimated effort (hours)
-	 * against the amount of days it took to complete the task (measured 8hrs/day)
-	 * If a task is completed more than a day (8+ hours) behind schedule, it is considered underestimation
-	 * If a task is completed within one work day, it is considered an accurate estimation
-	 * If a task is completed more than a day (8+ hours) ahead of schedule, it is an overestimation
+	 * Analyzes estimated effort against actual effort.
+	 * 
+	 * If a task had an actual that was <10% of estimate,
+	 * the analysis is considered overestimated.
+	 * 
+	 * If a task was completed within 10% of the estimate,
+	 * the analysis is considered accurate.
+	 * 
+	 * If a task had an actual that was >10% of estimate,
+	 * the analysis is considered underestimated.
 	 */
-	public int getAnalysis() {
-		long effort = getEffort();
+	public int getAccuracy() {
+		int accuracy = ANALYSIS_UNKNOWN;
 		
-		CalendarDate endCalDate = getEndDate();
-		Date endDate = CalendarDate.toDate(endCalDate.getDay(), endCalDate.getMonth(), endCalDate.getYear());
+		float est = (float)getEffort();
+		float act = (float)getLoggedTime();
 		
-		CalendarDate startCalDate = getStartDate();
-		Date startDate = CalendarDate.toDate(startCalDate.getDay(), startCalDate.getMonth(), startCalDate.getYear());
-		
-		int diffInHours = (int)( (endDate.getTime() - startDate.getTime()) 
-                / (1000 * 60 * 60) );
-		
-		if (effort <= diffInHours) {
-			if (diffInHours - effort <= 8) {
-				return ANALYSIS_ACCURATE;
+		if (est > 0 && this.isCompleted()) {
+			if (act / est < 0.90) {
+				accuracy = ANALYSIS_OVERESTIMATED;
+			} else if (act / est > 1.10) {
+				accuracy = ANALYSIS_UNDERESTIMATED;
 			} else {
-				return ANALYSIS_UNDERESTIMATED;
+				accuracy = ANALYSIS_ACCURATE;
 			}
-		} else {
-			return ANALYSIS_OVERESTIMATED;
 		}
+		
+		return accuracy;
 	}
 
 	public Process getProcess() {

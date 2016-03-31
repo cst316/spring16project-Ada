@@ -20,12 +20,16 @@ public class ProcessListTest {
 	ProcessList pl;
 	TaskList tl;
 	CalendarDate today;
+	CalendarDate tomorrow;
+	CalendarDate yesterday;
 	
 	@Before
 	public void setUp() throws Exception {
 		pl = CurrentProject.getProcessList();
 		tl = CurrentProject.getTaskList();
-		today = new CalendarDate();
+		yesterday = new CalendarDate(1, 3, 2016);
+		today = new CalendarDate(2, 3, 2016);
+		tomorrow = new CalendarDate(3, 3, 2016);
 	}
 
 	@After
@@ -57,8 +61,7 @@ public class ProcessListTest {
 		Task t1 = tl.createTask(today, today, "text", "type", 0, 10, "description", null);
 		p3.addTask(t1.getID());
 		t1.setProgress(100);
-		
-		CalendarDate tomorrow = CalendarDate.tomorrow();
+
 		Process p4 = pl.createProcess("future process", tomorrow, tomorrow);
 		
 		sizeOne = pl.getAllProcesses().size();

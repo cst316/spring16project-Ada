@@ -22,6 +22,7 @@ package net.sf.memoranda.ui;
 
 import java.util.Collection;
 
+import javax.swing.ImageIcon;
 import javax.swing.event.EventListenerList;
 
 import net.sf.memoranda.CurrentProject;
@@ -43,9 +44,16 @@ import net.sf.memoranda.util.Local;
  */
 public class TaskTableModel extends AbstractTreeTableModel implements TreeTableModel {
 
-    String[] columnNames = {"", Local.getString("To-do"), Local.getString("Type"),
-            Local.getString("Start date"), Local.getString("End date"),
-            Local.getString("Priority"), Local.getString("Status"),
+    String[] columnNames = {
+    		"",
+    		Local.getString("To-do"),
+    		Local.getString(""),
+    		Local.getString("Actual Effort"),
+    		Local.getString("Type"),
+            Local.getString("Start date"),
+            Local.getString("End date"),
+            Local.getString("Priority"),
+            Local.getString("Status"),
             "% " + Local.getString("done") };
 
     protected EventListenerList listenerList = new EventListenerList();
@@ -80,79 +88,90 @@ public class TaskTableModel extends AbstractTreeTableModel implements TreeTableM
      *      int)
      */
     public Object getValueAt(Object node, int column) {
-        Object o = null;
+        Object object = null;
     	if (node instanceof Project) {
-    		o = null;
-    	}
-    	else if (node instanceof Process) {
-    		Process p = (Process) node;
+    		object = null;
+    	} else if (node instanceof Process) {
+    		Process process = (Process) node;
     		switch (column) {
 			case 0:
-				o = "";
+				object = "";
 				break;
 			case 1:
-				o = p.getName();
+				object = process.getName();
 				break;
 			case 3:
-				o = p.getStartDate().getDate();
-				break;
-			case 4:
-				o = p.getEndDate().getDate();
-				break;
-			case 7:
-				o = p;
-				break;
-			case TaskTable.TASK_ID:
-				o = p.getID();
-				break;
-			case TaskTable.TASK:
-				o = p;
-				break;
-			default:
-				o = "";
-				break;
-			}
-    	}
-    	else if (node instanceof Task) {
-			Task t = (Task) node;
-			switch (column) {
-			case 0:
-				o = "";
-				break;
-			case 1:
-				o = t;
-				break;
-			case 2:
-				o = t.getType();
-				break;
-			case 3:
-				o = t.getStartDate().getDate();
-				break;
-			case 4:
-				if (t.getEndDate() == null)
-					o = null;
-				else
-					o = t.getEndDate().getDate();
+				object = (float)process.getLoggedTime() / 1000f / 60f / 60f;
 				break;
 			case 5:
-				o = getPriorityString(t.getPriority());
+				object = process.getStartDate().getDate();
 				break;
 			case 6:
-				o = getStatusString(t.getStatus(CurrentDate.get()));
+				object = process.getEndDate().getDate();
 				break;
-			case 7:
-				//return new Integer(t.getProgress());
-				o = t;
+			case 9:
+				object = process;
 				break;
 			case TaskTable.TASK_ID:
-				o = t.getID();
+				object = process.getID();
 				break;
 			case TaskTable.TASK:
-				o = t;
+				object = process;
+				break;
+			default:
+				object = "";
+				break;
+			}
+    	} else if (node instanceof Task) {
+			Task task = (Task) node;
+			switch (column) {
+			case 0:
+				object = "";
+				break;
+			case 1:
+				object = task;
+				break;
+			case 2:
+				object = "";
+				break;
+			case 3:
+				object = (float)task.getLoggedTime() / 1000f / 60f / 60f;
+				break;
+			case 4:
+				object = task.getType();
+				break;
+			case 5:
+				object = task.getStartDate().getDate();
+				break;
+			case 6:
+				if (task.getEndDate() == null) {
+					object = null;
+				} else {
+					object = task.getEndDate().getDate();
+				}
+				break;
+			case 7:
+				object = getPriorityString(task.getPriority());
+				break;
+			case 8:
+				object = getStatusString(task.getStatus(CurrentDate.get()));
+				break;
+			case 9:
+				//return new Integer(t.getProgress());
+				object = task;
+				break;
+			case TaskTable.TASK_ID:
+				object = task.getID();
+				break;
+			case TaskTable.TASK:
+				object = task;
+				break;
+			default:
+				object = "";
 				break;
 			}
 		}
-		return o;
+		return object;
     }
 
     String getStatusString(int status) {
@@ -287,14 +306,18 @@ public class TaskTableModel extends AbstractTreeTableModel implements TreeTableM
             case 0:
                 return TaskTable.class;
             case 2:
-            case 5:
-            case 6:
-                return Class.forName("java.lang.String");
             case 3:
             case 4:
-                return Class.forName("java.util.Date");
             case 7:
+            case 8:
+                return Class.forName("java.lang.String");
+            case 5:
+            case 6:
+                return Class.forName("java.util.Date");
+            case 9:
                 return Class.forName("java.lang.Integer");
+            default:
+                return Object.class;
             }
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -329,7 +352,9 @@ public class TaskTableModel extends AbstractTreeTableModel implements TreeTableM
     }
     
     public boolean isCellEditable(Object node, int column) {
-		if(column == 6) return true; 
+		if(column == 9) {
+			return true; 
+		}
         return super.isCellEditable(node, column); 
     }
 

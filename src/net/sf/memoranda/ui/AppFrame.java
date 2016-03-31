@@ -33,6 +33,7 @@ import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 import javax.swing.JToolBar;
@@ -44,11 +45,17 @@ import net.sf.memoranda.CurrentProject;
 import net.sf.memoranda.History;
 import net.sf.memoranda.Note;
 import net.sf.memoranda.NoteList;
+import net.sf.memoranda.ProcessList;
 import net.sf.memoranda.Project;
 import net.sf.memoranda.ProjectListener;
+import net.sf.memoranda.ProjectManager;
 import net.sf.memoranda.Report;
 import net.sf.memoranda.ResourcesList;
+import net.sf.memoranda.Search;
+import net.sf.memoranda.Task;
 import net.sf.memoranda.TaskList;
+import net.sf.memoranda.Template;
+import net.sf.memoranda.TemplateList;
 import net.sf.memoranda.date.CurrentDate;
 import net.sf.memoranda.ui.htmleditor.HTMLEditor;
 import net.sf.memoranda.util.Configuration;
@@ -154,6 +161,22 @@ public class AppFrame extends JFrame {
         			pReport_actionPerformed(e);
         		}
         	};	
+        
+        public Action templatesAction =
+        		new AbstractAction(Local.getString("Templates")) {
+        	
+        		public void actionPerformed(ActionEvent event) {
+        			templates_actionPerformed(event);
+        		}
+        	};
+        	
+        public Action searchAction = new AbstractAction(Local.getString("Search")) {
+
+			@Override
+			public void actionPerformed(ActionEvent event) {
+				pSearch_actionPerformed(event);
+			}
+        };
 	
     JMenuItem jMenuFileNewPrj = new JMenuItem();
         JMenuItem jMenuFileNewNote = new JMenuItem(workPanel.dailyItemsPanel.editorPanel.newAction);
@@ -166,6 +189,8 @@ public class AppFrame extends JFrame {
             workPanel.dailyItemsPanel.editorPanel.exportAction);
     // new option for Report
     JMenuItem jMenuFileReport = new JMenuItem(ReportAction);
+    JMenuItem menuFileTemplates = new JMenuItem(templatesAction);
+    JMenuItem jMenuFileSearch = new JMenuItem(searchAction);
     JMenuItem jMenuFileMin = new JMenuItem(minimizeAction);
 
     JMenuItem jMenuItem1 = new JMenuItem();
@@ -475,7 +500,11 @@ public class AppFrame extends JFrame {
         jMenuFile.add(jMenuFileImportNote);
         jMenuFile.add(jMenuFileImportPrj);
         jMenuFile.addSeparator();
+        jMenuFile.add(menuFileTemplates);
+        jMenuFile.addSeparator();
         jMenuFile.add(jMenuFileReport);
+        jMenuFile.addSeparator();
+        jMenuFile.add(jMenuFileSearch);
         jMenuFile.addSeparator();
         jMenuFile.add(jMenuEditPref);
         jMenuFile.addSeparator();
@@ -1157,4 +1186,27 @@ public class AppFrame extends JFrame {
 				}
             }
         }
+            
+            // Templates menu action event
+            protected void templates_actionPerformed(ActionEvent event) {
+        		TemplateSelectDialog dialog =
+        				new TemplateSelectDialog(App.getFrame(), "Select template");
+        		dialog.setLocationRelativeTo(this);
+        		dialog.setVisible(true);
+        		
+                            if (dialog.remove == true){
+                                TemplateList newtemplatelist = CurrentProject.getTemplateList();
+                                newtemplatelist.removeTemplate(dialog.getTemplate());
+                                dialog.remove = false;
+                                
+                            } else if (!dialog.isCancelled() && dialog.getTemplate() != null) {
+        			TemplateDialogInterface.openEditTemplate(dialog.getTemplate());
+        		}
+            }
+                            
+            protected void pSearch_actionPerformed(ActionEvent event) {
+            	SearchDialog dialog = new SearchDialog(this, "Search", "", true);
+            	dialog.setLocationRelativeTo(this);
+            	dialog.setVisible(true);
+            }
 }
