@@ -489,12 +489,15 @@ public class TaskPanel extends JPanel {
 		// - KEY:SPACE => finish Task.
 		taskTable.addKeyListener(new KeyListener() {
 			public void keyPressed(KeyEvent e){
-				if(e.getKeyCode() == KeyEvent.VK_DELETE) {
+				if(e.getKeyCode() == KeyEvent.VK_DELETE || e.getKeyCode() == KeyEvent.VK_BACK_SPACE) {
 					// Only elect to delete a Process if it's the only item selected.
 					if (taskTable.getSelectedRowCount() == 1 &&
 							taskTable.getModel().getValueAt(taskTable.getSelectedRow(), TaskTable.TASK) instanceof Process) {
-						
-						// TODO
+						ppRemoveTask.addActionListener(new java.awt.event.ActionListener() {
+                                                public void actionPerformed(ActionEvent e) {
+                                                ppRemoveTask_actionPerformed(e);
+                                                }
+                                            });
 					}
 					else {
 						ppRemoveTask_actionPerformed(null);
