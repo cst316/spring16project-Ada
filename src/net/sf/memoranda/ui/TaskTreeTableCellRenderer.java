@@ -8,13 +8,17 @@ import net.sf.memoranda.date.CurrentDate;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.event.ActionEvent;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
 import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -23,6 +27,8 @@ import javax.swing.JTree;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeCellRenderer;
+import net.sf.memoranda.util.Local;
+import net.sf.memoranda.util.Util;
 
 /**
  * 
@@ -52,6 +58,7 @@ public class TaskTreeTableCellRenderer extends DefaultTreeCellRenderer implement
     		.getResource("resources/icons/process.png"));
     // reusable cellrenderers
     JLabel label = new JLabel();
+    JPanel jPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
     //JLabel tree_label = new JLabel();
     ProgressLabel progressLabel;
     JPanel empty_panel = new JPanel();
@@ -113,56 +120,60 @@ public class TaskTreeTableCellRenderer extends DefaultTreeCellRenderer implement
 			return table.getTree();
 		}
     	
-    	Object o = table.getModel().getValueAt(row, TaskTable.TASK);
-        if (o instanceof Task) {
-			Task t = (Task) o;
+    	Object object = table.getModel().getValueAt(row, TaskTable.TASK);
+        if (object instanceof Task) {
+			Task task = (Task) object;
 
 			// default values
 			// label.setOpaque(true);
 			label.setForeground(Color.BLACK);
 			label.setIcon(null);
-			// label.setToolTipText(t.getDescription()); //XXX Disabled because of bug 1596966
-			applyFont(t, label);
+			// label.setToolTipText(t.getDescription());
+			//XXX Disabled because of bug 1596966
+			applyFont(task, label);
 			applySelectionStyle(selected, label);
 			applyFocus(hasFocus, label);
 			// if( column_name.equals("% " + Local.getString("done")) ){
-			if (column == 7) {
-				return getProgressCellRenderer(t, selected, hasFocus, column);
+			if (column == 9) {
+				return getProgressCellRenderer(task, selected, hasFocus, column);
 			}
 			// if( column_name.equals("") ){
 			if (column == 0) {
-				return getPriorityIconCellRenderer(t, selected, hasFocus);
+				return getPriorityIconCellRenderer(task, selected, hasFocus);
+			}
+			if (column == 2) {
+				label.setIcon(new ImageIcon(
+						net.sf.memoranda.ui.AppFrame.class.getResource(
+								"resources/icons/todo_edit.png")));
+				return label;
 			}
 			// if( column_name.equals(Local.getString("Start date")) ||
 			// column_name.equals(Local.getString("End date")) ){
-			if ((column == 3) || (column == 4)) {
+			if ((column == 5) || (column == 6)) {
 				label.setText(dateFormat.format((Date) value));
 				return label;
 			}
 			// if( column_name.equals( Local.getString("Status") ) ){
-			if (column == 6) {
+			if (column == 8) {
 				label.setText(value.toString());
-				label.setForeground(getColorForTaskStatus(t, false));
+				label.setForeground(getColorForTaskStatus(task, false));
 				return label;
 			}
 			label.setText(value.toString());
-		}
-        else if (o instanceof Process) {
-        	Process p = (Process) o;
+		} else if (object instanceof Process) {
+        	Process process = (Process) object;
         	
 			applySelectionStyle(selected, label);
 			applyFocus(hasFocus, label);
 			label.setIcon(null);
 			
-			// date columns
-			if (column == 3 || column == 4) {
+			if (column == 3) { // actual effort column 
+				label.setText(value.toString());
+			} else if (column == 5 || column == 6) { // date columns
 				label.setText(dateFormat.format((Date) value));
-			}
-			// progress column
-			else if (column == 7) {
-				return getProgressCellRenderer(p, selected, hasFocus, column);
-			}
-			else {
+			} else if (column == 9) { // progress column
+				return getProgressCellRenderer(process, selected, hasFocus, column);
+			} else {
 				label.setText("");
 			}
         }
@@ -316,6 +327,4 @@ public class TaskTreeTableCellRenderer extends DefaultTreeCellRenderer implement
         System.err.println("Problem finding priority icon");
         return null;
     }
-    
-    
 }

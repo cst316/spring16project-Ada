@@ -2,6 +2,7 @@ package net.sf.memoranda.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
@@ -16,6 +17,7 @@ import java.util.Vector;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JComponent;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -568,6 +570,40 @@ public class TaskPanel extends JPanel {
 
     }
 
+    void logTimeB_actionPerformed(ActionEvent e) {
+        Task t =
+            CurrentProject.getTaskList().getTask(
+                taskTable.getModel().getValueAt(taskTable.getSelectedRow(), TaskTable.TASK_ID).toString());
+        Process p = t.getProcess();
+        LogEffortDialog dlg;
+        if (p == null) {
+        	dlg = new LogEffortDialog(App.getFrame(), Local.getString("Log effort"), null);
+        }
+        else {
+        	dlg = new LogEffortDialog(App.getFrame(), Local.getString("Log effort"), p.getID());
+        }
+        Dimension frmSize = App.getFrame().getSize();
+        Point loc = App.getFrame().getLocation();
+        dlg.setLocation((frmSize.width - dlg.getSize().width) / 2 + loc.x, (frmSize.height - dlg.getSize().height) / 2 + loc.y);
+        dlg.jSpinnerLogDate.getModel().setValue(t.getStartDate().getDate());    
+        dlg.timeField.setText("0.0");
+		dlg.jSpinnerProgress.setValue(new Integer(t.getProgress()));	
+        dlg.setVisible(true);
+        if (dlg.CANCELLED) {
+        	return;
+        }
+        CalendarDate ld = new CalendarDate((Date) dlg.jSpinnerLogDate.getModel().getValue());
+        t.addLoggedTime(ld.toString(), Util.getMillisFromHours(dlg.timeField.getText()));
+        t.setEffort(Util.getMillisFromHours(dlg.timeField.getText()));
+        t.setProgress(((Integer)dlg.jSpinnerProgress.getValue()).intValue());
+        // CurrentProject.getTaskList().adjustParentTasks(t);
+        CurrentStorage.get().storeTaskList(CurrentProject.getTaskList(), CurrentProject.get());
+        taskTable.tableChanged();
+        parentPanel.updateIndicators();
+        // taskTable.updateUI();
+    }
+    
+    
     void editTaskB_actionPerformed(ActionEvent e) {
         Task t =
             CurrentProject.getTaskList().getTask(
@@ -631,6 +667,7 @@ public class TaskPanel extends JPanel {
         parentPanel.updateIndicators();
         //taskTable.updateUI();
     }
+    
 
     void newTaskB_actionPerformed(ActionEvent e) {
         TaskDialog dlg = new TaskDialog(
@@ -1132,34 +1169,50 @@ public class TaskPanel extends JPanel {
 
     class PopupListener extends MouseAdapter {
 
-        public void mouseClicked(MouseEvent e) {
-		if ((e.getClickCount() == 2) && (taskTable.getSelectedRow() > -1)){
-			// ignore "tree" column
-			//if(taskTable.getSelectedColumn() == 1) return;
-			Object o = taskTable.getModel().getValueAt(taskTable.getSelectedRow(), TaskTable.TASK);
-			
-			if (o instanceof Task) {
-				editTaskB_actionPerformed(null);
+        public void mouseClicked(MouseEvent event) {
+        	if (taskTable.getSelectedRow() > -1) {
+        		Object object = taskTable.getModel().getValueAt(
+        				taskTable.getSelectedRow(),
+        				TaskTable.TASK);
+        		
+				if (event.getClickCount() == 2) {
+					if (object instanceof Task) {
+						editTaskB_actionPerformed(null);
+					} else if (object instanceof Process) {
+						editProcessB_actionPerformed(null);
+					}
+					// Checks if the log effort button was clicked.
+				} else if (object instanceof Task
+						&& taskTable.getSelectedColumn() == 2) {
+					
+					LoggedTimeDialog dialog = new LoggedTimeDialog(
+							App.getFrame(),
+							"Logged time",
+							(Task) object);
+					dialog.setLocationRelativeTo(App.getFrame());
+					dialog.setVisible(true);
+					
+					CurrentStorage.get().storeTaskList(
+							CurrentProject.getTaskList(),
+							CurrentProject.get());
+					taskTable.tableChanged();
+				} 
 			}
-			else if (o instanceof Process) {
-				editProcessB_actionPerformed(null);
-			}
-		}
         }
 
-                public void mousePressed(MouseEvent e) {
-                    maybeShowPopup(e);
-                }
+        public void mousePressed(MouseEvent event) {
+            maybeShowPopup(event);
+        }
 
-                public void mouseReleased(MouseEvent e) {
-                    maybeShowPopup(e);
-                }
+        public void mouseReleased(MouseEvent event) {
+            maybeShowPopup(event);
+        }
 
-                private void maybeShowPopup(MouseEvent e) {
-                    if (e.isPopupTrigger()) {
-                        taskPPMenu.show(e.getComponent(), e.getX(), e.getY());
-                    }
-                }
+        private void maybeShowPopup(MouseEvent event) {
+            if (event.isPopupTrigger()) {
+                taskPPMenu.show(event.getComponent(), event.getX(), event.getY());
+            }
+        }
 
     }
 
