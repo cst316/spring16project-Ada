@@ -185,7 +185,7 @@ public class ResourcesPanel extends JPanel {
 		resourcesTable.addKeyListener(new KeyListener() {
 			public void keyPressed(KeyEvent e){
 				if(resourcesTable.getSelectedRows().length>0 
-					&& e.getKeyCode()==KeyEvent.VK_DELETE)
+					&& (e.getKeyCode()==KeyEvent.VK_DELETE || e.getKeyCode() == KeyEvent.VK_BACK_SPACE))
 					ppRemoveRes_actionPerformed(null);
 			}
 			public void	keyReleased(KeyEvent e){}

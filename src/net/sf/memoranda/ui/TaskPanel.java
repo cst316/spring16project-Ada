@@ -536,12 +536,8 @@ public class TaskPanel extends JPanel {
 					// Only elect to delete a Process if it's the only item selected.
 					if (taskTable.getSelectedRowCount() == 1 &&
 							taskTable.getModel().getValueAt(taskTable.getSelectedRow(), TaskTable.TASK) instanceof Process) {
-						ppRemoveTask.addActionListener(new java.awt.event.ActionListener() {
-                                                public void actionPerformed(ActionEvent e) {
-                                                ppRemoveTask_actionPerformed(e);
-                                                }
-                                            });
-					}
+                                                removeProcessB_actionPerformed(null);
+                                        }
 					else {
 						ppRemoveTask_actionPerformed(null);
 					}
