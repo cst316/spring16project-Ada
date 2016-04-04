@@ -8,19 +8,16 @@
  */
 package net.sf.memoranda;
 
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.List;
 import java.util.Vector;
-import java.util.ArrayList;
-import java.util.Calendar;
 
 import net.sf.memoranda.date.CalendarDate;
 import net.sf.memoranda.date.CurrentDate;
-<<<<<<< HEAD
-import net.sf.memoranda.util.Util;
-=======
 import net.sf.memoranda.util.LogPair;
->>>>>>> master
+import net.sf.memoranda.util.Util;
 import nu.xom.Attribute;
 import nu.xom.Element;
 import nu.xom.Elements;

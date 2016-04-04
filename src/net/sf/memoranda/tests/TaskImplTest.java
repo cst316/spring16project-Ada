@@ -68,14 +68,10 @@ public class TaskImplTest {
 	public void testDatesWithProcess() {
 		CalendarDate yesterday = new CalendarDate(1, 3, 2016);
 		CalendarDate today = new CalendarDate(2, 3, 2016);
-<<<<<<< HEAD
 		Process process = processList.createProcess(
 				"test",
 				yesterday,
 				yesterday);
-=======
-		Process process = processList.createProcess("test", yesterday, yesterday);
->>>>>>> master
 		Task task = taskList.createTask(
 				today,
 				today,
@@ -85,16 +81,6 @@ public class TaskImplTest {
 				0,
 				"description",
 				null);
-<<<<<<< HEAD
-		
-		assertTrue(today.equals(task.getStartDate()));
-		assertTrue(today.equals(task.getEndDate()));
-		
-		process.addTask(task.getID());
-		
-		assertTrue(yesterday.equals(task.getStartDate()));
-		assertTrue(yesterday.equals(task.getEndDate()));
-=======
 		
 		assertTrue(today.equals(task.getStartDate()));
 		assertTrue(today.equals(task.getEndDate()));
@@ -216,6 +202,5 @@ public class TaskImplTest {
 		
 		// Remove using invalid index
 		assertFalse(task.removeLoggedTime(task.getLoggedTimes().size()));
->>>>>>> master
 	}
 }
