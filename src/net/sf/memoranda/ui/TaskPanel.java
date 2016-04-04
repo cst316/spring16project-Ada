@@ -61,7 +61,7 @@ public class TaskPanel extends JPanel {
     JButton editProcessB = new JButton();
     JButton addProcessTaskB = new JButton();
     JButton removeProcessB = new JButton();
-    
+    JButton timer = new JButton();
 	JCheckBoxMenuItem ppShowActiveOnlyChB = new JCheckBoxMenuItem();
 		
     JScrollPane scrollPane = new JScrollPane();
@@ -267,6 +267,22 @@ public class TaskPanel extends JPanel {
             }
         });
         removeProcessB.setBorderPainted(false);
+        
+        timer.setBorderPainted(false);
+        timer.setFocusable(false);
+        timer.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                timer_actionPerformed(e);
+            }
+        });
+        timer.setPreferredSize(new Dimension(24, 24));
+        timer.setRequestFocusEnabled(false);
+        timer.setToolTipText(Local.getString("Timer"));
+        timer.setMinimumSize(new Dimension(24, 24));
+        timer.setMaximumSize(new Dimension(24, 24));
+        timer.setIcon(
+            new ImageIcon(net.sf.memoranda.ui.AppFrame.class.getResource("resources/icons/notify.png")));
+        timer.setEnabled(false);
             
 		// added by rawsushi
 //		showActiveOnly.setBorderPainted(false);
@@ -420,6 +436,8 @@ public class TaskPanel extends JPanel {
         tasksToolBar.add(editProcessB, null);
         tasksToolBar.add(addProcessTaskB, null);
         tasksToolBar.add(removeProcessB, null);
+        tasksToolBar.addSeparator(new Dimension(8, 24));
+        tasksToolBar.add(timer, null);
 
 		//tasksToolBar.add(showActiveOnly, null);
         
@@ -463,6 +481,7 @@ public class TaskPanel extends JPanel {
                 ppEditTask.setEnabled(taskSelected);
                 removeTaskB.setEnabled(taskSelected);
                 ppRemoveTask.setEnabled(taskSelected);
+                timer.setEnabled(taskSelected);
 				
 				ppCompleteTask.setEnabled(taskSelected);
 				completeTaskB.setEnabled(taskSelected);
@@ -1241,4 +1260,8 @@ public class TaskPanel extends JPanel {
   void ppCalcTask_actionPerformed(ActionEvent e) {
       calcTask_actionPerformed(e);
   }
+  private void timer_actionPerformed(ActionEvent e) {
+      //TODO
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
 }
