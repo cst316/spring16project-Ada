@@ -63,6 +63,7 @@ public class TaskPanel extends JPanel {
     JButton removeProcessB = new JButton();
     
 	JCheckBoxMenuItem ppShowActiveOnlyChB = new JCheckBoxMenuItem();
+        JCheckBoxMenuItem ppCalendarSort = new JCheckBoxMenuItem();
 		
     JScrollPane scrollPane = new JScrollPane();
     TaskTable taskTable = new TaskTable();
@@ -305,6 +306,17 @@ public class TaskPanel extends JPanel {
 		ppShowActiveOnlyChB.setSelected(isShao);
 		toggleShowActiveOnly_actionPerformed(null);
 
+                ppCalendarSort.setFont(new java.awt.Font("Dialog", 1, 11));
+		ppCalendarSort.setText(
+			Local.getString("View by date"));
+		ppCalendarSort
+			.addActionListener(new java.awt.event.ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				toggleShowByDate_actionPerformed(e);
+			}
+
+            
+		});
 		/*showActiveOnly.setPreferredSize(new Dimension(24, 24));
 		showActiveOnly.setRequestFocusEnabled(false);
 		if (taskTable.isShowActiveOnly()) {
@@ -506,14 +518,14 @@ public class TaskPanel extends JPanel {
     taskPPMenu.add(ppEditTask);
     
     taskPPMenu.addSeparator();
-    taskPPMenu.add(ppNewTask);
-    taskPPMenu.add(ppAddSubTask);
-    taskPPMenu.add(ppRemoveTask);
+        taskPPMenu.add(ppNewTask);
+        taskPPMenu.add(ppAddSubTask);
+        taskPPMenu.add(ppRemoveTask);
     
     taskPPMenu.addSeparator();
 	taskPPMenu.add(ppCompleteTask);
 	taskPPMenu.add(ppCalcTask);
-	
+    
     //taskPPMenu.addSeparator();
     
     //taskPPMenu.add(ppSubTasks);
@@ -523,8 +535,10 @@ public class TaskPanel extends JPanel {
     
     taskPPMenu.addSeparator();
 	taskPPMenu.add(ppShowActiveOnlyChB);
+        
+    taskPPMenu.addSeparator();
+        taskPPMenu.add(ppCalendarSort);
 
-	
 		// define key actions in TaskPanel:
 		// - KEY:DELETE => delete tasks (recursivly).
 		// - KEY:INTERT => insert new Subtask if another is selected.
@@ -1158,14 +1172,19 @@ public class TaskPanel extends JPanel {
 			}
 		}
 	}
-
+        
+        void toggleShowByDate_actionPerformed(ActionEvent e) {
+            //TODO
+                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            }
+        
 	// toggle "show active only"
 	void toggleShowActiveOnly_actionPerformed(ActionEvent e) {
 		Context.put(
 			"SHOW_ACTIVE_TASKS_ONLY",
 			new Boolean(ppShowActiveOnlyChB.isSelected()));
 		taskTable.tableChanged();
-	}
+            }
 
     class PopupListener extends MouseAdapter {
 
