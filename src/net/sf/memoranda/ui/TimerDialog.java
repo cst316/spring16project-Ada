@@ -95,6 +95,7 @@ public class TimerDialog extends JDialog {
 		startStopButton = new JButton(Local.getString("Start"));
 		resetButton = new JButton(Local.getString("Reset"));
 		logButton = new JButton(Local.getString("Log"));
+		logButton.setEnabled(false);
 		
 		startStopButton.addActionListener(new ActionListener() {
 
@@ -111,6 +112,13 @@ public class TimerDialog extends JDialog {
 				resetButton_actionPerformed(event);
 			}
 		});
+		
+		logButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent event) {
+				logButton_actionPerformed(event);
+			}
+		});
                 
 		buttonsPanel.add(startStopButton);
 		buttonsPanel.add(resetButton);
@@ -120,6 +128,9 @@ public class TimerDialog extends JDialog {
 	
 	private void reset() {
 		timeDelta = 0;
+		
+		logButton.setEnabled(false);
+		
 		date = CalendarDate.today();
 		dateLabel.setText(CalendarDate.getSimpleDateFormat().format(date.getDate()));
 		updateTimerLabel();
@@ -152,6 +163,23 @@ public class TimerDialog extends JDialog {
 			startStopButton.setText(Local.getString("Stop"));
 		}
 		pack();
+	}
+	
+	/**
+	 * Logs current time and appends it to current Task logs.
+	 */
+	private void logTime() {
+		long length = timeDelta;
+		
+		task.addLoggedTime(CalendarDate.
+				getSimpleDateFormat().format(date.getDate()), length);
+	}
+	
+	/**
+	 * Action handler for logging the current time.
+	 */
+	private void logButton_actionPerformed(ActionEvent event) {
+		logTime();
 	}
 	
 	/**
@@ -195,6 +223,8 @@ public class TimerDialog extends JDialog {
 			lastTimeDelta = System.currentTimeMillis();
 			lastSecond = TimerDialog.this.timeDelta / 1000;
 			
+			logButton.setEnabled(true);
+			
 			while (isRunning) {
 				long newTimeDelta = System.currentTimeMillis();
 				TimerDialog.this.timeDelta += newTimeDelta - lastTimeDelta;
@@ -233,8 +263,7 @@ public class TimerDialog extends JDialog {
                             Local.getString("resetting timer"),
                             JOptionPane.YES_NO_OPTION);
                             if (n == JOptionPane.YES_OPTION){
-                               //TODO
-                               //log time here!
+                               logTime();
                             } else if(n == JOptionPane.CLOSED_OPTION){
                                 ResetCancelled = true;
                             }
