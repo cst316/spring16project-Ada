@@ -3,6 +3,8 @@ package net.sf.memoranda.ui;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -14,6 +16,7 @@ import javax.swing.JPanel;
 import net.sf.memoranda.Task;
 import net.sf.memoranda.date.CalendarDate;
 import net.sf.memoranda.util.Local;
+import net.sf.memoranda.util.Util;
 
 /**
  * Dialog for displaying a timer to log time for a Task.
@@ -28,6 +31,7 @@ public class TimerDialog extends JDialog {
 	
 	private CalendarDate date;
 	private Task task;
+	private Timer timer;
 	
 	private JLabel timerLabel;
 	private JLabel dateLabel;
@@ -89,6 +93,14 @@ public class TimerDialog extends JDialog {
 		resetButton = new JButton(Local.getString("Reset"));
 		logButton = new JButton(Local.getString("Log"));
 		
+		startStopButton.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent event) {
+				startStopButton_actionPerformed(event);
+			}
+		});
+		
 		buttonsPanel.add(startStopButton);
 		buttonsPanel.add(resetButton);
 		buttonsPanel.add(logButton);
@@ -100,6 +112,7 @@ public class TimerDialog extends JDialog {
 		date = CalendarDate.today();
 		dateLabel.setText(CalendarDate.getSimpleDateFormat().format(date.getDate()));
 		updateTimerLabel();
+		pack();
 	}
 	
 	/**
@@ -107,6 +120,25 @@ public class TimerDialog extends JDialog {
 	 */
 	private void updateTimerLabel() {
 		timerLabel.setText(timeToString(timeDelta));
+	}
+	
+	/**
+	 * Action handler for starting and stopping the timer.
+	 */
+	private void startStopButton_actionPerformed(ActionEvent event) {
+		if (timer == null) {
+			timer = new Timer();
+		}
+		
+		if (timer.isRunning) {
+			Util.debug("Stopping timer for task: " + task.getID());
+			timer.stop();
+			startStopButton.setText(Local.getString("Start"));
+		} else {
+			Util.debug("Starting timer for task: " + task.getID());
+			timer.start();
+			startStopButton.setText(Local.getString("Stop"));
+		}
 		pack();
 	}
 	
@@ -130,5 +162,54 @@ public class TimerDialog extends JDialog {
 		timeString.append(seconds < 10 ? "0" + seconds : seconds);
 		
 		return timeString.toString();
+	}
+	
+	/**
+	 * Timer runs on a separate thread to update the timeDelta.
+	 * @author James Smith
+	 */
+	private class Timer implements Runnable {
+		
+		boolean isRunning;
+		long lastTimeDelta;
+		long lastSecond;
+		
+		Timer() {
+			isRunning = false;
+		}
+
+		@Override
+		public void run() {
+			lastTimeDelta = System.currentTimeMillis();
+			lastSecond = TimerDialog.this.timeDelta / 1000;
+			
+			while (isRunning) {
+				long newTimeDelta = System.currentTimeMillis();
+				TimerDialog.this.timeDelta += newTimeDelta - lastTimeDelta;
+				long newSecond = TimerDialog.this.timeDelta / 1000;
+				
+				if (newSecond > lastSecond) {
+					lastSecond = newSecond;
+					updateTimerLabel();
+					pack();
+				}
+				lastTimeDelta = newTimeDelta;
+			}
+		}
+		
+		/**
+		 * Start the timer.
+		 */
+		public void start() {
+			isRunning = true;
+			new Thread(this).start();
+		}
+		
+		/**
+		 * Stop the timer.
+		 */
+		public void stop() {
+			isRunning = false;
+		}
 	}
 }
