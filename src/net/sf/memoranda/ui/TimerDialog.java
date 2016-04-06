@@ -11,6 +11,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import net.sf.memoranda.Task;
@@ -39,6 +40,8 @@ public class TimerDialog extends JDialog {
 	private JButton startStopButton;
 	private JButton resetButton;
 	private JButton logButton;
+        private boolean ResetCancelled;
+        private boolean TimerLogged;
 	
 	public TimerDialog(Task task) {
 		super(App.getFrame(), Local.getString("Timer"), false);
@@ -100,7 +103,15 @@ public class TimerDialog extends JDialog {
 				startStopButton_actionPerformed(event);
 			}
 		});
-		
+            
+		resetButton.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent event) {
+				resetButton_actionPerformed(event);
+			}
+		});
+                
 		buttonsPanel.add(startStopButton);
 		buttonsPanel.add(resetButton);
 		buttonsPanel.add(logButton);
@@ -126,6 +137,7 @@ public class TimerDialog extends JDialog {
 	 * Action handler for starting and stopping the timer.
 	 */
 	private void startStopButton_actionPerformed(ActionEvent event) {
+                TimerLogged = false;
 		if (timer == null) {
 			timer = new Timer();
 		}
@@ -212,4 +224,25 @@ public class TimerDialog extends JDialog {
 			isRunning = false;
 		}
 	}
+        private void resetButton_actionPerformed(ActionEvent event) {
+            ResetCancelled = false;
+            if(!TimerLogged){
+                int n = JOptionPane.showConfirmDialog(
+                            App.getFrame(),
+                            "do you want to log time before reset?",
+                            Local.getString("resetting timer"),
+                            JOptionPane.YES_NO_OPTION);
+                            if (n == JOptionPane.YES_OPTION){
+                               //TODO
+                               //log time here!
+                            } else if(n == JOptionPane.CLOSED_OPTION){
+                                ResetCancelled = true;
+                            }
+            }
+            if(!ResetCancelled){
+                this.timer.stop();
+                reset();
+                startStopButton.setText(Local.getString("Start"));
+            }
+        }
 }
