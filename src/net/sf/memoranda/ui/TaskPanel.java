@@ -1235,33 +1235,37 @@ public class TaskPanel extends JPanel {
 
     }
 
-  void ppEditTask_actionPerformed(ActionEvent e) {
-    editTaskB_actionPerformed(e);
+  void ppEditTask_actionPerformed(ActionEvent event) {
+    editTaskB_actionPerformed(event);
   }
-  void ppRemoveTask_actionPerformed(ActionEvent e) {
-    removeTaskB_actionPerformed(e);
+  void ppRemoveTask_actionPerformed(ActionEvent event) {
+    removeTaskB_actionPerformed(event);
   }
-  void ppNewTask_actionPerformed(ActionEvent e) {
-    newTaskB_actionPerformed(e);
-  }
-
-  void ppAddSubTask_actionPerformed(ActionEvent e) {
-  	addSubTask_actionPerformed(e);
+  void ppNewTask_actionPerformed(ActionEvent event) {
+    newTaskB_actionPerformed(event);
   }
 
-  void ppListSubTasks_actionPerformed(ActionEvent e) {
-  	listSubTasks_actionPerformed(e);
+  void ppAddSubTask_actionPerformed(ActionEvent event) {
+  	addSubTask_actionPerformed(event);
   }
 
-  void ppParentTask_actionPerformed(ActionEvent e) {
-  	parentTask_actionPerformed(e);
+  void ppListSubTasks_actionPerformed(ActionEvent event) {
+  	listSubTasks_actionPerformed(event);
   }
 
-  void ppCalcTask_actionPerformed(ActionEvent e) {
-      calcTask_actionPerformed(e);
+  void ppParentTask_actionPerformed(ActionEvent event) {
+  	parentTask_actionPerformed(event);
   }
-  private void timer_actionPerformed(ActionEvent e) {
-      //TODO
-                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-            }
+
+  void ppCalcTask_actionPerformed(ActionEvent event) {
+      calcTask_actionPerformed(event);
+  }
+  private void timer_actionPerformed(ActionEvent event) {
+	  Task task = (Task) taskTable.getModel().getValueAt(
+				taskTable.getSelectedRow(),
+				TaskTable.TASK);
+	  TimerDialog dialog = new TimerDialog(task);
+	  dialog.setLocationRelativeTo(this);
+	  dialog.setVisible(true);
+  }
 }
