@@ -744,10 +744,12 @@ public class AppFrame extends JFrame {
 
     protected void processWindowEvent(WindowEvent e) {
         if (e.getID() == WindowEvent.WINDOW_CLOSING) {
-            if (Configuration.get("ON_CLOSE").equals("exit"))
+            //there is no way to set the configuration in the app. once 
+            //implemented, these lines can be uncommented.
+            //if (Configuration.get("ON_CLOSE").equals("exit"))
                 doExit();
-            else
-                doMinimize();
+            //else
+                //doMinimize();
         }
         else if ((e.getID() == WindowEvent.WINDOW_ICONIFIED)) {
             super.processWindowEvent(new WindowEvent(this,
