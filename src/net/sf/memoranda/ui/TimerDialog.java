@@ -5,6 +5,8 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -40,13 +42,13 @@ public class TimerDialog extends JDialog {
 	private JButton startStopButton;
 	private JButton resetButton;
 	private JButton logButton;
-        private boolean ResetCancelled;
-        private boolean TimerLogged;
+	private boolean timerLogged;
 	
 	public TimerDialog(Task task) {
 		super(App.getFrame(), Local.getString("Timer"), false);
 		this.task = task;
 		timeDelta = 0;
+		timer = new Timer();
 		
 		try {
 			jbInit();
@@ -64,6 +66,44 @@ public class TimerDialog extends JDialog {
 		drawHeader();
 		drawTimer();
 		drawButtons();
+		
+		this.addWindowListener(new WindowListener() {
+
+			@Override
+			public void windowActivated(WindowEvent event) {
+				// do nothing
+			}
+
+			@Override
+			public void windowClosed(WindowEvent event) {
+				// do nothing
+			}
+
+			@Override
+			public void windowClosing(WindowEvent event) {
+				checkIfLoggedToContinue();
+			}
+
+			@Override
+			public void windowDeactivated(WindowEvent event) {
+				// do nothing
+			}
+
+			@Override
+			public void windowDeiconified(WindowEvent event) {
+				// do nothing
+			}
+
+			@Override
+			public void windowIconified(WindowEvent event) {
+				// do nothing
+			}
+
+			@Override
+			public void windowOpened(WindowEvent event) {
+				// do nothing
+			}
+		});
 	}
 	
 	private void drawHeader() {
@@ -128,6 +168,7 @@ public class TimerDialog extends JDialog {
 	
 	private void reset() {
 		timeDelta = 0;
+		timerLogged = true;
 		
 		logButton.setEnabled(false);
 		
@@ -148,17 +189,15 @@ public class TimerDialog extends JDialog {
 	 * Action handler for starting and stopping the timer.
 	 */
 	private void startStopButton_actionPerformed(ActionEvent event) {
-                TimerLogged = false;
-		if (timer == null) {
-			timer = new Timer();
-		}
+        if (timerLogged) {
+        	reset();
+        	timerLogged = false;
+        }
 		
 		if (timer.isRunning) {
-			Util.debug("Stopping timer for task: " + task.getID());
 			timer.stop();
 			startStopButton.setText(Local.getString("Start"));
 		} else {
-			Util.debug("Starting timer for task: " + task.getID());
 			timer.start();
 			startStopButton.setText(Local.getString("Stop"));
 		}
@@ -171,14 +210,19 @@ public class TimerDialog extends JDialog {
 	private void logTime() {
 		long length = timeDelta;
 		
-		task.addLoggedTime(CalendarDate.
-				getSimpleDateFormat().format(date.getDate()), length);
+		task.addLoggedTime(date.toString(), length);
+		timerLogged = true;
+		logButton.setEnabled(false);
 	}
 	
 	/**
 	 * Action handler for logging the current time.
 	 */
 	private void logButton_actionPerformed(ActionEvent event) {
+		if (timer.isRunning) {
+			timer.stop();
+		}
+		
 		logTime();
 	}
 	
@@ -243,6 +287,7 @@ public class TimerDialog extends JDialog {
 		 * Start the timer.
 		 */
 		public void start() {
+			Util.debug("Starting timer for task: " + task.getID());
 			isRunning = true;
 			new Thread(this).start();
 		}
@@ -251,27 +296,38 @@ public class TimerDialog extends JDialog {
 		 * Stop the timer.
 		 */
 		public void stop() {
+			Util.debug("Stopping timer for task: " + task.getID());
 			isRunning = false;
 		}
 	}
         private void resetButton_actionPerformed(ActionEvent event) {
-            ResetCancelled = false;
-            if(!TimerLogged){
-                int n = JOptionPane.showConfirmDialog(
-                            App.getFrame(),
-                            "do you want to log time before reset?",
-                            Local.getString("resetting timer"),
-                            JOptionPane.YES_NO_OPTION);
-                            if (n == JOptionPane.YES_OPTION){
-                               logTime();
-                            } else if(n == JOptionPane.CLOSED_OPTION){
-                                ResetCancelled = true;
-                            }
-            }
-            if(!ResetCancelled){
+            boolean toContinue = checkIfLoggedToContinue();
+            if(toContinue){
                 this.timer.stop();
                 reset();
                 startStopButton.setText(Local.getString("Start"));
             }
         }
+
+		/**
+		 * Check if the timer has been logged. If not checks if the user wants
+		 * to log. Will return false if the user cancels the dialog.
+		 */
+		private boolean checkIfLoggedToContinue() {
+			boolean toContinue = true;
+			if(!timerLogged && timeDelta > 0L){
+                int dialogSelection = JOptionPane.showConfirmDialog(
+                            App.getFrame(),
+                            "Log time before continuing?",
+                            Local.getString("Timer"),
+                            JOptionPane.YES_NO_OPTION);
+                
+                if (dialogSelection == JOptionPane.YES_OPTION){
+                   logTime();
+                } else if (dialogSelection == JOptionPane.CLOSED_OPTION){
+                	toContinue = false;
+                }
+            }
+			return toContinue;
+		}
 }
