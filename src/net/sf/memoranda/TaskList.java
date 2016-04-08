@@ -37,6 +37,13 @@ public interface TaskList {
     public Collection<String> getIds();
     public Collection<String> getTaskTypes();
     
+    /**
+     * Gets all the top-level Tasks that are active on a date.
+     * @param date The date on which Tasks are active
+     * @return Collection of active Tasks
+     */
+    Collection<Task> getTasksByDate(CalendarDate date);
+    
 //    public void adjustParentTasks(Task t);
     
     public long calculateTotalEffortFromSubTasks(Task t);
