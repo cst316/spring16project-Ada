@@ -186,9 +186,7 @@ public class TaskListImpl implements TaskList {
     	ArrayList<Task> tasks = new ArrayList<Task>();
     	
     	for (Task task : allTasks) {
-    		if ((task.getStartDate().before(date) || task.getStartDate().equals(date))  
-    				&& (task.getEndDate().after(date) 
-    						|| task.getEndDate().equals(date))) {
+    		if (date.inPeriod(task.getStartDate(), task.getEndDate())) {
     			tasks.add(task);
     		}
     	}
