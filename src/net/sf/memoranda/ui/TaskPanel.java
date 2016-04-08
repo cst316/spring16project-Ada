@@ -309,10 +309,10 @@ public class TaskPanel extends JPanel {
                 ppCalendarSort.setFont(new java.awt.Font("Dialog", 1, 11));
 		ppCalendarSort.setText(
 			Local.getString("View by date"));
-		ppCalendarSort
-			.addActionListener(new java.awt.event.ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				toggleShowByDate_actionPerformed(e);
+		ppCalendarSort.addActionListener(
+				new java.awt.event.ActionListener() {
+			public void actionPerformed(ActionEvent event) {
+				toggleShowByDate_actionPerformed(event);
 			}
 
             
@@ -1173,13 +1173,13 @@ public class TaskPanel extends JPanel {
 		}
 	}
         
-        void toggleShowByDate_actionPerformed(ActionEvent e) {
+        void toggleShowByDate_actionPerformed(ActionEvent event) {
             //TODO
                 throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
             }
         
 	// toggle "show active only"
-	void toggleShowActiveOnly_actionPerformed(ActionEvent e) {
+	void toggleShowActiveOnly_actionPerformed(ActionEvent event) {
 		Context.put(
 			"SHOW_ACTIVE_TASKS_ONLY",
 			new Boolean(ppShowActiveOnlyChB.isSelected()));
