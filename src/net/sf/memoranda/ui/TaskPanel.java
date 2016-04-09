@@ -1174,8 +1174,14 @@ public class TaskPanel extends JPanel {
 	}
         
         void toggleShowByDate_actionPerformed(ActionEvent event) {
-            //TODO
-                throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            Context.put("SHOW_BY_DATE_ONLY", new Boolean(ppCalendarSort.isSelected()));            
+            if (ppCalendarSort.isSelected()) {
+            	ppShowActiveOnlyChB.setSelected(false);
+            	Context.put(
+            			"SHOW_ACTIVE_TASKS_ONLY",
+            			new Boolean(ppShowActiveOnlyChB.isSelected()));
+            }
+            taskTable.tableChanged();
             }
         
 	// toggle "show active only"
@@ -1183,6 +1189,11 @@ public class TaskPanel extends JPanel {
 		Context.put(
 			"SHOW_ACTIVE_TASKS_ONLY",
 			new Boolean(ppShowActiveOnlyChB.isSelected()));
+		
+		if (ppShowActiveOnlyChB.isSelected()) {
+			ppCalendarSort.setSelected(false);
+            Context.put("SHOW_BY_DATE_ONLY", new Boolean(ppCalendarSort.isSelected()));    
+		}
 		taskTable.tableChanged();
             }
 

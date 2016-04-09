@@ -18,7 +18,7 @@ import net.sf.memoranda.date.*;
 public class TaskTableSorter extends TaskTableModel{
 	
 	// -1 == no sorting
-	int sorting_column = -1;
+	int sortingColumn = -1;
 	
 	// sort opposite direction
 	boolean opposite = false;
@@ -26,13 +26,13 @@ public class TaskTableSorter extends TaskTableModel{
 	Comparator comparator = new Comparator(){
 		public int compare(Object o1, Object o2){
 			int compare = 0;
-			if (sorting_column == -1) {
+			if (sortingColumn == -1) {
 				// do nothing
 			} else if (o1 instanceof Task && o2 instanceof Task) {
 				Task task1 = (Task) o1;
 				Task task2 = (Task) o2;
 				// based on TaskTableModel.columnNames
-				switch (sorting_column) {
+				switch (sortingColumn) {
 				case 1:
 					compare = task1.getText().compareTo(task2.getText());
 					break;
@@ -70,7 +70,7 @@ public class TaskTableSorter extends TaskTableModel{
 				Process p1 = (Process) o1;
 				Process p2 = (Process) o2;
 				
-				switch (sorting_column) {
+				switch (sortingColumn) {
 				case 1:
 					compare = p1.getName().compareTo(p2.getName());
 					break;
@@ -110,38 +110,51 @@ public class TaskTableSorter extends TaskTableModel{
 	}
 	
 	public Object getChild(Object parent, int index) {
-		Collection c = null;
+		Collection collection = null;
 		
 		if (parent instanceof Project){
 			if( activeOnly() ) {
-				c = CurrentProject.getTaskList().getActiveTopLevelNoProcessTasks(CurrentDate.get());
-				c.addAll(CurrentProject.getProcessList().getActiveProcesses(CurrentDate.get()));
+				collection =
+						CurrentProject.
+						getTaskList().
+						getActiveTopLevelNoProcessTasks(CurrentDate.get());
+				collection.addAll(
+						CurrentProject.getProcessList().getActiveProcesses(
+								CurrentDate.get()));
+			} else if ( byDateOnly() ) {
+				collection =
+						CurrentProject.getTaskList().getTasksByDate(
+								CurrentDate.get(), false);
+				collection.addAll(
+						CurrentProject.getProcessList().getProcessesByDate(
+								CurrentDate.get()));
+			} else  {
+				collection =
+						CurrentProject.
+						getTaskList().
+						getTopLevelNoProcessTasks();
+				collection.addAll(
+						CurrentProject.getProcessList().getAllProcesses());
 			}
-			else  {
-				c = CurrentProject.getTaskList().getTopLevelNoProcessTasks();
-				c.addAll(CurrentProject.getProcessList().getAllProcesses());
-			}
-		}
-		else if (parent instanceof Process) {
-			Process p = (Process) parent;
+		} else if (parent instanceof Process) {
+			Process process = (Process) parent;
 			if (activeOnly()) {
-				c = p.getActiveTasks(CurrentDate.get());
+				collection = process.getActiveTasks(CurrentDate.get());
+			} else {
+				collection = process.getTasks();
 			}
-			else {
-				c = p.getTasks();
-			}
-		}
-		else{
-			Task t = (Task) parent;
+		} else {
+			Task task = (Task) parent;
 			if (activeOnly()) {
-				c = CurrentProject.getTaskList().getActiveSubTasks(t.getID(), CurrentDate.get());
-			}
-			else  {
-				c = t.getSubTasks();
+				collection = CurrentProject.getTaskList().getActiveSubTasks(
+								task.getID(),
+								CurrentDate.get());
+			} else  {
+				collection = task.getSubTasks();
 			}
 		}
 		
-		Object array[] = c.toArray();
+		Object array[] = collection.toArray();
 		if (!(parent instanceof Process)) {
 			Arrays.sort(array, comparator);
 			if(opposite){
@@ -154,35 +167,40 @@ public class TaskTableSorter extends TaskTableModel{
 	
     
     private class MouseHandler extends MouseAdapter {
-        public void mouseClicked(MouseEvent e) {
-            JTableHeader h = (JTableHeader) e.getSource();
-            TableColumnModel columnModel = h.getColumnModel();
-            int viewColumn = columnModel.getColumnIndexAtX(e.getX());
+        public void mouseClicked(MouseEvent event) {
+            JTableHeader header = (JTableHeader) event.getSource();
+            TableColumnModel columnModel = header.getColumnModel();
+            int viewColumn = columnModel.getColumnIndexAtX(event.getX());
             int column = columnModel.getColumn(viewColumn).getModelIndex();
             if (column != -1) {
-		sorting_column = column;
+		sortingColumn = column;
 		
 		// 0 == priority icon column
 		// 4 == priority text column
-		if(column == 0) sorting_column = 4;
+		if (column == 0) {
+			sortingColumn = 4;
+		}
 		
-		if(e.isControlDown()) sorting_column = -1;
-		else opposite = !opposite;
+		if (event.isControlDown()) {
+			sortingColumn = -1;
+		} else {
+			opposite = !opposite;
+		}
 		
-		TaskTable treetable = ( (TaskTable) h.getTable());
+		TaskTable treetable = ( (TaskTable) header.getTable());
 		
 		//java.util.Collection expanded = treetable.getExpandedTreeNodes();
 		
 		treetable.tableChanged();
 		//treetable.setExpandedTreeNodes(expanded);
 		//h.updateUI();
-		h.resizeAndRepaint();
+		header.resizeAndRepaint();
             }
         }
     }
     
 	/**
-	* Render sorting header differently
+	* Render sorting header differently.
 	*/
 	private class SortableHeaderRenderer implements TableCellRenderer {
 	    
@@ -194,13 +212,14 @@ public class TaskTableSorter extends TaskTableModel{
 							       boolean hasFocus,
 							       int row, 
 							       int column) {
-			JComponent c = new JLabel(value.toString());
-			if(column == sorting_column){
-				c.setFont(c.getFont().deriveFont(Font.BOLD));
+			JComponent component = new JLabel(value.toString());
+			if(column == sortingColumn){
+				component.setFont(component.getFont().deriveFont(Font.BOLD));
 				//c.setBorder(BorderFactory.createMatteBorder(1,1,1,1,Color.BLACK));
+			} else {
+				component.setFont(component.getFont().deriveFont(Font.PLAIN));
 			}
-			else c.setFont(c.getFont().deriveFont(Font.PLAIN));
-			return c;
+			return component;
 		}
 	}
 	

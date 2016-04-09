@@ -55,23 +55,23 @@ public class TaskListImplTest {
 				"Description", 
 				null);
 		
-		result = taskList.getTasksByDate(new CalendarDate(25, 4, 2016));
+		result = taskList.getTasksByDate(new CalendarDate(25, 4, 2016), true);
 		assertTrue(result.contains(task1));
 		assertFalse(result.contains(task2));
 		
-		result = taskList.getTasksByDate(new CalendarDate(20, 4, 2016));
+		result = taskList.getTasksByDate(new CalendarDate(20, 4, 2016), true);
 		assertTrue(result.contains(task1));
 		assertTrue(result.contains(task2));
 		
-		result = taskList.getTasksByDate(new CalendarDate(29, 4, 2016));
+		result = taskList.getTasksByDate(new CalendarDate(29, 4, 2016), true);
 		assertTrue(result.contains(task1));
 		assertFalse(result.contains(task2));
 		
-		result = taskList.getTasksByDate(new CalendarDate(19, 4, 2016));
+		result = taskList.getTasksByDate(new CalendarDate(19, 4, 2016), true);
 		assertFalse(result.contains(task1));
 		assertFalse(result.contains(task2));
 		
-		result = taskList.getTasksByDate(new CalendarDate(30, 4, 2016));
+		result = taskList.getTasksByDate(new CalendarDate(30, 4, 2016), true);
 		assertFalse(result.contains(task1));
 		assertFalse(result.contains(task2));
 	}

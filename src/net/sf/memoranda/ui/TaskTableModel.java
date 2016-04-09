@@ -34,6 +34,7 @@ import net.sf.memoranda.ui.treetable.AbstractTreeTableModel;
 import net.sf.memoranda.ui.treetable.TreeTableModel;
 import net.sf.memoranda.util.Context;
 import net.sf.memoranda.util.Local;
+import net.sf.memoranda.util.Util;
 
 /**
  * JAVADOC:
@@ -59,6 +60,7 @@ public class TaskTableModel extends AbstractTreeTableModel implements TreeTableM
     protected EventListenerList listenerList = new EventListenerList();
 
     private boolean activeOnly = check_activeOnly();
+    private boolean byDateOnly = check_byDateOnly();
         
     /**
      * JAVADOC: Constructor of <code>TaskTableModel</code>
@@ -218,30 +220,49 @@ public class TaskTableModel extends AbstractTreeTableModel implements TreeTableM
     	
     	if (parent instanceof Project) {
 			if( activeOnly() ){
-				childCount = CurrentProject.getTaskList().getActiveTopLevelNoProcessTasks(CurrentDate.get()).size();
-				childCount += CurrentProject.getProcessList().getActiveProcesses(CurrentDate.get()).size();
+				childCount = CurrentProject.
+						getTaskList().
+						getActiveTopLevelNoProcessTasks(CurrentDate.get()).
+						size();
+				childCount += CurrentProject.
+						getProcessList().
+						getActiveProcesses(CurrentDate.get()).
+						size();
+			} else if ( byDateOnly ) {
+				childCount = CurrentProject.
+						getTaskList().
+						getTasksByDate(CurrentDate.get(), false).
+						size();
+				childCount += CurrentProject.
+						getProcessList().
+						getProcessesByDate(CurrentDate.get()).
+						size();
+			} else {
+				childCount = CurrentProject.
+						getTaskList().
+						getTopLevelNoProcessTasks().
+						size();
+				childCount += CurrentProject.
+						getProcessList().
+						getAllProcesses().
+						size();
 			}
-			else {
-				childCount = CurrentProject.getTaskList().getTopLevelNoProcessTasks().size();
-				childCount += CurrentProject.getProcessList().getAllProcesses().size();
-			}
-        }
-        else if (parent instanceof Process) {
-        	Process p = (Process) parent;
+        } else if (parent instanceof Process) {
+        	Process process = (Process) parent;
         	if (activeOnly()) {
-				childCount = p.getActiveTasks(CurrentDate.get()).size();
-			}
-        	else {
-				childCount = p.getTasks().size();
+				childCount = process.getActiveTasks(CurrentDate.get()).size();
+			} else {
+				childCount = process.getTasks().size();
 			} 
-        }
-        else if (parent instanceof Task) {
-			Task t = (Task) parent;
+        } else if (parent instanceof Task) {
+			Task task = (Task) parent;
 			if (activeOnly()) {
-				childCount = CurrentProject.getTaskList().getActiveSubTasks(t.getID(), CurrentDate.get()).size();
-			}
-			else {
-				childCount = t.getSubTasks().size();
+				childCount = CurrentProject.
+						getTaskList().
+						getActiveSubTasks(task.getID(), CurrentDate.get()).
+						size();
+			} else {
+				childCount = task.getSubTasks().size();
 			} 
 		}
     	
@@ -254,43 +275,11 @@ public class TaskTableModel extends AbstractTreeTableModel implements TreeTableM
     public Object getChild(Object parent, int index) {
     	Object child = null;
         if (parent instanceof Project) {
-        	if( activeOnly() ) {
-        		Collection<Task> tasks = CurrentProject.getTaskList().getActiveSubTasks(null, CurrentDate.get());
-        		
-        		if (index < tasks.size()) {
-        			child = tasks.toArray()[index];
-        		}
-        		else {
-        			child = CurrentProject.getProcessList().getActiveProcesses(CurrentDate.get()).toArray()[index - tasks.size()];
-        		}
-        	}
-        	else {
-        		Collection<Task> tasks = CurrentProject.getTaskList().getTopLevelNoProcessTasks();
-        		
-        		if (index < tasks.size()) {
-        			child = tasks.toArray()[index];
-        		}
-        		else {
-        			child = CurrentProject.getProcessList().getAllProcesses().toArray()[index - tasks.size()];
-        		}
-        	}
-        }
-        else if (parent instanceof Process) {
-        	Process p = (Process) parent;
-        	if (activeOnly()) {
-        		child = p.getActiveTasks(CurrentDate.get()).toArray()[index];
-        	}
-        	else {
-        		child = p.getTasks().toArray()[index];
-        	}
-        }
-        else if (parent instanceof Task) {
-			Task t = (Task) parent;
-			if (activeOnly()) {
-				child = CurrentProject.getTaskList().getActiveSubTasks(t.getID(), CurrentDate.get()).toArray()[index];
-			} else {
-				child = t.getSubTasks().toArray()[index];
-			} 
+        	child = getChildOfProject(index);
+        } else if (parent instanceof Process) {
+        	child = getChildOfProcess((Process) parent, index);
+        } else if (parent instanceof Task) {
+			child = getChildOfTask((Task) parent, index);
 		}
         return child;
     }
@@ -339,6 +328,7 @@ public class TaskTableModel extends AbstractTreeTableModel implements TreeTableM
      */
     public void fireUpdateCache(){
 		activeOnly = check_activeOnly();
+		byDateOnly = check_byDateOnly();
     }
 
     public static boolean check_activeOnly(){
@@ -351,6 +341,20 @@ public class TaskTableModel extends AbstractTreeTableModel implements TreeTableM
 		return activeOnly;
     }
     
+    public static boolean check_byDateOnly() {
+    	boolean byDateOnly = false;
+    	Object object = Context.get("SHOW_BY_DATE_ONLY");
+    	if (object != null) {
+    		byDateOnly = object.toString().equals("true");
+    	}
+    	Util.debug("byDateOnly: " + byDateOnly);
+    	return byDateOnly;
+    }
+    
+    public boolean byDateOnly() {
+    	return byDateOnly;
+    }
+    
     public boolean isCellEditable(Object node, int column) {
 		if(column == 9) {
 			return true; 
@@ -358,4 +362,88 @@ public class TaskTableModel extends AbstractTreeTableModel implements TreeTableM
         return super.isCellEditable(node, column); 
     }
 
+    private Object getChildOfProject(int index) {
+    	Object child;
+    	if( activeOnly() ) {
+    		child = getChildOfProjectActiveOnly(index);
+    	} else if (byDateOnly) {
+    		child = getChildOfProjectDateOnly(index);
+    	} else {
+    		child = getChildOfProjectDefault(index);
+    	}
+    	
+    	return child;
+    }
+
+	private Object getChildOfProjectActiveOnly(int index) {
+		Object child;
+		Collection<Task> tasks = CurrentProject.
+				getTaskList().
+				getActiveSubTasks(null, CurrentDate.get());
+		
+		if (index < tasks.size()) {
+			child = tasks.toArray()[index];
+		} else {
+			child = CurrentProject.
+					getProcessList().
+					getActiveProcesses(CurrentDate.get()).
+					toArray()[index - tasks.size()];
+		}
+		return child;
+	}
+	
+	private Object getChildOfProjectDateOnly(int index) {
+		Object child;
+		Collection<Task> tasks = CurrentProject.
+				getTaskList().
+				getTasksByDate(CurrentDate.get(), false);
+		
+		if (index < tasks.size()) {
+			child = tasks.toArray()[index];
+		} else {
+			child = CurrentProject.
+					getProcessList().
+					getProcessesByDate(CurrentDate.get()).
+					toArray()[index - tasks.size()];
+		}
+		return child;
+	}
+
+	private Object getChildOfProjectDefault(int index) {
+		Object child;
+		Collection<Task> tasks = CurrentProject.getTaskList().getTopLevelNoProcessTasks();
+		
+		if (index < tasks.size()) {
+			child = tasks.toArray()[index];
+		} else {
+			child = CurrentProject.
+					getProcessList().
+					getAllProcesses().
+					toArray()[index - tasks.size()];
+		}
+		return child;
+	}
+    
+    private Object getChildOfProcess(Process process, int index) {
+    	Object child;
+    	if (activeOnly()) {
+    		child = process.getActiveTasks(CurrentDate.get()).toArray()[index];
+    	} else {
+    		child = process.getTasks().toArray()[index];
+    	}
+    	return child;
+    }
+    
+    private Object getChildOfTask(Task task, int index) {
+    	Object child;
+		if (activeOnly()) {
+			child = CurrentProject.
+					getTaskList().
+					getActiveSubTasks(task.getID(), CurrentDate.get()).
+					toArray()[index];
+		} else {
+			child = task.getSubTasks().toArray()[index];
+		} 
+		return child;
+    }
 }

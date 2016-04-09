@@ -42,7 +42,7 @@ public interface TaskList {
      * @param date The date on which Tasks are active
      * @return Collection of active Tasks
      */
-    Collection<Task> getTasksByDate(CalendarDate date);
+    Collection<Task> getTasksByDate(CalendarDate date, boolean includeProcessTasks);
     
 //    public void adjustParentTasks(Task t);
     
