@@ -24,6 +24,8 @@ public interface NoteList {
 
     Note getNoteForDate(CalendarDate date);
     
+    Collection<Note> getNotesForDate(CalendarDate date);
+    
     Note createNoteForDate(CalendarDate date);
     
 //    void removeNoteForDate(CalendarDate date);

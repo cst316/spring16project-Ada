@@ -142,6 +142,19 @@ public class NoteListImpl implements NoteList {
 		return null;
         //return new NoteImpl(d.getElement(), _project);
     }
+    
+    public Collection<Note> getNotesForDate(CalendarDate date) {
+    	Collection<Note> notes = new Vector<Note>();
+    	Day day = getDay(date);
+    	if (day != null) {
+    		Vector elements = day.getNotes();
+    		for (int i=0; i < elements.size(); i++) {
+    			NoteElement element = (NoteElement) elements.get(i);
+    			notes.add(new NoteImpl(element.getElement(), _project));
+    		}
+    	}
+    	return notes;
+    }
 
     public Note createNoteForDate(CalendarDate date) {
         Year y = getYear(date.getYear());
