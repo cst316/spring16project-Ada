@@ -267,7 +267,7 @@ public class TimerDialog extends JDialog {
 			lastTimeDelta = System.currentTimeMillis();
 			lastSecond = TimerDialog.this.timeDelta / 1000;
 			
-			logButton.setEnabled(true);
+			logButton.setEnabled(false);
 			
 			while (isRunning) {
 				long newTimeDelta = System.currentTimeMillis();
@@ -297,6 +297,7 @@ public class TimerDialog extends JDialog {
 		 */
 		public void stop() {
 			Util.debug("Stopping timer for task: " + task.getID());
+			logButton.setEnabled(true);
 			isRunning = false;
 		}
 	}
