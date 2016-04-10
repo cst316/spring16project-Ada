@@ -316,7 +316,13 @@ public class TaskPanel extends JPanel {
 			}
 
             
-		});
+		});		
+		boolean isDateOnly =
+				(Context.get("SHOW_BY_DATE_ONLY") != null)
+					&& (Context.get("SHOW_BY_DATE_ONLY").equals("true"));
+			ppCalendarSort.setSelected(isDateOnly);
+			toggleShowActiveOnly_actionPerformed(null);
+			
 		/*showActiveOnly.setPreferredSize(new Dimension(24, 24));
 		showActiveOnly.setRequestFocusEnabled(false);
 		if (taskTable.isShowActiveOnly()) {
