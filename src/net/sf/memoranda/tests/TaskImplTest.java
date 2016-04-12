@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.junit.AfterClass;
@@ -14,10 +15,13 @@ import net.sf.memoranda.CurrentProject;
 import net.sf.memoranda.Process;
 import net.sf.memoranda.ProcessList;
 import net.sf.memoranda.Task;
+import net.sf.memoranda.TaskImpl;
 import net.sf.memoranda.TaskList;
 import net.sf.memoranda.date.CalendarDate;
 import net.sf.memoranda.util.LogPair;
 import net.sf.memoranda.util.Util;
+import nu.xom.Attribute;
+import nu.xom.Element;
 
 public class TaskImplTest {
 
@@ -199,5 +203,46 @@ public class TaskImplTest {
 		
 		// Remove using invalid index
 		assertFalse(task.removeLoggedTime(task.getLoggedTimes().size()));
+	}
+
+	/**
+	 * NotSet Tests.
+	 * The NotSet tests are designed to test what happens when a value was never
+	 * set properly. This is to ensure that a user upgrading Memoranda does not
+	 * experience any unexpected behavior from updating to newer data values.
+	 */
+	
+	@Test
+	public void testTypeNotSet() {
+		Task task = createBlankTask();
+		assertEquals("", task.getType());
+	}
+	
+	@Test
+	public void testLoggedTimeNotSet() {
+		Task task = createBlankTask();
+		assertEquals(0, task.getLoggedTime());
+		Collection<LogPair> logs = task.getLoggedTimes();
+		assertEquals(0, logs.size());
+	}
+	
+	@Test
+	public void testProcessNotSet() {
+		Task task = createBlankTask();
+		assertEquals(null, task.getProcess());
+		assertEquals(0, task.getProcessWeight());
+	}
+	
+	@Test
+	public void testAnalysisNotSet() {
+		Task task = createBlankTask();
+		assertEquals(Task.ANALYSIS_UNKNOWN, task.getAccuracy());
+	}
+	
+	private Task createBlankTask() {
+		Element element = new Element("task");
+		String id = Util.generateId();
+	    element.addAttribute(new Attribute("id", id));
+		return new TaskImpl(element, taskList);
 	}
 }
