@@ -592,7 +592,7 @@ public class TaskPanel extends JPanel {
         	return;
         }
         CalendarDate ld = new CalendarDate((Date) dlg.jSpinnerLogDate.getModel().getValue());
-        t.addLoggedTime(CalendarDate.getSimpleDateFormat().format(ld.getDate()), Util.getMillisFromHours(dlg.timeField.getText()));
+        t.addLoggedTime(ld.toString(), Util.getMillisFromHours(dlg.timeField.getText()));
         t.setEffort(Util.getMillisFromHours(dlg.timeField.getText()));
         t.setProgress(((Integer)dlg.jSpinnerProgress.getValue()).intValue());
         // CurrentProject.getTaskList().adjustParentTasks(t);

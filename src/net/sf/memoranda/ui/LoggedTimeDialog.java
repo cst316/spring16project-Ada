@@ -8,6 +8,7 @@ import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
+import java.text.DateFormat;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
@@ -156,9 +157,11 @@ public class LoggedTimeDialog extends JDialog {
 		
 		for (LogPair logPair : logsTreeSet) {
 			JRadioButton radioButton = new JRadioButton();
+			DateFormat dateFormat = CalendarDate.getSimpleDateFormat();
+			CalendarDate entryDate = new CalendarDate(logPair.getDate());
 			float effortInHours = (float)logPair.getLength() / 1000f / 60f / 60f;
 			JLabel hours = new JLabel(effortInHours + "");
-			JLabel date = new JLabel(logPair.getDate());
+			JLabel date = new JLabel(dateFormat.format(entryDate.getDate()));
 			
 			gc.gridy = gc.gridy + 1;
 			gc.gridx = 0;
@@ -281,7 +284,7 @@ public class LoggedTimeDialog extends JDialog {
 							date.toString(),
 							millis);
 				} else {
-					task.addLoggedTime(CalendarDate.getSimpleDateFormat().format(date.getDate()), millis);
+					task.addLoggedTime(date.toString(), millis);
 				}
 				
 				task.setProgress(progress);

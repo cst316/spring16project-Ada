@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
+import net.sf.memoranda.date.CalendarDate;
 import net.sf.memoranda.util.FileStorage;
 import net.sf.memoranda.util.LogPair;
 import net.sf.memoranda.util.Util;
@@ -359,12 +360,16 @@ public class ReportImpl implements Report {
 			for (int i = 0; i < list.size(); i++) {
 				if (count == 0) {
 					htmlBuilder.append("<tr><td>" + task.getText() 
-						+ "</td><td>" + list.get(i).getDate()
-						+ "</td><td>" + (list.get(i).getLength() / 3600000.0f)
+						+ "</td><td>"
+						+ dateFormat.format((new CalendarDate(list.get(i).getDate()).getDate()))
+						+ "</td><td>"
+						+ (list.get(i).getLength() / 3600000.0f)
 						+ "</td></tr>");
 				} else {
-					htmlBuilder.append("<tr><td></td><td>" + list.get(i).getDate() 
-						+ "</td><td>" + (list.get(i).getLength() / 3600000.0f) 
+					htmlBuilder.append("<tr><td></td><td>"
+						+ dateFormat.format((new CalendarDate(list.get(i).getDate()).getDate()))
+						+ "</td><td>"
+						+ (list.get(i).getLength() / 3600000.0f) 
 						+ "</td></tr>");
 				}
 				
