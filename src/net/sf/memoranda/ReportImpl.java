@@ -343,12 +343,6 @@ public class ReportImpl implements Report {
 			
 			htmlBuilder.append("</tr>");
 		}
-		/*
-		if (task.getLoggedTimes().size() > 0) {
-			// Time logs
-			htmlBuilder.append("<tr><th>Time logs</th></tr>");
-		}
-		*/
 		
 		// Close this table so we can make new one for time logs
 		htmlBuilder.append("</table><br>");
