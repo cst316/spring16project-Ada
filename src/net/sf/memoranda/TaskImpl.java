@@ -68,9 +68,9 @@ public class TaskImpl implements Task, Comparable {
     		Util.debug("Process End Date");
     		date = getProcess().getEndDate();
     	}
-    	else if (_element.getAttribute("enddate") != null) {
+    	else if (_element.getAttribute("endDate") != null) {
     		Util.debug("Task End Date");
-    		date = new CalendarDate(_element.getAttribute("enddate").getValue());
+    		date = new CalendarDate(_element.getAttribute("endDate").getValue());
     	}
     	else if (getParentId() != null) {
     		Util.debug("Parent End Date");
