@@ -63,6 +63,7 @@ public class TaskPanel extends JPanel {
     JButton removeProcessB = new JButton();
     JButton timer = new JButton();
 	JCheckBoxMenuItem ppShowActiveOnlyChB = new JCheckBoxMenuItem();
+        JCheckBoxMenuItem ppCalendarSort = new JCheckBoxMenuItem();
 		
     JScrollPane scrollPane = new JScrollPane();
     TaskTable taskTable = new TaskTable();
@@ -330,6 +331,23 @@ public class TaskPanel extends JPanel {
 		ppShowActiveOnlyChB.setSelected(isShao);
 		toggleShowActiveOnly_actionPerformed(null);
 
+                ppCalendarSort.setFont(new java.awt.Font("Dialog", 1, 11));
+		ppCalendarSort.setText(
+			Local.getString("View by date"));
+		ppCalendarSort.addActionListener(
+				new java.awt.event.ActionListener() {
+			public void actionPerformed(ActionEvent event) {
+				toggleShowByDate_actionPerformed(event);
+			}
+
+            
+		});		
+		boolean isDateOnly =
+				(Context.get("SHOW_BY_DATE_ONLY") != null)
+					&& (Context.get("SHOW_BY_DATE_ONLY").equals("true"));
+			ppCalendarSort.setSelected(isDateOnly);
+			toggleShowActiveOnly_actionPerformed(null);
+			
 		/*showActiveOnly.setPreferredSize(new Dimension(24, 24));
 		showActiveOnly.setRequestFocusEnabled(false);
 		if (taskTable.isShowActiveOnly()) {
@@ -534,14 +552,14 @@ public class TaskPanel extends JPanel {
     taskPPMenu.add(ppEditTask);
     
     taskPPMenu.addSeparator();
-    taskPPMenu.add(ppNewTask);
-    taskPPMenu.add(ppAddSubTask);
-    taskPPMenu.add(ppRemoveTask);
+        taskPPMenu.add(ppNewTask);
+        taskPPMenu.add(ppAddSubTask);
+        taskPPMenu.add(ppRemoveTask);
     
     taskPPMenu.addSeparator();
 	taskPPMenu.add(ppCompleteTask);
 	taskPPMenu.add(ppCalcTask);
-	
+    
     //taskPPMenu.addSeparator();
     
     //taskPPMenu.add(ppSubTasks);
@@ -551,8 +569,10 @@ public class TaskPanel extends JPanel {
     
     taskPPMenu.addSeparator();
 	taskPPMenu.add(ppShowActiveOnlyChB);
+        
+    taskPPMenu.addSeparator();
+        taskPPMenu.add(ppCalendarSort);
 
-	
 		// define key actions in TaskPanel:
 		// - KEY:DELETE => delete tasks (recursivly).
 		// - KEY:INTERT => insert new Subtask if another is selected.
@@ -1186,14 +1206,30 @@ public class TaskPanel extends JPanel {
 			}
 		}
 	}
-
+        
+        void toggleShowByDate_actionPerformed(ActionEvent event) {
+            Context.put("SHOW_BY_DATE_ONLY", new Boolean(ppCalendarSort.isSelected()));            
+            if (ppCalendarSort.isSelected()) {
+            	ppShowActiveOnlyChB.setSelected(false);
+            	Context.put(
+            			"SHOW_ACTIVE_TASKS_ONLY",
+            			new Boolean(ppShowActiveOnlyChB.isSelected()));
+            }
+            taskTable.tableChanged();
+            }
+        
 	// toggle "show active only"
-	void toggleShowActiveOnly_actionPerformed(ActionEvent e) {
+	void toggleShowActiveOnly_actionPerformed(ActionEvent event) {
 		Context.put(
 			"SHOW_ACTIVE_TASKS_ONLY",
 			new Boolean(ppShowActiveOnlyChB.isSelected()));
+		
+		if (ppShowActiveOnlyChB.isSelected()) {
+			ppCalendarSort.setSelected(false);
+            Context.put("SHOW_BY_DATE_ONLY", new Boolean(ppCalendarSort.isSelected()));    
+		}
 		taskTable.tableChanged();
-	}
+            }
 
     class PopupListener extends MouseAdapter {
 

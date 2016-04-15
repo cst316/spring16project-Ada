@@ -180,6 +180,25 @@ public class TaskListImpl implements TaskList {
     	
     	return taskTypes;
     }
+    
+    public Collection<Task> getTasksByDate(CalendarDate date, boolean includeProcessTasks) {
+    	Collection<Task> allTasks;
+    	if (includeProcessTasks) {
+    		allTasks = getTopLevelTasks();
+    	} else {
+    		allTasks = getTopLevelNoProcessTasks();
+    	}
+    	
+    	ArrayList<Task> tasks = new ArrayList<Task>();
+    	
+    	for (Task task : allTasks) {
+    		if (date.inPeriod(task.getStartDate(), task.getEndDate())) {
+    			tasks.add(task);
+    		}
+    	}
+    	
+    	return tasks;
+    }
 
     public Task createTask(CalendarDate startDate, CalendarDate endDate, String text, String type, int priority, long effort, String description, String parentTaskId) {
         Element el = new Element("task");

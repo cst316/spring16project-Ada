@@ -4,6 +4,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.util.Collection;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -68,5 +70,37 @@ public class ProcessListTest {
 		sizeTwo = pl.getActiveProcesses(today).size();
 		
 		assertTrue((sizeOne - sizeTwo) >= 2);
+	}
+	
+	@Test
+	public void testGetProcessesByDate() {
+		Collection<Process> result;
+		
+		Process p1 = pl.createProcess("process", 
+				new CalendarDate(20, 4, 2016), 
+				new CalendarDate(29, 4, 2016));
+		Process p2 = pl.createProcess("process", 
+				new CalendarDate(20, 4, 2016), 
+				new CalendarDate(20, 4, 2016));
+		
+		result = pl.getProcessesByDate(new CalendarDate(25, 4, 2016));
+		assertTrue(result.contains(p1));
+		assertFalse(result.contains(p2));
+		
+		result = pl.getProcessesByDate(new CalendarDate(20, 4, 2016));
+		assertTrue(result.contains(p1));
+		assertTrue(result.contains(p2));
+		
+		result = pl.getProcessesByDate(new CalendarDate(29, 4, 2016));
+		assertTrue(result.contains(p1));
+		assertFalse(result.contains(p2));
+		
+		result = pl.getProcessesByDate(new CalendarDate(19, 4, 2016));
+		assertFalse(result.contains(p1));
+		assertFalse(result.contains(p2));
+		
+		result = pl.getProcessesByDate(new CalendarDate(30, 4, 2016));
+		assertFalse(result.contains(p1));
+		assertFalse(result.contains(p2));
 	}
 }

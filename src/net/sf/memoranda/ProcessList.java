@@ -13,4 +13,12 @@ public interface ProcessList {
 	public Collection<Process> getActiveProcesses(CalendarDate date);
 	public Collection<Process> getAllProcesses();
 	public Document getXMLContent();
+	
+    
+    /**
+     * Gets all the Processes that occur on a date.
+     * @param date The date on which Processes occur
+     * @return Collection of Processes
+     */
+    Collection<Process> getProcessesByDate(CalendarDate date);
 }

@@ -27,6 +27,8 @@ import net.sf.memoranda.date.CurrentDate;
 import net.sf.memoranda.date.DateListener;
 import net.sf.memoranda.util.Configuration;
 //import net.sf.memoranda.util.NotesVectorSorter;
+import net.sf.memoranda.util.Context;
+import net.sf.memoranda.util.Util;
 
 /*$Id: NotesList.java,v 1.9 2005/05/05 16:19:16 ivanrise Exp $*/
 public class NotesList extends JList {
@@ -46,6 +48,7 @@ public class NotesList extends JList {
 			sortOrderDesc = true;
 		}
         _type = type;
+
         this.setFont(new java.awt.Font("Dialog", 0, 11));
         this.setModel(new NotesListModel());
         CurrentDate.addDateListener(new DateListener() {
@@ -58,6 +61,12 @@ public class NotesList extends JList {
             public void noteChange(Note n, boolean toSaveCurrentNote) {
                 updateUI();
             }
+        });
+        
+        CurrentDate.addDateListener(new DateListener() {
+        	public void dateChange(CalendarDate date) {
+        		update();
+        	}
         });
 
         CurrentProject.addProjectListener(new ProjectListener() {
@@ -84,13 +93,18 @@ public class NotesList extends JList {
     }
 
     public void update(NoteList nl) {
-        if (_type == ALL)
-            notes = (Vector) nl.getAllNotes();
-        else
-            notes = (Vector) nl.getMarkedNotes();
+        if (_type == ALL) {
+        	if (showByDateOnly()) {
+        		CalendarDate date = CurrentDate.get();
+        		notes = (Vector) nl.getNotesForDate(date);
+        	} else {
+        		Util.debug("show all notes");
+        		notes = (Vector) nl.getAllNotes();
+        	}
+        } else {
+        	notes = (Vector) nl.getMarkedNotes();
+        }
         
-//        Util.debug("No. of notes in noteList " + notes.size());
-        //NotesVectorSorter.sort(notes);
 		Collections.sort(notes);
 		if (sortOrderDesc) {
 			Collections.reverse(notes);		    
@@ -175,7 +189,11 @@ public class NotesListModel extends AbstractListModel {
      }
     };
 
+
  }
 
-
+    private boolean showByDateOnly() {
+    	Object showByDateOnly = Configuration.get("NOTES_BY_DATE");
+    	return (showByDateOnly != null ? showByDateOnly.toString().equals("true") : false);
+    }
 }
