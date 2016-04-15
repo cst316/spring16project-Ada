@@ -215,7 +215,7 @@ public class EventsPanel extends JPanel {
 		eventsTable.addKeyListener(new KeyListener() {
 			public void keyPressed(KeyEvent e){
 				if(eventsTable.getSelectedRows().length>0 
-					&& e.getKeyCode()==KeyEvent.VK_DELETE)
+					&& (e.getKeyCode()==KeyEvent.VK_DELETE || e.getKeyCode() == KeyEvent.VK_BACK_SPACE))
 					ppRemoveEvent_actionPerformed(null);
 			}
 			public void	keyReleased(KeyEvent e){}

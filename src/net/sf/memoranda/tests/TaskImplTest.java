@@ -68,7 +68,10 @@ public class TaskImplTest {
 	public void testDatesWithProcess() {
 		CalendarDate yesterday = new CalendarDate(1, 3, 2016);
 		CalendarDate today = new CalendarDate(2, 3, 2016);
-		Process process = processList.createProcess("test", yesterday, yesterday);
+		Process process = processList.createProcess(
+				"test",
+				yesterday,
+				yesterday);
 		Task task = taskList.createTask(
 				today,
 				today,

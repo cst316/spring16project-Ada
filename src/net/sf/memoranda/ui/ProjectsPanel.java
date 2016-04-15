@@ -315,7 +315,7 @@ public class ProjectsPanel extends JPanel implements ExpandablePanel {
 			prjTablePanel.projectsTable.addKeyListener(new KeyListener() {
 				public void keyPressed(KeyEvent e){
 					if(prjTablePanel.projectsTable.getSelectedRows().length>0 
-						&& e.getKeyCode()==KeyEvent.VK_DELETE)
+						&& (e.getKeyCode()==KeyEvent.VK_DELETE || e.getKeyCode()==KeyEvent.VK_BACK_SPACE))
 						ppDeleteProject_actionPerformed(null);
 				}
 				public void	keyReleased(KeyEvent e){}

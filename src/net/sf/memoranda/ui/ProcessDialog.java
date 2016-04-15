@@ -74,8 +74,8 @@ public class ProcessDialog extends JDialog {
 	}
 	
 	private void jbInit(CalendarDate startDate, CalendarDate endDate) {
-		this.setResizable(false);
-		defaultBorder = BorderFactory.createEmptyBorder(3, 3, 3, 3);
+		this.setResizable(true);
+		defaultBorder = BorderFactory.createEmptyBorder(25, 25, 25, 25);
 		
 		drawNamePanel();
 		

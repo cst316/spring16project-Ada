@@ -8,15 +8,16 @@
  */
 package net.sf.memoranda;
 
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.List;
 import java.util.Vector;
-import java.util.ArrayList;
-import java.util.Calendar;
 
 import net.sf.memoranda.date.CalendarDate;
 import net.sf.memoranda.date.CurrentDate;
 import net.sf.memoranda.util.LogPair;
+import net.sf.memoranda.util.Util;
 import nu.xom.Attribute;
 import nu.xom.Element;
 import nu.xom.Elements;
@@ -61,21 +62,30 @@ public class TaskImpl implements Task, Comparable {
     }
 
     public CalendarDate getEndDate() {
-    	Process p = getProcess();
-    	if (p != null) {
-    		return p.getEndDate();
+    	CalendarDate date;
+    	
+    	if (getProcess() != null) {
+    		Util.debug("Process End Date");
+    		date = getProcess().getEndDate();
     	}
-		String ed = _element.getAttribute("endDate").getValue();
-		if (ed != "")
-			return new CalendarDate(_element.getAttribute("endDate").getValue());
-		Task parent = this.getParentTask();
-		if (parent != null)
-			return parent.getEndDate();
-		Project pr = this._tl.getProject();
-		if (pr.getEndDate() != null)
-			return pr.getEndDate();
-		return this.getStartDate();
+    	else if (_element.getAttribute("enddate") != null) {
+    		Util.debug("Task End Date");
+    		date = new CalendarDate(_element.getAttribute("enddate").getValue());
+    	}
+    	else if (getParentId() != null) {
+    		Util.debug("Parent End Date");
+    		date = getParentTask().getEndDate();
+    	}
+    	else if (_tl.getProject().getEndDate() != null) {
+    		Util.debug("Project End Date");
+    		date = _tl.getProject().getEndDate();
+    	}
+    	else {
+    		Util.debug("No End Date");
+    		date = getStartDate();
+    	}
         
+    	return date;
     }
 
     public void setEndDate(CalendarDate date) {

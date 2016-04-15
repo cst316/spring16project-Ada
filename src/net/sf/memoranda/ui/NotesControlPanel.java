@@ -197,7 +197,7 @@ public class NotesControlPanel extends JPanel {
 		// remove notes using the DEL key
 		KeyListener delNotes = new KeyListener() {
 			public void keyPressed(KeyEvent e){
-				if(e.getKeyCode()==KeyEvent.VK_DELETE) {
+				if(e.getKeyCode()==KeyEvent.VK_DELETE || e.getKeyCode() == KeyEvent.VK_BACK_SPACE) {
 					ppClearNote_actionPerformed(null);
 				}
 			}

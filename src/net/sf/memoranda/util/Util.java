@@ -5,12 +5,16 @@
  *
  * @author Alex V. Alishevskikh, alex@openmechanics.net
  * Copyright (c) 2003 Memoranda team: http://memoranda.sf.net
+ * @editor Micah Mehan
  */
 package net.sf.memoranda.util;
+import java.awt.Desktop;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Calendar;
 import java.util.HashSet;
 import java.util.Set;
@@ -23,6 +27,9 @@ import net.sf.memoranda.ui.App;
 import net.sf.memoranda.ui.AppFrame;
 import net.sf.memoranda.ui.ExceptionDialog;
 import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -93,22 +100,26 @@ public class Util {
       return "<![CDATA["+s+"]]>";
     }
     
-    public static void runBrowser(String url) {
-        if (!checkBrowser())
+    public static void runBrowser(String url) throws IOException {
+        if (!checkBrowser()){
             return;
-        String commandLine = MimeTypesList.getAppList().getBrowserExec()+" "+url;
-        System.out.println("Run: " + commandLine);
-        try {
-            /*DEBUG*/
-            Runtime.getRuntime().exec(commandLine);
         }
-        catch (Exception ex) {
-            new ExceptionDialog(ex, "Failed to run an external web-browser application with commandline<br><code>"
-                    +commandLine+"</code>", "Check the application path and command line parameters " +
-                    		"(File-&gt;Preferences-&gt;Resource types).");
+        else{
+            //imported java.awt.desktop, should be fine
+            if(Desktop.isDesktopSupported()){
+        try {
+            //gets your desktop's default web browser, and sends in the url
+            Desktop.getDesktop().browse(new URI(url));
+         } catch (URISyntaxException ex) {
+            Logger.getLogger(Util.class.getName()).log(Level.SEVERE, null, ex);
+         }
+      } else {
+                //if your browser can't view this webpage, get a new browser.
+         JOptionPane.showMessageDialog(null, "Your browser is not supported", "Browser Error", JOptionPane.ERROR_MESSAGE);
+     
+        }
         }
     }
-    
     public static boolean checkBrowser() {
         AppList appList = MimeTypesList.getAppList();
         String bpath = appList.getBrowserExec();
