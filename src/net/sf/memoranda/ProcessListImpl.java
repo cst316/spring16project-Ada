@@ -117,4 +117,17 @@ public class ProcessListImpl implements ProcessList {
 	public Document getXMLContent() {
 		return document;
 	}
+	
+	public Collection<Process> getProcessesByDate(CalendarDate date) {
+    	Collection<Process> allProcesses = getAllProcesses();
+    	ArrayList<Process> processes = new ArrayList<Process>();
+    	
+    	for (Process process : allProcesses) {
+    		if (date.inPeriod(process.getStartDate(), process.getEndDate())) {
+    			processes.add(process);
+    		}
+    	}
+    	
+    	return processes;
+	}
 }

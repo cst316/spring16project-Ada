@@ -54,7 +54,7 @@ public class NotesControlPanel extends JPanel {
     JPopupMenu notesPPMenu = new JPopupMenu();
     JMenuItem ppOpenNote = new JMenuItem();
     JMenuItem ppRemoveBkmrk = new JMenuItem();
-
+    JMenuItem ppViewByDate = new JCheckBoxMenuItem();
 	
     public NotesControlPanel() {
         try {
@@ -140,6 +140,18 @@ public class NotesControlPanel extends JPanel {
 			(Configuration.get("NOTES_SORT_ORDER").equals("true"));
 		ppInvertSort.setSelected(descSort);
 		
+		ppViewByDate.setFont(new java.awt.Font("Dialog", 1, 11));
+		ppViewByDate.setText(Local.getString("View By Date"));
+		ppViewByDate.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+            	ppViewByDate_actionPerformed(event);
+            }
+        });
+		ppViewByDate.setEnabled(true);
+		boolean viewByDate =
+			(Configuration.get("NOTES_BY_DATE").equals("true"));
+		ppViewByDate.setSelected(viewByDate);
+		
         ppRemoveBkmrk.setFont(new java.awt.Font("Dialog", 1, 11));
         ppRemoveBkmrk.setText(Local.getString("Remove bookmark"));
         ppRemoveBkmrk.addActionListener(new java.awt.event.ActionListener() {
@@ -179,6 +191,8 @@ public class NotesControlPanel extends JPanel {
         notesPPMenu.add(ppRemoveBkmrk);
         notesPPMenu.addSeparator();
         notesPPMenu.add(ppClearNote);
+        notesPPMenu.addSeparator();
+        notesPPMenu.add(ppViewByDate);
 
 		// remove notes using the DEL key
 		KeyListener delNotes = new KeyListener() {
@@ -322,6 +336,14 @@ public class NotesControlPanel extends JPanel {
 		Configuration.saveConfig();
         notesList.invertSortOrder();
         notesList.update();
+    }
+    
+    void ppViewByDate_actionPerformed(ActionEvent event) {
+    	Configuration.put(
+    			"NOTES_BY_DATE",
+    			new Boolean(ppViewByDate.isSelected()));
+    	Configuration.saveConfig();
+    	notesList.update();
     }
 
     void ppRemoveBkmrk_actionPerformed(ActionEvent e) {

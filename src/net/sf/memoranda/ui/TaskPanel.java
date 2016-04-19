@@ -61,8 +61,9 @@ public class TaskPanel extends JPanel {
     JButton editProcessB = new JButton();
     JButton addProcessTaskB = new JButton();
     JButton removeProcessB = new JButton();
-    
+    JButton timer = new JButton();
 	JCheckBoxMenuItem ppShowActiveOnlyChB = new JCheckBoxMenuItem();
+        JCheckBoxMenuItem ppCalendarSort = new JCheckBoxMenuItem();
 		
     JScrollPane scrollPane = new JScrollPane();
     TaskTable taskTable = new TaskTable();
@@ -110,7 +111,8 @@ public class TaskPanel extends JPanel {
         historyForwardB.setText("");
 
         newTaskB.setIcon(
-            new ImageIcon(net.sf.memoranda.ui.AppFrame.class.getResource("resources/icons/todo_new.png")));
+            new ImageIcon(net.sf.memoranda.ui.AppFrame.class.getResource(
+            		"resources/icons/todo_new.png")));
         newTaskB.setEnabled(true);
         newTaskB.setMaximumSize(new Dimension(24, 24));
         newTaskB.setMinimumSize(new Dimension(24, 24));
@@ -119,14 +121,15 @@ public class TaskPanel extends JPanel {
         newTaskB.setPreferredSize(new Dimension(24, 24));
         newTaskB.setFocusable(false);
         newTaskB.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                newTaskB_actionPerformed(e);
+            public void actionPerformed(ActionEvent event) {
+                newTaskB_actionPerformed(event);
             }
         });
         newTaskB.setBorderPainted(false);
         
         subTaskB.setIcon(
-            new ImageIcon(net.sf.memoranda.ui.AppFrame.class.getResource("resources/icons/todo_new_sub.png")));
+            new ImageIcon(net.sf.memoranda.ui.AppFrame.class.getResource(
+            		"resources/icons/todo_new_sub.png")));
         subTaskB.setEnabled(true);
         subTaskB.setMaximumSize(new Dimension(24, 24));
         subTaskB.setMinimumSize(new Dimension(24, 24));
@@ -135,8 +138,8 @@ public class TaskPanel extends JPanel {
         subTaskB.setPreferredSize(new Dimension(24, 24));
         subTaskB.setFocusable(false);
         subTaskB.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                addSubTask_actionPerformed(e);
+            public void actionPerformed(ActionEvent event) {
+                addSubTask_actionPerformed(event);
             }
         });
         subTaskB.setBorderPainted(false);
@@ -144,8 +147,8 @@ public class TaskPanel extends JPanel {
         editTaskB.setBorderPainted(false);
         editTaskB.setFocusable(false);
         editTaskB.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                editTaskB_actionPerformed(e);
+            public void actionPerformed(ActionEvent event) {
+                editTaskB_actionPerformed(event);
             }
         });
         editTaskB.setPreferredSize(new Dimension(24, 24));
@@ -153,15 +156,15 @@ public class TaskPanel extends JPanel {
         editTaskB.setToolTipText(Local.getString("Edit task"));
         editTaskB.setMinimumSize(new Dimension(24, 24));
         editTaskB.setMaximumSize(new Dimension(24, 24));
-//        editTaskB.setEnabled(true);
         editTaskB.setIcon(
-            new ImageIcon(net.sf.memoranda.ui.AppFrame.class.getResource("resources/icons/todo_edit.png")));
+            new ImageIcon(net.sf.memoranda.ui.AppFrame.class.getResource(
+            		"resources/icons/todo_edit.png")));
 
         removeTaskB.setBorderPainted(false);
         removeTaskB.setFocusable(false);
         removeTaskB.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                removeTaskB_actionPerformed(e);
+            public void actionPerformed(ActionEvent event) {
+                removeTaskB_actionPerformed(event);
             }
         });
         removeTaskB.setPreferredSize(new Dimension(24, 24));
@@ -170,13 +173,14 @@ public class TaskPanel extends JPanel {
         removeTaskB.setMinimumSize(new Dimension(24, 24));
         removeTaskB.setMaximumSize(new Dimension(24, 24));
         removeTaskB.setIcon(
-            new ImageIcon(net.sf.memoranda.ui.AppFrame.class.getResource("resources/icons/todo_remove.png")));
+            new ImageIcon(net.sf.memoranda.ui.AppFrame.class.getResource(
+            		"resources/icons/todo_remove.png")));
         
         completeTaskB.setBorderPainted(false);
         completeTaskB.setFocusable(false);
         completeTaskB.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                ppCompleteTask_actionPerformed(e);
+            public void actionPerformed(ActionEvent event) {
+                ppCompleteTask_actionPerformed(event);
             }
         });
         completeTaskB.setPreferredSize(new Dimension(24, 24));
@@ -185,7 +189,8 @@ public class TaskPanel extends JPanel {
         completeTaskB.setMinimumSize(new Dimension(24, 24));
         completeTaskB.setMaximumSize(new Dimension(24, 24));
         completeTaskB.setIcon(
-            new ImageIcon(net.sf.memoranda.ui.AppFrame.class.getResource("resources/icons/todo_complete.png")));
+            new ImageIcon(net.sf.memoranda.ui.AppFrame.class.getResource(
+            		"resources/icons/todo_complete.png")));
 
         editTemplateB.setBorderPainted(false);
         editTemplateB.setFocusable(false);
@@ -204,7 +209,8 @@ public class TaskPanel extends JPanel {
             		"resources/icons/template_edit.png")));
 
         newProcessB.setIcon(
-                new ImageIcon(net.sf.memoranda.ui.AppFrame.class.getResource("resources/icons/process_new.png")));
+                new ImageIcon(net.sf.memoranda.ui.AppFrame.class.getResource(
+                		"resources/icons/process_new.png")));
         newProcessB.setEnabled(true);
         newProcessB.setMaximumSize(new Dimension(24, 24));
         newProcessB.setMinimumSize(new Dimension(24, 24));
@@ -213,14 +219,15 @@ public class TaskPanel extends JPanel {
         newProcessB.setPreferredSize(new Dimension(24, 24));
         newProcessB.setFocusable(false);
         newProcessB.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-            	newProcessB_actionPerformed(e);
+            public void actionPerformed(ActionEvent event) {
+            	newProcessB_actionPerformed(event);
             }
         });
         newProcessB.setBorderPainted(false);
         
         editProcessB.setIcon(
-                new ImageIcon(net.sf.memoranda.ui.AppFrame.class.getResource("resources/icons/todo_edit.png")));
+                new ImageIcon(net.sf.memoranda.ui.AppFrame.class.getResource(
+                		"resources/icons/todo_edit.png")));
         editProcessB.setEnabled(false);
         editProcessB.setMaximumSize(new Dimension(24, 24));
         editProcessB.setMinimumSize(new Dimension(24, 24));
@@ -229,14 +236,15 @@ public class TaskPanel extends JPanel {
         editProcessB.setPreferredSize(new Dimension(24, 24));
         editProcessB.setFocusable(false);
         editProcessB.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-            	editProcessB_actionPerformed(e);
+            public void actionPerformed(ActionEvent event) {
+            	editProcessB_actionPerformed(event);
             }
         });
         editProcessB.setBorderPainted(false);
         
         addProcessTaskB.setIcon(
-                new ImageIcon(net.sf.memoranda.ui.AppFrame.class.getResource("resources/icons/todo_new.png")));
+                new ImageIcon(net.sf.memoranda.ui.AppFrame.class.getResource(
+                		"resources/icons/todo_new.png")));
         addProcessTaskB.setEnabled(false);
         addProcessTaskB.setMaximumSize(new Dimension(24, 24));
         addProcessTaskB.setMinimumSize(new Dimension(24, 24));
@@ -245,8 +253,8 @@ public class TaskPanel extends JPanel {
         addProcessTaskB.setPreferredSize(new Dimension(24, 24));
         addProcessTaskB.setFocusable(false);
         addProcessTaskB.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-            	addProcessTaskB_actionPerformed(e);
+            public void actionPerformed(ActionEvent event) {
+            	addProcessTaskB_actionPerformed(event);
             }
         });
         addProcessTaskB.setBorderPainted(false);
@@ -267,6 +275,24 @@ public class TaskPanel extends JPanel {
             }
         });
         removeProcessB.setBorderPainted(false);
+        
+        timer.setBorderPainted(false);
+        timer.setFocusable(false);
+        timer.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                timer_actionPerformed(event);
+            }
+        });
+        timer.setPreferredSize(new Dimension(24, 24));
+        timer.setRequestFocusEnabled(false);
+        timer.setToolTipText(Local.getString("Timer"));
+        timer.setMinimumSize(new Dimension(24, 24));
+        timer.setMaximumSize(new Dimension(24, 24));
+        timer.setIcon(
+            new ImageIcon(
+            		net.sf.memoranda.ui.AppFrame.class.getResource(
+            				"resources/icons/notify.png")));
+        timer.setEnabled(false);
             
 		// added by rawsushi
 //		showActiveOnly.setBorderPainted(false);
@@ -305,6 +331,23 @@ public class TaskPanel extends JPanel {
 		ppShowActiveOnlyChB.setSelected(isShao);
 		toggleShowActiveOnly_actionPerformed(null);
 
+                ppCalendarSort.setFont(new java.awt.Font("Dialog", 1, 11));
+		ppCalendarSort.setText(
+			Local.getString("View by date"));
+		ppCalendarSort.addActionListener(
+				new java.awt.event.ActionListener() {
+			public void actionPerformed(ActionEvent event) {
+				toggleShowByDate_actionPerformed(event);
+			}
+
+            
+		});		
+		boolean isDateOnly =
+				(Context.get("SHOW_BY_DATE_ONLY") != null)
+					&& (Context.get("SHOW_BY_DATE_ONLY").equals("true"));
+			ppCalendarSort.setSelected(isDateOnly);
+			toggleShowActiveOnly_actionPerformed(null);
+			
 		/*showActiveOnly.setPreferredSize(new Dimension(24, 24));
 		showActiveOnly.setRequestFocusEnabled(false);
 		if (taskTable.isShowActiveOnly()) {
@@ -420,6 +463,8 @@ public class TaskPanel extends JPanel {
         tasksToolBar.add(editProcessB, null);
         tasksToolBar.add(addProcessTaskB, null);
         tasksToolBar.add(removeProcessB, null);
+        tasksToolBar.addSeparator(new Dimension(8, 24));
+        tasksToolBar.add(timer, null);
 
 		//tasksToolBar.add(showActiveOnly, null);
         
@@ -463,6 +508,7 @@ public class TaskPanel extends JPanel {
                 ppEditTask.setEnabled(taskSelected);
                 removeTaskB.setEnabled(taskSelected);
                 ppRemoveTask.setEnabled(taskSelected);
+                timer.setEnabled(taskSelected);
 				
 				ppCompleteTask.setEnabled(taskSelected);
 				completeTaskB.setEnabled(taskSelected);
@@ -506,14 +552,14 @@ public class TaskPanel extends JPanel {
     taskPPMenu.add(ppEditTask);
     
     taskPPMenu.addSeparator();
-    taskPPMenu.add(ppNewTask);
-    taskPPMenu.add(ppAddSubTask);
-    taskPPMenu.add(ppRemoveTask);
+        taskPPMenu.add(ppNewTask);
+        taskPPMenu.add(ppAddSubTask);
+        taskPPMenu.add(ppRemoveTask);
     
     taskPPMenu.addSeparator();
 	taskPPMenu.add(ppCompleteTask);
 	taskPPMenu.add(ppCalcTask);
-	
+    
     //taskPPMenu.addSeparator();
     
     //taskPPMenu.add(ppSubTasks);
@@ -523,8 +569,10 @@ public class TaskPanel extends JPanel {
     
     taskPPMenu.addSeparator();
 	taskPPMenu.add(ppShowActiveOnlyChB);
+        
+    taskPPMenu.addSeparator();
+        taskPPMenu.add(ppCalendarSort);
 
-	
 		// define key actions in TaskPanel:
 		// - KEY:DELETE => delete tasks (recursivly).
 		// - KEY:INTERT => insert new Subtask if another is selected.
@@ -1157,14 +1205,30 @@ public class TaskPanel extends JPanel {
 			}
 		}
 	}
-
+        
+        void toggleShowByDate_actionPerformed(ActionEvent event) {
+            Context.put("SHOW_BY_DATE_ONLY", new Boolean(ppCalendarSort.isSelected()));            
+            if (ppCalendarSort.isSelected()) {
+            	ppShowActiveOnlyChB.setSelected(false);
+            	Context.put(
+            			"SHOW_ACTIVE_TASKS_ONLY",
+            			new Boolean(ppShowActiveOnlyChB.isSelected()));
+            }
+            taskTable.tableChanged();
+            }
+        
 	// toggle "show active only"
-	void toggleShowActiveOnly_actionPerformed(ActionEvent e) {
+	void toggleShowActiveOnly_actionPerformed(ActionEvent event) {
 		Context.put(
 			"SHOW_ACTIVE_TASKS_ONLY",
 			new Boolean(ppShowActiveOnlyChB.isSelected()));
+		
+		if (ppShowActiveOnlyChB.isSelected()) {
+			ppCalendarSort.setSelected(false);
+            Context.put("SHOW_BY_DATE_ONLY", new Boolean(ppCalendarSort.isSelected()));    
+		}
 		taskTable.tableChanged();
-	}
+            }
 
     class PopupListener extends MouseAdapter {
 
@@ -1215,29 +1279,37 @@ public class TaskPanel extends JPanel {
 
     }
 
-  void ppEditTask_actionPerformed(ActionEvent e) {
-    editTaskB_actionPerformed(e);
+  void ppEditTask_actionPerformed(ActionEvent event) {
+    editTaskB_actionPerformed(event);
   }
-  void ppRemoveTask_actionPerformed(ActionEvent e) {
-    removeTaskB_actionPerformed(e);
+  void ppRemoveTask_actionPerformed(ActionEvent event) {
+    removeTaskB_actionPerformed(event);
   }
-  void ppNewTask_actionPerformed(ActionEvent e) {
-    newTaskB_actionPerformed(e);
-  }
-
-  void ppAddSubTask_actionPerformed(ActionEvent e) {
-  	addSubTask_actionPerformed(e);
+  void ppNewTask_actionPerformed(ActionEvent event) {
+    newTaskB_actionPerformed(event);
   }
 
-  void ppListSubTasks_actionPerformed(ActionEvent e) {
-  	listSubTasks_actionPerformed(e);
+  void ppAddSubTask_actionPerformed(ActionEvent event) {
+  	addSubTask_actionPerformed(event);
   }
 
-  void ppParentTask_actionPerformed(ActionEvent e) {
-  	parentTask_actionPerformed(e);
+  void ppListSubTasks_actionPerformed(ActionEvent event) {
+  	listSubTasks_actionPerformed(event);
   }
 
-  void ppCalcTask_actionPerformed(ActionEvent e) {
-      calcTask_actionPerformed(e);
+  void ppParentTask_actionPerformed(ActionEvent event) {
+  	parentTask_actionPerformed(event);
+  }
+
+  void ppCalcTask_actionPerformed(ActionEvent event) {
+      calcTask_actionPerformed(event);
+  }
+  private void timer_actionPerformed(ActionEvent event) {
+	  Task task = (Task) taskTable.getModel().getValueAt(
+				taskTable.getSelectedRow(),
+				TaskTable.TASK);
+	  TimerDialog dialog = new TimerDialog(task);
+	  dialog.setLocationRelativeTo(this);
+	  dialog.setVisible(true);
   }
 }
