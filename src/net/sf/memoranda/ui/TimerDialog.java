@@ -42,6 +42,7 @@ public class TimerDialog extends JDialog {
 	private JButton startStopButton;
 	private JButton resetButton;
 	private JButton logButton;
+	private JButton cancelButton;
 	private boolean timerLogged;
 	
 	public TimerDialog(Task task) {
@@ -135,6 +136,7 @@ public class TimerDialog extends JDialog {
 		startStopButton = new JButton(Local.getString("Start"));
 		resetButton = new JButton(Local.getString("Reset"));
 		logButton = new JButton(Local.getString("Log"));
+		cancelButton = new JButton(Local.getString("Cancel"));
 		logButton.setEnabled(false);
 		
 		startStopButton.addActionListener(new ActionListener() {
@@ -159,10 +161,18 @@ public class TimerDialog extends JDialog {
 				logButton_actionPerformed(event);
 			}
 		});
+		
+		cancelButton.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent event) {
+				TimerDialog.this.dispose();
+			}
+		});
                 
 		buttonsPanel.add(startStopButton);
 		buttonsPanel.add(resetButton);
 		buttonsPanel.add(logButton);
+		buttonsPanel.add(cancelButton);
 		this.getContentPane().add(buttonsPanel, BorderLayout.SOUTH);
 	}
 	
