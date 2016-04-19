@@ -1056,49 +1056,9 @@ public class TaskPanel extends JPanel {
 		
 		// Check if process has tasks
 		if (selectedProcess.getTasks().size() > 0) {
-			// Text for JOptionPane buttons
-			String[] options = new String[2];
-			options[0] = new String(Local.getString("Delete"));
-			options[1] = new String(Local.getString("Keep"));
-					
-			int selection = JOptionPane.
-					showOptionDialog(App.getFrame(), 
-							Local.getString("Delete or Keep Tasks?"), 
-							Local.getString(selectedProcess.getName()), 
-							0, 
-							JOptionPane.INFORMATION_MESSAGE, 
-							null, 
-							options, 
-							null);
-			
-			Util.debug("You selected: " + selection);
-			
-			// All tasks within Process
-			Collection<Task> processTasks = CurrentProject.
-					getProcessList().
-					getProcess(selectedProcess.getID()).getTasks();
-			
-			if (selection == 0) { // Delete Tasks
-				for (Task t : processTasks) {
-	    			CurrentProject.getTaskList().removeTask(t);
-				}
-			} else if (selection == 1) { // Remove Tasks from Process
-				for (Task t : processTasks) {
-	    			selectedProcess.removeTask(t.getID());
-				}
-			} else {
-				delete = false;
-			}
+			delete = showRemoveProcessWithTasksDialog(selectedProcess);
 		} else {
-			// Confirm deletion
-			int choice = JOptionPane.showConfirmDialog(App.getFrame(), 
-					Local.getString("Do you want to delete this process?"), 
-					Local.getString("Remove Process"),
-					JOptionPane.YES_NO_OPTION);
-			
-			if (choice != JOptionPane.YES_OPTION) {
-				delete = false;
-			}
+			delete = showRemoveProcessNoTasksDialog();
 		}
 		
 		if (delete) {
@@ -1113,6 +1073,59 @@ public class TaskPanel extends JPanel {
 		CurrentStorage.get().storeProcessList(CurrentProject.getProcessList(), 
 				CurrentProject.get());
 		parentPanel.updateIndicators();
+	}
+	
+	private boolean showRemoveProcessWithTasksDialog(Process selectedProcess) {
+		boolean delete = true;
+		// Text for JOptionPane buttons
+		String[] options = new String[3];
+		options[0] = new String(Local.getString("Delete"));
+		options[1] = new String(Local.getString("Keep"));
+		options[2] = new String(Local.getString("Cancel"));
+				
+		int selection = JOptionPane.
+				showOptionDialog(App.getFrame(), 
+						Local.getString("Delete or Keep Tasks?"), 
+						Local.getString(selectedProcess.getName()), 
+						0, 
+						JOptionPane.INFORMATION_MESSAGE, 
+						null, 
+						options, 
+						null);
+		
+		Util.debug("You selected: " + selection);
+		
+		// All tasks within Process
+		Collection<Task> processTasks = CurrentProject.
+				getProcessList().
+				getProcess(selectedProcess.getID()).getTasks();
+		
+		if (selection == 0) { // Delete Tasks
+			for (Task t : processTasks) {
+				CurrentProject.getTaskList().removeTask(t);
+			}
+		} else if (selection == 1) { // Remove Tasks from Process
+			for (Task t : processTasks) {
+				selectedProcess.removeTask(t.getID());
+			}
+		} else {
+			delete = false;
+		}
+		return delete;
+	}
+
+	private boolean showRemoveProcessNoTasksDialog() {
+		boolean delete = true;
+		// Confirm deletion
+		int choice = JOptionPane.showConfirmDialog(App.getFrame(), 
+				Local.getString("Do you want to delete this process?"), 
+				Local.getString("Remove Process"),
+				JOptionPane.YES_NO_OPTION);
+		
+		if (choice != JOptionPane.YES_OPTION) {
+			delete = false;
+		}
+		return delete;
 	}
 	
 	// US-3 Task 49: Create add task wizard
