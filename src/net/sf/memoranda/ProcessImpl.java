@@ -63,16 +63,23 @@ public class ProcessImpl implements Process {
 		int progress = 0;
 		long progressSum = 0;
 		long effortSum = 0;
+                long numTasks = 0;
+                long numTasksCompleted = 0;
 		Collection<Task> tasks = getTasks();
 		
 		for (Task t : tasks) {
 			progressSum += (t.getEffort() * t.getProgress()) / 100L;
 			effortSum += t.getEffort();
+                        numTasks += 1;
+                        if (t.getProgress() == 100){
+                            numTasksCompleted += 1;
+                        }
 		}
-		
 		if (effortSum != 0) {
 			progress = (int) ((100 * progressSum) / effortSum);
-		}
+		}else if (effortSum == 0 && numTasks != 0){
+                    progress = ((int) (100 * numTasksCompleted / numTasks));
+                }
 		
 		return progress;
 	}
